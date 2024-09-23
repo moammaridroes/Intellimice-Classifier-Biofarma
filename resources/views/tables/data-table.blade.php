@@ -51,11 +51,19 @@
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <ul class="nav">
           <li class="nav-item">
-            <a class="nav-link" href="{{ url('/') }}">
+            <a class="nav-link" href="{{ url('dashboard') }}">
               <i class="icon-grid menu-icon"></i>
               <span class="menu-title">Home</span>
             </a>
           </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url('/notification') }}">
+              <i class="ti-bell menu-icon"></i>
+              <span class="menu-title">Notification</span>
+            </a>
+          </li>
+
           <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
               <i class="icon-columns menu-icon"></i>
@@ -80,7 +88,7 @@
             </a>
             <div class="collapse" id="tables">
               <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link" href="{{ url('datatable') }}">Data Table</a></li>
+                <li class="nav-item"> <a class="nav-link" href="{{ url('stok') }}">Data Table</a></li>
               </ul>
             </div>
           </li>
@@ -88,47 +96,30 @@
       </nav>
       <!-- partial -->
       <div class="main-panel">
-        <div class="content-wrapper">
-          <div class="row">
-            <div class="col-lg-12 grid-margin stretch-card">
-              <div class="card">
-                <div class="card-body">
-                  <h4 class="card-title">Data Collecting</h4>
-                  <div class="table-responsive">
-                    <table class="table">
-                      <thead>
-                        <tr>
-                          <th>NO</th>
-                          <th>DATE</th>
-                          <th>WEIGHT</th>
-                          <th>GENDER</th>
-                          <th>HEALTH STATUS</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-    @foreach($data as $key => $item)
-    <tr>
-        <td>{{ $key + 1 }}</td>
-        <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y') }}</td>
-        <td>{{ $item->berat }}</td>
-        <td>{{ $item->jenis_kelamin }}</td>
-        <td>
-            @if($item->health_status == 'Healthy')
-                <label class="badge badge-success">Healthy</label>
-            @else
-                <label class="badge badge-danger">Sick</label>
-            @endif
-        </td>
-    </tr>
-    @endforeach
-</tbody>
-
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-        <!-- content-wrapper ends -->
+                <div class="content-wrapper">
+                    <div class="row">
+                        <div class="col-lg-12 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Data Collecting</h4>
+                                    <div class="table-responsive">
+                                        <table class="table" id="data-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>NO</th>
+                                                    <th>DATE</th>
+                                                    <th>WEIGHT</th>
+                                                    <th>GENDER</th>
+                                                    <th>HEALTH STATUS</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                      <!-- content-wrapper ends -->
         <!-- partial:../../partials/_footer.html -->
         <footer class="footer">
           <div class="d-sm-flex justify-content-center justify-content-sm-between">
@@ -157,6 +148,22 @@
   <!-- endinject -->
   <!-- Custom js for this page-->
   <!-- End custom js for this page-->
+  <script>
+        $(document).ready(function() {
+            $('#data-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('detailmencit.data') }}", // Route to fetch data
+                columns: [
+                    { data: 'DT_RowIndex', name: 'DT_RowIndex' },
+                    { data: 'created_at', name: 'created_at' },
+                    { data: 'berat', name: 'berat' },
+                    { data: 'jenis_kelamin', name: 'jenis_kelamin' },
+                    { data: 'health_status', name: 'health_status' },
+                ]
+            });
+        });
+    </script>
 </body>
 
 </html>

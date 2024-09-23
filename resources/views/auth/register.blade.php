@@ -1,60 +1,68 @@
-<x-guest-layout>
-    <x-authentication-card>
-        <x-slot name="logo">
-            <x-authentication-card-logo />
-        </x-slot>
+<!DOCTYPE html>
+<html lang="en">
 
-        <x-validation-errors class="mb-4" />
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Register</title>
 
-        <form method="POST" action="{{ route('register') }}">
-            @csrf
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="vendors/feather/feather.css">
+    <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css">
+    <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
+    <!-- endinject -->
 
-            <div>
-                <x-label for="name" value="{{ __('Name') }}" />
-                <x-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
+    <!-- inject:css -->
+    <link rel="stylesheet" href="css/vertical-layout-light/style.css">
+    <!-- endinject -->
+
+    <link rel="shortcut icon" href="images/logobiofarmakecil.png" />
+</head>
+
+<body>
+    <div class="min-vh-100 d-flex align-items-center justify-content-center bg-light">
+        <div class="bg-white p-4 rounded-lg shadow w-100" style="max-width: 400px;">
+            <div class="text-center mb-4">
+                <img src="images/logobiofarmakecil.png" alt="Biofarma Logo" class="img-fluid" style="height: 100px;">
+                <h2 class="mt-3 text-dark font-weight-bold">Create your account</h2>
             </div>
-
-            <div class="mt-4">
-                <x-label for="email" value="{{ __('Email') }}" />
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            </div>
-
-            <div class="mt-4">
-                <x-label for="password" value="{{ __('Password') }}" />
-                <x-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-            </div>
-
-            <div class="mt-4">
-                <x-label for="password_confirmation" value="{{ __('Confirm Password') }}" />
-                <x-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
-            </div>
-
-            @if (Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature())
-                <div class="mt-4">
-                    <x-label for="terms">
-                        <div class="flex items-center">
-                            <x-checkbox name="terms" id="terms" required />
-
-                            <div class="ms-2">
-                                {!! __('I agree to the :terms_of_service and :privacy_policy', [
-                                        'terms_of_service' => '<a target="_blank" href="'.route('terms.show').'" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">'.__('Terms of Service').'</a>',
-                                        'privacy_policy' => '<a target="_blank" href="'.route('policy.show').'" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">'.__('Privacy Policy').'</a>',
-                                ]) !!}
-                            </div>
-                        </div>
-                    </x-label>
+            <form method="POST" action="/register">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <div class="form-group">
+                    <label for="name" class="text-muted">Name</label>
+                    <input id="name" name="name" type="text" required class="form-control" placeholder="Enter your name">
                 </div>
-            @endif
+                <div class="form-group">
+                    <label for="email" class="text-muted">Email address</label>
+                    <input id="email" name="email" type="email" required class="form-control" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="password" class="text-muted">Password</label>
+                    <input id="password" name="password" type="password" required class="form-control" placeholder="Create a password">
+                </div>
+                <div class="form-group">
+                    <label for="password_confirmation" class="text-muted">Confirm Password</label>
+                    <input id="password_confirmation" name="password_confirmation" type="password" required class="form-control" placeholder="Confirm your password">
+                </div>
+                <!-- <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="form-check d-flex align-items-center">
+                        <input id="terms" name="terms" type="checkbox" class="form-check-input" style="margin-right: 5px;" required>
+                        <label for="terms" class="form-check-label mb-0">I agree to the terms</label>
+                    </div>
+                </div> -->
+                <button type="submit" class="btn btn-primary btn-block">Register</button>
+            </form>
+            <p class="mt-4 text-center text-muted">
+                Already have an account? 
+                <a href="/login" class="text-primary">Sign in here</a>
+            </p>
+        </div>
+    </div>
 
-            <div class="flex items-center justify-end mt-4">
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                    {{ __('Already registered?') }}
-                </a>
+    <!-- plugins:js -->
+    <script src="vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+</body>
 
-                <x-button class="ms-4">
-                    {{ __('Register') }}
-                </x-button>
-            </div>
-        </form>
-    </x-authentication-card>
-</x-guest-layout>
+</html>
