@@ -184,10 +184,13 @@
                 <li class="nav-item"><a class="nav-link" href="{{ url('orderform') }}">Order Forms</a></li>
               </ul>
               <ul class="nav flex-column sub-menu">
-                <li class="nav-item"><a class="nav-link" href="{{ url('orderhistory') }}">Order History</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url('orderhistory') }}">Offline History</a></li>
+              </ul>
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item"><a class="nav-link" href="{{ url('online-history') }}">Online History</a></li>
               </ul>
             </div>
-          </li>
+          </li> 
           
           <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
@@ -205,7 +208,7 @@
 
       <div class="main-panel">
       <div class="content-wrapper">
-        <h4 class="card-title mb-4">Order History</h4>
+        <h4 class="card-title mb-4">Offline Order History</h4>
         <div class="card">
           <div class="card-body">
             <!-- Tampilkan pesan sukses -->

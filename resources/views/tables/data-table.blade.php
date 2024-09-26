@@ -75,7 +75,10 @@
                 <li class="nav-item"><a class="nav-link" href="{{ url('orderform') }}">Order Forms</a></li>
               </ul>
               <ul class="nav flex-column sub-menu">
-                <li class="nav-item"><a class="nav-link" href="{{ url('orderhistory') }}">Order History</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url('orderhistory') }}">Offline History</a></li>
+              </ul>
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item"><a class="nav-link" href="{{ url('online-history') }}">Online History</a></li>
               </ul>
             </div>
           </li>

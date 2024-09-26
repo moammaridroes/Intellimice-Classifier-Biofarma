@@ -112,7 +112,7 @@
                 <li class="nav-item"><a class="nav-link" href="{{ url('customer/orderform') }}">Order Forms</a></li>
               </ul>
               <ul class="nav flex-column sub-menu">
-                <li class="nav-item"><a class="nav-link" href="{{ url('/') }}">Order History</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url('customer/history') }}">Order History</a></li>
               </ul>
             </div>
           </li>
