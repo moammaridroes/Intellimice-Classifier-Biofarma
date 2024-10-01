@@ -156,7 +156,7 @@
             $('#data-table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('detailmencit.data') }}", // Route to fetch data
+                ajax: "{{ route('detailmencit.data') }}",
                 columns: [
                     { data: 'DT_RowIndex', name: 'DT_RowIndex' },
                     { data: 'created_at', name: 'created_at' },

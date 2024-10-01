@@ -31,11 +31,15 @@
         .dataTables_wrapper {
             padding: 20px;
         }
+        .modal-body p {
+            word-wrap: break-word;
+            white-space: pre-wrap; 
+        }
 
         .table-container {
             background-color: #fff;
             border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 20px rgba(140, 72, 72, 0.1);
             overflow: hidden;
         }
 
@@ -75,7 +79,7 @@
 
         .dataTables_filter input,
         .dataTables_length select {
-            border: 1px solid #ced4da;
+            border: 1px solid #4B49AC;
             border-radius: 4px;
             padding: 5px 10px;
         }
@@ -94,7 +98,7 @@
 
         .details-button {
             cursor: pointer;
-            color: #007bff;
+            color: #4B49AC;
             font-size: 1.2em;
         }
 
@@ -309,13 +313,7 @@
                     // { data: 'phone_number', name: 'phone_number' },
                     // { data: 'email', name: 'email' },
                     { data: 'item_name', name: 'item_name' },
-                    {
-                        data: 'pick_up_date',
-                        name: 'pick_up_date',
-                        render: function (data) {
-                            return data && moment(data, 'YYYY-MM-DD').isValid() ? moment(data, 'YYYY-MM-DD').format('DD-MM-YYYY') : 'Invalid Date';
-                        }
-                    },
+                    { data: 'pick_up_date', name: 'pick_up_date' },
                     { data: 'total_price', name: 'total_price', render: function(data) { return data && !isNaN(data) ? 'Rp ' + new Intl.NumberFormat('id-ID').format(data) : data; }},
                     { data: 'is_paid', name: 'is_paid', render: function(data) { return data ? 'Paid' : 'Unpaid'; }},
                     { data: 'status', name: 'status' },
@@ -348,7 +346,7 @@
                 modalBody.append('<p><strong>Phone Number:</strong> ' + data.phone_number + '</p>');
                 modalBody.append('<p><strong>Email:</strong> ' + data.email + '</p>');
                 modalBody.append('<p><strong>Item Name:</strong> ' + data.item_name + '</p>');
-                modalBody.append('<p><strong>Pick Up Date:</strong> ' + (data.pick_up_date ? moment(data.pick_up_date, 'YYYY-MM-DD').format('DD-MM-YYYY') : 'No Date') + '</p>');
+                modalBody.append('<p><strong>Pick Up Date:</strong> ' + data.pick_up_date + '</p>');
                 modalBody.append('<p><strong>Weight:</strong> ' + data.weight + '</p>');
                 modalBody.append('<p><strong>Male Quantity:</strong> ' + data.male_quantity + '</p>');
                 modalBody.append('<p><strong>Female Quantity:</strong> ' + data.female_quantity + '</p>');
@@ -359,7 +357,6 @@
             });
         });
     </script>
-
 </body>
 
 </html>

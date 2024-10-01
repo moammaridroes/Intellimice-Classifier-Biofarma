@@ -10,19 +10,13 @@ class DetailMencitController extends Controller
 {
     public function showData()
     {
-        return view('tables.data-table');
+        return view('tables.data-table'); 
     }
 
     public function getData(Request $request)
     {
         if ($request->ajax()) {
-            $data = DetailMencit::select([
-                'id', 
-                'created_at', 
-                'berat', 
-                'jenis_kelamin', 
-                'health_status'
-            ]);
+            $data = DetailMencit::select(['id', 'created_at', 'berat', 'gender', 'health_status']);
 
             return DataTables::of($data)
                 ->addIndexColumn()
@@ -34,7 +28,7 @@ class DetailMencitController extends Controller
                         ? '<label class="badge badge-success">Healthy</label>' 
                         : '<label class="badge badge-danger">Sick</label>';
                 })
-                ->rawColumns(['health_status']) // Membuat kolom health_status menjadi HTML
+                ->rawColumns(['health_status']) 
                 ->make(true);
         }
     }

@@ -11,11 +11,11 @@ class CustomerOrderController extends Controller
 {
     // Method untuk menyimpan pesanan dari customer
     public function store(Request $request)
-    {
+    {   
         $totalPrice = ($request->male_quantity * 4000) + ($request->female_quantity * 5000);
 
         $order = new CustomerOrder();
-        $order->customer_id = auth()->id();
+        $order->customer_id = auth()->id(); // Pastikan auth()->id() mengembalikan ID customer yang valid
         $order->fullname = $request->fullname;
         $order->phone_number = $request->phone_number;
         $order->email = $request->email;
@@ -23,8 +23,8 @@ class CustomerOrderController extends Controller
         $order->agency_name = $request->agency_name;
         $order->pick_up_date = $request->pick_up_date;
         $order->weight = $request->weight;
-        $order->male_quantity = $request->male_quantity;
-        $order->female_quantity = $request->female_quantity;
+        $order->male_quantity = $request->male_quantity ?? 0;
+        $order->female_quantity = $request->female_quantity ?? 0;
         $order->total_price = $totalPrice;
         $order->notes = $request->notes;
         $order->status = 'pending';
@@ -40,14 +40,12 @@ class CustomerOrderController extends Controller
         $orders = CustomerOrder::where('status', 'pending')->get();
         return view('admin.orders.index', compact('orders'));
     }
-
     // Method untuk menampilkan notifikasi admin
     public function notificationAdmin()
     {
         $orders = CustomerOrder::where('status', 'pending')->get();
         return view('notification', compact('orders'));
     }
-
     // Method untuk menyetujui pesanan
     public function approve($id)
     {
@@ -149,20 +147,23 @@ class CustomerOrderController extends Controller
                 'is_paid', 
                 'status',
                 'notes'
-            ]);                    
-            return DataTables::of($orders)
-            ->addIndexColumn()
-            ->editColumn('pick_up_date', function($order) {
-                return Carbon::parse($order->pick_up_date)->format('d-m-Y'); // Format ini harus benar
-            })
-            ->editColumn('total_price', function ($order) {
-                return 'Rp ' . number_format($order->total_price, 2, ',', '.'); // Format ini harus benar
-            })
-            ->editColumn('is_paid', function ($order) {
-                return $order->is_paid ? 'Paid' : 'Unpaid';
-            })
-            ->make(true);
+            ]);
+
+        
+return DataTables::of($orders)
+    ->addIndexColumn()
+    ->editColumn('pick_up_date', function($order) {
+        return Carbon::parse($order->pick_up_date)->format('d-m-Y');
+    })
+    ->editColumn('total_price', function ($order) {
+        return 'Rp ' . number_format($order->total_price, 2, ',', '.'); 
+    })
+    ->editColumn('is_paid', function ($order) {
+        return $order->is_paid ? 'Paid' : 'Unpaid';
+    })
+    ->make(true);
     }
+    
 
     // Method untuk form order customer
     public function create()

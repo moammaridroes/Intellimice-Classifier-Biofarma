@@ -24,6 +24,7 @@
         .form-check-input {
             margin-right: 10px;
         }
+
         .form-check {
             display: flex;
             align-items: center;
@@ -38,6 +39,14 @@
                 <img src="images/logobiofarmakecil.png" alt="Biofarma Logo" class="img-fluid" style="height: 50px;">
                 <h2 class="mt-3 text-dark font-weight-bold">Sign in to your account</h2>
             </div>
+
+            <!-- Alert Message -->
+            @if ($errors->has('login_error'))
+                <div class="alert alert-danger" role="alert">
+                    {{ $errors->first('login_error') }}
+                </div>
+            @endif
+
             <form method="POST" action="/login">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <div class="form-group">

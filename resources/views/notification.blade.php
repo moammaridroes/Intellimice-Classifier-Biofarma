@@ -5,7 +5,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Admin Notifications</title>
+    <title>Notifications</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="{{ asset('vendors/feather/feather.css') }}">
     <link rel="stylesheet" href="{{ asset('vendors/ti-icons/css/themify-icons.css') }}">
@@ -17,6 +17,12 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+<style> 
+    .modal-body p {
+    word-wrap: break-word;
+    white-space: pre-wrap; /* Preserves the line breaks and spaces */
+}
+</style>
 
 <body>
     <div class="container-scroller">
@@ -56,10 +62,6 @@
 
                     <!-- Dropdown Menu -->
                     <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
-                        <!-- Profile Link -->
-                        <a class="dropdown-item" href="{{ route('profile.edit') }}">
-                            {{ __('Profile') }}
-                        </a>
 
                         <!-- Logout Form -->
                         <form method="POST" action="{{ route('logout') }}">
@@ -169,7 +171,7 @@
                                                     <td>{{ $order->fullname }}</td>
                                                     <td>{{ $order->item_name }}</td>
                                                     <td>{{ $order->agency_name }}</td>
-                                                    <td>{{ \Carbon\Carbon::parse($order->pick_up_date)->format('d-m-Y') }}</td>
+                                                    <td>{{ ($order->pick_up_date)->format('d-m-Y') }}</td>
                                                     <td>Rp. {{ $order->total_price }}</td>
                                                     <td>
                                                         <span class="badge rounded-pill bg-{{ $order->status == 'approved' ? 'success' : ($order->status == 'rejected' ? 'danger' : 'warning') }}">

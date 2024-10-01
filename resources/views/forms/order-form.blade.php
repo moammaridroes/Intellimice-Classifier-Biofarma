@@ -186,7 +186,7 @@
                   <label>Total</label>
                   <input type="number" class="form-control form-control-lg" id="totalQuantity" placeholder="Total" readonly>
                 </div>
-                <button type="button" class="btn btn-primary mr-2" id="submitOrderButton">Submit</button>
+                <button type="submit" class="btn btn-primary mr-2" style="background-color: #4B49AC; border-color: #4B49AC;" id="submitOrderButton">Submit</button>
               </div>
             </div>
           </div>
@@ -203,12 +203,12 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <!-- Invoice Content will be dynamically loaded here -->
+              <!-- Invoice nnti disini -->
               <div id="invoiceContent"></div>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary" id="payButton">Bayar</button>
+              <button type="button" class="btn btn-primary" style="background-color: #4B49AC; border-color: #4B49AC;" id="payButton">Bayar</button>
             </div>
           </div>
         </div>
@@ -256,10 +256,10 @@
 
       if (weightValue <= 0) {
         weightInput.style.borderColor = 'red';
-        errorDiv.style.display = 'block'; // Show error message
+        errorDiv.style.display = 'block'; 
       } else {
         weightInput.style.borderColor = '';
-        errorDiv.style.display = 'none'; // Hide error message
+        errorDiv.style.display = 'none'; 
       }
     }
 
@@ -312,7 +312,7 @@
           weight: document.querySelector("input[name='weight']").value,
           male_quantity: document.querySelector("input[name='male_quantity']").value || 0,
           female_quantity: document.querySelector("input[name='female_quantity']").value || 0,
-          total_price: calculateTotalPrice() // Assuming calculateTotalPrice() returns the correct total price
+          total_price: calculateTotalPrice() 
         };
         // Show invoice modal with fetched data
         showInvoiceModal(orderData);
@@ -322,8 +322,8 @@
       function calculateTotalPrice() {
         const maleQuantity = parseInt(document.querySelector("input[name='male_quantity']").value) || 0;
         const femaleQuantity = parseInt(document.querySelector("input[name='female_quantity']").value) || 0;
-        const malePrice = 4000; // Price per male
-        const femalePrice = 5000; // Price per female
+        const malePrice = 4000; 
+        const femalePrice = 5000; 
         return (maleQuantity * malePrice) + (femaleQuantity * femalePrice);
       }
 
@@ -381,7 +381,7 @@
               document.getElementById("payButton").disabled = true;
               document.getElementById("invoiceContent").innerHTML += "<p><strong>Status:</strong> Paid</p>";
               var invoiceModal = bootstrap.Modal.getInstance(document.getElementById('invoiceModal'));
-              invoiceModal.hide(); // Hide modal using Bootstrap 5
+              invoiceModal.hide(); 
             } else {
               alert("Failed to process payment!");
             }

@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\CustomerOrder;
+use App\Http\Controllers\CustomerOrderController;
+// use Carbon\Carbon
 
 class OrderController extends Controller
 {
@@ -44,10 +47,18 @@ class OrderController extends Controller
         $order->male_quantity = $request->male_quantity;
         $order->female_quantity = $request->female_quantity;
         $order->total_price = $totalPrice;
-        $order->is_paid = false; // Default value
+        $order->is_paid = true; // Default value
         $order->save();
 
         return response()->json(['success' => true, 'order' => $order]);
+    }
+
+    // Mengambil data order terbaru
+    public function getData()
+    {
+        // Mengambil data order terbaru, diurutkan dari yang paling baru pkonya
+        $orders = Order::orderBy('created_at', 'desc')->get(); 
+        return datatables()->of($orders)->make(true);
     }
 
     public function showInvoice($id)
@@ -64,4 +75,52 @@ class OrderController extends Controller
         ]);
         return redirect()->route('orderhistory.index')->with('success', 'Order has been paid successfully!');
     }
+
+    public function edit($id)
+    {
+    $order = Order::findOrFail($id);
+    return response()->json($order);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
+        $order->update($request->all());
+        return response()->json(['success' => true, 'order' => $order]);
+    }
+
+    public function delete($id)
+    {
+        $order = Order::findOrFail($id);
+        $order->delete();
+        return response()->json(['success' => true]);
+    }
+
+
+    public function dashboardData()
+    {
+        $today = \Carbon\Carbon::today()->format('Y-m-d');
+
+        // Periksa jumlah order offline hari ini
+        $offlineOrdersToday = Order::whereDate('created_at', $today)->count();
+
+        // Periksa jumlah order online hari ini
+        $onlineOrdersToday = CustomerOrder::whereDate('created_at', $today)->where('status', 'approved')->count();
+
+        // Periksa total pendapatan hari ini
+        $totalRevenueToday = Order::whereDate('created_at', $today)->sum('total_price') + CustomerOrder::whereDate('created_at', $today)->where('status', 'approved')->sum('total_price');
+
+        // Jumlah male dan female terjual hari ini
+        $totalMaleSoldToday = Order::whereDate('created_at', $today)->sum('male_quantity') + CustomerOrder::whereDate('created_at', $today)->where('status', 'approved')->sum('male_quantity');
+        $totalFemaleSoldToday = Order::whereDate('created_at', $today)->sum('female_quantity') + CustomerOrder::whereDate('created_at', $today)->where('status', 'approved')->sum('female_quantity');
+        return response()->json([
+            'onlineOrdersToday' => $onlineOrdersToday,
+            'offlineOrdersToday' => $offlineOrdersToday,
+            'totalRevenueToday' => $totalRevenueToday,
+            'totalMaleSoldToday' => $totalMaleSoldToday ?? 0,
+            'totalFemaleSoldToday' => $totalFemaleSoldToday ?? 0,
+        ]);
+    }
+
+
 }

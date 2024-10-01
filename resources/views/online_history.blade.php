@@ -79,7 +79,7 @@
     }
     .details-button {
       cursor: pointer;
-      color: #007bff;
+      color: #4B49AC;
       font-size: 1.2em;
     }
     .details-button:hover {
@@ -220,14 +220,14 @@
                   <thead>
                     <tr>
                       <th>Fullname</th>
-                      <th>Phone Number</th>
-                      <th>Email</th>
+                      {{-- <th>Phone Number</th> --}}
+                      {{-- <th>Email</th> --}}
                       <th>Item Name</th>
                       <th>Pick Up Date</th>
-                      <th>Weight</th>
+                      {{-- <th>Weight</th> --}}
                       <th>Total Price</th>
-                      <th>Payment Status</th>
-                      <th>Action</th>
+                      {{-- <th>Payment Status</th> --}}
+                      <th>Details</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -296,13 +296,13 @@
         ajax: "{{ route('onlinehistory.getData') }}",
         columns: [
           {data: 'fullname', name: 'fullname'},
-          {data: 'phone_number', name: 'phone_number'},
-          {data: 'email', name: 'email'},
+          // {data: 'phone_number', name: 'phone_number'},
+          // {data: 'email', name: 'email'},
           {data: 'item_name', name: 'item_name'},
           {data: 'pick_up_date', name: 'pick_up_date'},
-          {data: 'weight', name: 'weight'},
+          // {data: 'weight', name: 'weight'},
           {data: 'total_price', name: 'total_price', render: $.fn.dataTable.render.number(',', '.', 2, 'Rp ')}, // Menampilkan total harga dengan format Rupiah
-          {data: 'is_paid', name: 'is_paid', render: function(data) { return data ? 'Paid' : 'Unpaid'; }},
+          // {data: 'is_paid', name: 'is_paid', render: function(data) { return data ? 'Paid' : 'Unpaid'; }},
           {
             data: null,
             orderable: false,
@@ -336,7 +336,7 @@
         modalBody.append('<p><strong>Weight:</strong> ' + data.weight + ' gr</p>');
         modalBody.append('<p><strong>Male Quantity:</strong> ' + data.male_quantity + '</p>');
         modalBody.append('<p><strong>Female Quantity:</strong> ' + data.female_quantity + '</p>');
-        modalBody.append('<p><strong>Total Price:</strong> Rp ' + (data.total_price ? new Intl.NumberFormat('id-ID').format(data.total_price) : '0') + '</p>'); // Format harga
+        modalBody.append('<p><strong>Total Price:</strong> ' + data.total_price + '</p>'); 
         modalBody.append('<p><strong>Payment Status:</strong> ' + (data.is_paid ? 'Paid' : 'Unpaid') + '</p>');
       });
     });

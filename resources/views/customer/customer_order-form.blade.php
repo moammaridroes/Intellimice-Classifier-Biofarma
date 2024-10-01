@@ -134,37 +134,46 @@
                                             <label for="item_name">Name of item ordered</label>
                                             <input type="text" class="form-control" name="item_name" placeholder="Name of item ordered" required>
                                         </div>
+                                        <div class="form-group">
+                                            <label for="pick_up_date">Pick Up Date</label>
+                                            <input type="date" class="form-control" name="pick_up_date" placeholder="Pick Up Date" required>
+                                        </div>
                                 </div>
 
                                 <div class="form-section">
-                                    <div class="form-group">
-                                        <label for="pick_up_date">Pick Up Date</label>
-                                        <input type="date" class="form-control" name="pick_up_date" placeholder="Pick Up Date" required>
-                                    </div>
                                     <div class="form-group">
                                         <label for="weight">Weight (gr)</label>
                                         <input type="number" class="form-control" name="weight" id="weightInput" placeholder="Weight Ordered (gr)" required oninput="validateWeight()">
                                         <div id="weightError" class="error-message">Please input weight more than 0</div>
                                     </div>
+                                    <h4 class="card-title">Set amount of order</h4>
                                     <div class="form-group">
-                                        <label for="male_quantity">Male Quantity</label>
-                                        <input type="number" class="form-control" id="maleQuantity" name="male_quantity" placeholder="Male Quantity" value="" oninput="validateAndCalculate(this)">
+                                        <div class="form-check form-check-flat form-check-primary">
+                                            <label class="form-check-label">
+                                                <input type="checkbox" class="form-check-input" id="maleCheckbox"> Male
+                                            </label>
+                                        </div>
+                                        <input type="number" class="form-control form-control-lg" id="maleQuantity" name="male_quantity" placeholder="Quantity" min="1" value="0" oninput="validateAndCalculate(this)" disabled>
                                     </div>
                                     <div class="form-group">
-                                        <label for="female_quantity">Female Quantity</label>
-                                        <input type="number" class="form-control" id="femaleQuantity" name="female_quantity" placeholder="Female Quantity" value="" oninput="validateAndCalculate(this)">
+                                        <div class="form-check form-check-flat form-check-primary">
+                                            <label class="form-check-label">
+                                                <input type="checkbox" class="form-check-input" id="femaleCheckbox"> Female
+                                            </label>
+                                        </div>
+                                        <input type="number" class="form-control form-control-lg" id="femaleQuantity" name="female_quantity" placeholder="Quantity" min="1" value="0" oninput="validateAndCalculate(this)" disabled>
                                     </div>
                                     <div class="form-group">
-                                        <label for="total_quantity">Total Quantity</label>
-                                        <input type="number" class="form-control" id="totalQuantity" placeholder="Total Quantity" readonly>
+                                        <label>Total</label>
+                                        <input type="number" class="form-control form-control-lg" id="totalQuantity" placeholder="Total" readonly>
                                     </div>
                                     <div class="form-group">
                                         <label for="notes">Notes</label>
                                         <textarea class="form-control" name="notes" rows="3" placeholder="Enter any additional notes (max 500 characters)" maxlength="500"></textarea>
                                     </div>
-                                    <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                                    <button type="submit" class="btn btn-primary mr-2" style="background-color: #4B49AC; border-color: #4B49AC;">Submit</button>
                                     <button type="reset" class="btn btn-light">Reset</button>
-                                    </form>
+                                </form>
                                 </div>
                             </div>
                         </div>
@@ -204,10 +213,10 @@
 
             if (weightValue <= 0) {
                 weightInput.style.borderColor = 'red';
-                errorDiv.style.display = 'block'; // Show error message
+                errorDiv.style.display = 'block'; 
             } else {
                 weightInput.style.borderColor = '';
-                errorDiv.style.display = 'none'; // Hide error message
+                errorDiv.style.display = 'none';
             }
         }
 
@@ -216,6 +225,26 @@
                 input.value = 0;
             }
             calculateTotal();
+        }
+
+        document.getElementById('maleCheckbox').addEventListener('change', function () {
+            toggleInput('maleQuantity', this.checked);
+        });
+
+        document.getElementById('femaleCheckbox').addEventListener('change', function () {
+            toggleInput('femaleQuantity', this.checked);
+        });
+
+        function toggleInput(inputId, isChecked) {
+            var input = document.getElementById(inputId);
+            input.disabled = !isChecked;
+            if (isChecked) {
+                input.value = '';
+                input.focus();
+            } else {
+                input.value = 0;
+                calculateTotal();
+            }
         }
 
         function calculateTotal() {

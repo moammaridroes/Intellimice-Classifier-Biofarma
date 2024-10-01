@@ -18,7 +18,7 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth'])->group(function () {
-    // Semua route yang membutuhkan autentikasi dapat ditaruh di sini.
+    // Semua route yang membutuhkan autentikasi dapat ditaruh di sini tp ni ga kepake si.
 });
 
 Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->group(function () {
@@ -31,6 +31,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->g
     Route::get('/dashboard', function () {
         return view('forms.dashboard_home');
     })->name('dashboard');
+    Route::get('dashboard-data', [OrderController::class, 'dashboardData'])->name('dashboard.data');
 
     Route::get('/orderform', function () {
         return view('forms.order-form');
@@ -42,16 +43,20 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->g
 
     // Route untuk menyetujui pesanan
     Route::post('/admin/customer-orders/{id}/approve', [CustomerOrderController::class, 'approve'])->name('admin.customer-orders.approve');
-    
     // Route untuk menolak pesanan
     Route::post('/admin/customer-orders/{id}/reject', [CustomerOrderController::class, 'reject'])->name('admin.customer-orders.reject');
 
     Route::get('/stok', [DetailMencitController::class, 'showData']);
-    Route::get('data-table', [DetailMencitController::class, 'showData'])->name('detailmencit.data');
-    Route::get('data', [DetailMencitController::class, 'getData'])->name('detailmencit.data');
+    // Route::get('data-table', [DetailMencitController::class, 'showData'])->name('detailmencit.data');
+    // Route::get('data', [DetailMencitController::class, 'getData'])->name('detailmencit.data');
+    Route::get('data-table', [DetailMencitController::class, 'showData'])->name('data.table');
+    Route::get('detailmencit/data', [DetailMencitController::class, 'getData'])->name('detailmencit.data');
 
     Route::get('orderhistory', [OrderHistoryController::class, 'index'])->name('orderhistory.index');
     Route::get('orderhistory/data', [OrderHistoryController::class, 'getData'])->name('orderhistory.getData');
+    Route::get('orderhistory/edit/{id}', [OrderController::class, 'edit']);
+    Route::put('orderhistory/update/{id}', [OrderController::class, 'update']);
+    Route::delete('orderhistory/delete/{id}', [OrderController::class, 'delete']);
 
     Route::get('/online-history', [CustomerOrderController::class, 'showOnlineHistory'])->name('onlinehistory.index');
     Route::get('/online-history/data', [CustomerOrderController::class, 'getOnlineHistoryData'])->name('onlinehistory.getData');
