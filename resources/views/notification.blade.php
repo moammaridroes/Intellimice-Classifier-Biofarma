@@ -172,7 +172,7 @@
                                                     <td>{{ $order->item_name }}</td>
                                                     <td>{{ $order->agency_name }}</td>
                                                     <td>{{ ($order->pick_up_date)->format('d-m-Y') }}</td>
-                                                    <td>Rp. {{ $order->total_price }}</td>
+                                                    <td>Rp. {{ number_format($order->total_price,0,',','.') }}</td>
                                                     <td>
                                                         <span class="badge rounded-pill bg-{{ $order->status == 'approved' ? 'success' : ($order->status == 'rejected' ? 'danger' : 'warning') }}">
                                                             {{ ucfirst($order->status) }}

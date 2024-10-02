@@ -28,6 +28,22 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        .badge {
+        padding: 0.5em 0.75em;
+        font-size: 0.875em;
+        font-weight: 600;
+        text-transform: uppercase;
+        }
+
+        .bg-success {
+            background-color: #28a745 !important;
+            color: white;
+        }
+
+        .bg-danger {
+            background-color: #dc3545 !important;
+            color: white;
+        }
         .dataTables_wrapper {
             padding: 20px;
         }
@@ -315,7 +331,14 @@
                     { data: 'item_name', name: 'item_name' },
                     { data: 'pick_up_date', name: 'pick_up_date' },
                     { data: 'total_price', name: 'total_price', render: function(data) { return data && !isNaN(data) ? 'Rp ' + new Intl.NumberFormat('id-ID').format(data) : data; }},
-                    { data: 'is_paid', name: 'is_paid', render: function(data) { return data ? 'Paid' : 'Unpaid'; }},
+                    { 
+                        data: 'is_paid',
+                        name: 'is_paid',
+                        render: function (data, type, row) {
+                        var statusClass = data === 'Paid' ? 'badge bg-success' : 'badge bg-danger';
+                        return '<span class="' + statusClass + '">' + data + '</span>';
+                        }
+                    },
                     { data: 'status', name: 'status' },
                     {
                         data: null,
@@ -336,7 +359,7 @@
                     $('.dataTables_paginate > .pagination').addClass('pagination-rounded');
                 }
             });
-
+    
             // Handle click on details button
             $('.yajra-datatable').on('click', '.details-button', function () {
                 var data = JSON.parse(decodeURIComponent($(this).data('details')));
@@ -351,12 +374,13 @@
                 modalBody.append('<p><strong>Male Quantity:</strong> ' + data.male_quantity + '</p>');
                 modalBody.append('<p><strong>Female Quantity:</strong> ' + data.female_quantity + '</p>');
                 modalBody.append('<p><strong>Total Price:</strong>  ' + data.total_price + '</p>');
-                modalBody.append('<p><strong>Payment Status:</strong> ' + (data.is_paid ? 'Paid' : 'Unpaid') + '</p>');
+                modalBody.append('<p><strong>Payment Status:</strong> ' + data.is_paid + '</p>');
                 modalBody.append('<p><strong>Status:</strong> ' + data.status + '</p>');
                 modalBody.append('<p><strong>Notes:</strong> ' + (data.notes ? data.notes : '-') + '</p>');
             });
         });
     </script>
+    
 </body>
 
 </html>

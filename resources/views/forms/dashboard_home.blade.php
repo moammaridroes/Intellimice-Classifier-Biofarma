@@ -3,11 +3,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Admin Dashboard</title>
+    <title>Dashboard</title>
     <link rel="stylesheet" href="{{ asset('vendors/feather/feather.css') }}">
     <link rel="stylesheet" href="{{ asset('vendors/ti-icons/css/themify-icons.css') }}">
     <link rel="stylesheet" href="{{ asset('vendors/css/vendor.bundle.base.css') }}">
     <link rel="stylesheet" href="{{ asset('css/vertical-layout-light/style.css') }}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
     <link rel="shortcut icon" href="{{ asset('images/logobiofarmakecil.png') }}">
     <script src="{{ asset('vendors/js/vendor.bundle.base.js') }}"></script>
     <script src="{{ asset('js/off-canvas.js') }}"></script>
@@ -16,14 +17,100 @@
     <script src="{{ asset('js/settings.js') }}"></script>
     <script src="{{ asset('js/todolist.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+
+    <style>
+        /* Animasi untuk fade-in */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            opacity: 0;
+            animation: fadeIn 1s ease forwards;
+        }
+
+        .card:nth-child(1) { animation-delay: 0.2s; }
+        .card:nth-child(2) { animation-delay: 0.4s; }
+        .card:nth-child(3) { animation-delay: 0.6s; }
+        .card:nth-child(4) { animation-delay: 0.8s; }
+        .card:nth-child(5) { animation-delay: 1s; }
+
+        /* Styling layout */
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .card-row-1 {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .card-row-2 {
+            display: flex;
+            justify-content: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .card {
+            flex: 1;
+            min-width: 250px;
+            margin: 10px;
+        }
+
+        /* Styling tabel */
+        .table-container {
+            margin-top: 20px;
+        }
+
+        table.dataTable {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .dataTables_wrapper {
+            padding: 20px;
+        }
+
+        table.dataTable thead th {
+            background-color: #f8f9fa;
+            color: #333;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 15px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        table.dataTable tbody td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        table.dataTable tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        table.dataTable tbody tr:hover {
+            background-color: #f1f3f5;
+        }
+    </style>
 </head>
 <body>
 <div class="container-scroller">
     <!-- Navbar -->
-    <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+    <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row shadow-sm">
         <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
             <a class="navbar-brand brand-logo mr-5" href="{{ url('/') }}">
-                <img src="{{ asset('images/Logo_Bio_Farma.png') }}" style="width: 65%; height: 65%;" class="mr-2" alt="logo" />
+                <img src="{{ asset('images/Logo_Bio_Farma.png') }}" style="width: 65%; height: 65%;" alt="logo" />
             </a>
             <a class="navbar-brand brand-logo-mini" href="{{ url('/') }}">
                 <img src="{{ asset('images/logobiofarmakecil.png') }}" alt="logo" />
@@ -103,109 +190,76 @@
         <!-- Main Content -->
         <div class="main-panel">
             <div class="content-wrapper">
-                <div class="row">
-                    <div class="col-xl-3 col-sm-6 mb-4">
-                        <div class="card">
-                            <div class="card-body p-3">
-                                <div class="row">
-                                    <div class="col-8">
-                                        <div class="numbers">
-                                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Online Orders Today</p>
-                                            <h5 class="font-weight-bolder mb-0" id="onlineOrdersToday">0</h5>
-                                        </div>
-                                    </div>
-                                    <div class="col-4 text-end">
-                                        <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
-                                            <i class="ti-shopping-cart text-lg opacity-10" aria-hidden="true"></i>
-                                        </div>
-                                    </div>
-                                </div>
+                <!-- Card Container -->
+                <div class="card-container">
+                    <!-- Row 1 -->
+                    <div class="card-row-1">
+                        <div class="card bg-primary text-white text-center shadow">
+                            <div class="card-body">
+                                <p class="mb-2">Online Orders Today</p>
+                                <h4 id="onlineOrdersToday">0</h4>
+                            </div>
+                        </div>
+
+                        <div class="card bg-danger text-white text-center shadow">
+                            <div class="card-body">
+                                <p class="mb-2">Offline Orders Today</p>
+                                <h4 id="offlineOrdersToday">0</h4>
+                            </div>
+                        </div>
+
+                        <div class="card bg-success text-white text-center shadow">
+                            <div class="card-body">
+                                <p class="mb-2">Revenue Today</p>
+                                <h4 id="totalRevenueToday">Rp 0</h4>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-xl-3 col-sm-6 mb-4">
-                        <div class="card">
-                            <div class="card-body p-3">
-                                <div class="row">
-                                    <div class="col-8">
-                                        <div class="numbers">
-                                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Offline Orders Today</p>
-                                            <h5 class="font-weight-bolder mb-0" id="offlineOrdersToday">0</h5>
-                                        </div>
-                                    </div>
-                                    <div class="col-4 text-end">
-                                        <div class="icon icon-shape bg-gradient-danger shadow text-center border-radius-md">
-                                            <i class="ti-user text-lg opacity-10" aria-hidden="true"></i>
-                                        </div>
-                                    </div>
-                                </div>
+                    <!-- Row 2 -->
+                    <div class="card-row-2">
+                        <div class="card bg-warning text-white text-center shadow">
+                            <div class="card-body">
+                                <p class="mb-2">Male Quantity Sold Today</p>
+                                <h4 id="totalMaleSoldToday">0</h4>
+                            </div>
+                        </div>
+
+                        <div class="card bg-warning text-white text-center shadow">
+                            <div class="card-body">
+                                <p class="mb-2">Female Quantity Sold Today</p>
+                                <h4 id="totalFemaleSoldToday">0</h4>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="col-xl-3 col-sm-6 mb-4">
-                        <div class="card">
-                            <div class="card-body p-3">
-                                <div class="row">
-                                    <div class="col-8">
-                                        <div class="numbers">
-                                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Revenue Today</p>
-                                            <h5 class="font-weight-bolder mb-0" id="totalRevenueToday">0</h5>
-                                        </div>
-                                    </div>
-                                    <div class="col-4 text-end">
-                                        <div class="icon icon-shape bg-gradient-success shadow text-center border-radius-md">
-                                            <i class="ti-wallet text-lg opacity-10" aria-hidden="true"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-xl-3 col-sm-6 mb-4">
-                        <div class="card">
-                            <div class="card-body p-3">
-                                <div class="row">
-                                    <div class="col-8">
-                                        <div class="numbers">
-                                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Male Quantity Sold Today</p>
-                                            <h5 class="font-weight-bolder mb-0" id="totalMaleSoldToday">0</h5>
-                                        </div>
-                                    </div>
-                                    <div class="col-4 text-end">
-                                        <div class="icon icon-shape bg-gradient-warning shadow text-center border-radius-md">
-                                            <i class="ti-user text-lg opacity-10" aria-hidden="true"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-xl-3 col-sm-6 mb-4">
-                        <div class="card">
-                            <div class="card-body p-3">
-                                <div class="row">
-                                    <div class="col-8">
-                                        <div class="numbers">
-                                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Female Quantity Sold Today</p>
-                                            <h5 class="font-weight-bolder mb-0" id="totalFemaleSoldToday">0</h5>
-                                        </div>
-                                    </div>
-                                    <div class="col-4 text-end">
-                                        <div class="icon icon-shape bg-gradient-warning shadow text-center border-radius-md">
-                                            <i class="ti-user text-lg opacity-10" aria-hidden="true"></i>
-                                        </div>
-                                    </div>
-                                </div>
+                <!-- Monthly Recap Table -->
+                <div class="row table-container">
+                    <div class="col-12">
+                        <div class="card shadow-lg border-radius-2xl p-3">
+                            <h4 class="card-title text-center font-weight-bold mb-4">Monthly Recap</h4>
+                            <div class="table-responsive">
+                                <table id="monthlyRecapTable" class="table table-hover table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Month</th>
+                                            <th>Total Orders</th>
+                                            <th>Total Revenue</th>
+                                            <th>Male Quantity Sold</th>
+                                            <th>Female Quantity Sold</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Data akan dimuat melalui DataTables -->
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- content-wrapper ends -->
+
             <footer class="footer">
                 <div class="d-sm-flex justify-content-center justify-content-sm-between">
                     <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2024, Biofarma. STAS-RG. All rights reserved.</span>
@@ -231,6 +285,20 @@
             })
             .catch(error => console.error('Error:', error));
 
+        $(document).ready(function () {
+            $('#monthlyRecapTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: '{{ route('monthly.recap.data') }}',
+                columns: [
+                    { data: 'month', name: 'month' },
+                    { data: 'total_orders', name: 'total_orders' },
+                    { data: 'total_revenue', name: 'total_revenue' },
+                    { data: 'total_male_sold', name: 'total_male_sold' },
+                    { data: 'total_female_sold', name: 'total_female_sold' },
+                ]
+            });
+        });
     });
 </script>
 

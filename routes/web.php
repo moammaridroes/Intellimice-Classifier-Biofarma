@@ -12,6 +12,7 @@ use App\Http\Controllers\CustomerDashboardController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CustomerOrderController;
+use App\Models\Order;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -31,7 +32,10 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->g
     Route::get('/dashboard', function () {
         return view('forms.dashboard_home');
     })->name('dashboard');
-    Route::get('dashboard-data', [OrderController::class, 'dashboardData'])->name('dashboard.data');
+    // Route::get('dashboard-data', [OrderController::class, 'dashboardData'])->name('dashboard.data');
+    Route::get('/dashboard-data', [DashboardController::class, 'dashboardData'])->name('dashboard.data');
+    Route::get('/monthly-recap', [DashboardController::class, 'getMonthlyRecapData'])->name('monthly.recap');
+    Route::get('/monthly-recap-data', [DashboardController::class, 'getMonthlyRecapData'])->name('monthly.recap.data');
 
     Route::get('/orderform', function () {
         return view('forms.order-form');
@@ -47,8 +51,6 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->g
     Route::post('/admin/customer-orders/{id}/reject', [CustomerOrderController::class, 'reject'])->name('admin.customer-orders.reject');
 
     Route::get('/stok', [DetailMencitController::class, 'showData']);
-    // Route::get('data-table', [DetailMencitController::class, 'showData'])->name('detailmencit.data');
-    // Route::get('data', [DetailMencitController::class, 'getData'])->name('detailmencit.data');
     Route::get('data-table', [DetailMencitController::class, 'showData'])->name('data.table');
     Route::get('detailmencit/data', [DetailMencitController::class, 'getData'])->name('detailmencit.data');
 
@@ -60,6 +62,8 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->g
 
     Route::get('/online-history', [CustomerOrderController::class, 'showOnlineHistory'])->name('onlinehistory.index');
     Route::get('/online-history/data', [CustomerOrderController::class, 'getOnlineHistoryData'])->name('onlinehistory.getData');
+    Route::post('/customer-orders/{id}/mark-as-paid', [CustomerOrderController::class, 'markAsPaid'])->name('customer-orders.markAsPaid');
+
 
     Route::get('/datatable', function () {
         return view('tables.data-table');

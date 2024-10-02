@@ -389,7 +389,8 @@
                 tbody.append('<tr><th>Total Price</th><td>Rp ' + (data.total_price ? new Intl.NumberFormat('id-ID').format(data.total_price) : '0') + '</td></tr>');
                 tbody.append('<tr><th>Payment Status</th><td>' + (data.is_paid ? 'Paid' : 'Unpaid') + '</td></tr>');
                 modalBody.append(table);
-            });            // Handle click on edit button
+            });       
+                 // Handle click on edit button
             $('.yajra-datatable').on('click', '.edit-button', function () {
                 var id = $(this).data('id');
                 $.ajax({

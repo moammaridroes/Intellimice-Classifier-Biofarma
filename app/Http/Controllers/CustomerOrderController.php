@@ -83,38 +83,40 @@ class CustomerOrderController extends Controller
 
     // Method untuk mengambil data order online yang telah disetujui
     public function getOnlineHistoryData(Request $request)
-    {
-        $orders = CustomerOrder::where('status', 'approved')
-            ->select([
-                'id', 
-                'fullname', 
-                'phone_number', 
-                'email', 
-                'item_name', 
-                'agency_name', 
-                'pick_up_date', 
-                'weight', 
-                'male_quantity', 
-                'female_quantity', 
-                'total_price',
-                'is_paid',
-                'created_at', 
-                'updated_at'
-            ]);
+{
+    $orders = CustomerOrder::where('status', 'approved')
+        ->select([
+            'id', 
+            'fullname', 
+            'phone_number', 
+            'email', 
+            'item_name', 
+            'agency_name', 
+            'pick_up_date', 
+            'weight', 
+            'male_quantity', 
+            'female_quantity', 
+            'total_price',
+            'is_paid',
+            'created_at', 
+            'updated_at'
+        ])
+        ->orderBy('created_at', 'desc');
 
-        return DataTables::of($orders)
-            ->addIndexColumn()
-            ->editColumn('pick_up_date', function ($order) {
-                return Carbon::parse($order->pick_up_date)->format('d-m-Y');
-            })
-            ->editColumn('total_price', function ($order) {
-                return 'Rp ' . number_format($order->total_price, 2, ',', '.');
-            })
-            ->editColumn('is_paid', function ($order) {
-                return $order->is_paid ? 'Paid' : 'Unpaid';
-            })
-            ->make(true);
-    }
+    return DataTables::of($orders)
+        ->addIndexColumn()
+        ->editColumn('pick_up_date', function ($order) {
+            return Carbon::parse($order->pick_up_date)->format('d-m-Y');
+        })
+        ->editColumn('total_price', function ($order) {
+            return 'Rp ' . number_format($order->total_price, 2, ',', '.');
+        })
+        ->editColumn('is_paid', function ($order) {
+            return $order->is_paid ? 'Paid' : 'Unpaid';
+        })
+        ->make(true);
+}
+
 
     // Method untuk menampilkan notifikasi customer
     public function showCustomerNotifications()
@@ -163,6 +165,20 @@ return DataTables::of($orders)
     })
     ->make(true);
     }
+
+    public function markAsPaid($id)
+    {
+    $order = CustomerOrder::find($id);
+    if ($order) {
+        $order->is_paid = true;
+        $order->save();
+
+        return response()->json(['success' => true]);
+    }
+
+    return response()->json(['success' => false, 'message' => 'Order not found.'], 404);
+    }
+
     
 
     // Method untuk form order customer

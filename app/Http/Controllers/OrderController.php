@@ -95,32 +95,4 @@ class OrderController extends Controller
         $order->delete();
         return response()->json(['success' => true]);
     }
-
-
-    public function dashboardData()
-    {
-        $today = \Carbon\Carbon::today()->format('Y-m-d');
-
-        // Periksa jumlah order offline hari ini
-        $offlineOrdersToday = Order::whereDate('created_at', $today)->count();
-
-        // Periksa jumlah order online hari ini
-        $onlineOrdersToday = CustomerOrder::whereDate('created_at', $today)->where('status', 'approved')->count();
-
-        // Periksa total pendapatan hari ini
-        $totalRevenueToday = Order::whereDate('created_at', $today)->sum('total_price') + CustomerOrder::whereDate('created_at', $today)->where('status', 'approved')->sum('total_price');
-
-        // Jumlah male dan female terjual hari ini
-        $totalMaleSoldToday = Order::whereDate('created_at', $today)->sum('male_quantity') + CustomerOrder::whereDate('created_at', $today)->where('status', 'approved')->sum('male_quantity');
-        $totalFemaleSoldToday = Order::whereDate('created_at', $today)->sum('female_quantity') + CustomerOrder::whereDate('created_at', $today)->where('status', 'approved')->sum('female_quantity');
-        return response()->json([
-            'onlineOrdersToday' => $onlineOrdersToday,
-            'offlineOrdersToday' => $offlineOrdersToday,
-            'totalRevenueToday' => $totalRevenueToday,
-            'totalMaleSoldToday' => $totalMaleSoldToday ?? 0,
-            'totalFemaleSoldToday' => $totalFemaleSoldToday ?? 0,
-        ]);
-    }
-
-
 }

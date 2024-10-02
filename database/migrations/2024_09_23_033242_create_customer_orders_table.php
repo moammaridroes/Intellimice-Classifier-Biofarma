@@ -25,7 +25,7 @@ class CreateCustomerOrdersTable extends Migration
             $table->integer('male_quantity')->default(0);
             $table->integer('female_quantity')->default(0);
             $table->integer('total_price');
-            $table->boolean('is_paid')->default(false); // Status pembayaran
+            $table->boolean('is_paid')->default(false);
             $table->text('notes')->nullable(); // Catatan dari customer
             $table->string('status')->default('pending'); 
             $table->unsignedBigInteger('approved_by')->nullable(); // Admin yang menyetujui
