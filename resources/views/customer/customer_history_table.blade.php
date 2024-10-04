@@ -27,6 +27,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <style>
         .badge {
         padding: 0.5em 0.75em;
@@ -279,108 +281,213 @@
     </div>
 
     <!-- Detail Modal -->
-    <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="detailsModalLabel">Order Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Details will be inserted here dynamically -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">Order Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <!-- Details will be inserted here dynamically -->
+            </div>
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <!-- Tombol untuk mendownload detail order sebagai gambar -->
+                {{-- <button type="button" class="btn btn-primary download-details">Download as Image</button> --}}
             </div>
         </div>
     </div>
+</div>
 
-    <!-- plugins:js -->
-    <script src="{{ asset('vendors/js/vendor.bundle.base.js') }}"></script>
-    <!-- endinject -->
-    <!-- inject:js -->
-    <script src="{{ asset('js/off-canvas.js') }}"></script>
-    <script src="{{ asset('js/hoverable-collapse.js') }}"></script>
-    <script src="{{ asset('js/template.js') }}"></script>
-    <script src="{{ asset('js/settings.js') }}"></script>
-    <script src="{{ asset('js/todolist.js') }}"></script>
-    <!-- endinject -->
+<!-- plugins:js -->
+<script src="{{ asset('vendors/js/vendor.bundle.base.js') }}"></script>
+<!-- endinject -->
+<!-- inject:js -->
+<script src="{{ asset('js/off-canvas.js') }}"></script>
+<script src="{{ asset('js/hoverable-collapse.js') }}"></script>
+<script src="{{ asset('js/template.js') }}"></script>
+<script src="{{ asset('js/settings.js') }}"></script>
+<script src="{{ asset('js/todolist.js') }}"></script>
+<!-- endinject -->
 
-    <!-- jQuery and DataTables scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<!-- jQuery and DataTables scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- DataTables Bootstrap 5 integration -->
-    <script src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<!-- DataTables Bootstrap 5 integration -->
+<script src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
-    <script type="text/javascript">
-        $(function () {
-            var table = $('.yajra-datatable').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: "{{ route('customer.history.getData') }}",
-                columns: [
-                    // { data: 'fullname', name: 'fullname' },
-                    // { data: 'phone_number', name: 'phone_number' },
-                    // { data: 'email', name: 'email' },
-                    { data: 'item_name', name: 'item_name' },
-                    { data: 'pick_up_date', name: 'pick_up_date' },
-                    { data: 'total_price', name: 'total_price', render: function(data) { return data && !isNaN(data) ? 'Rp ' + new Intl.NumberFormat('id-ID').format(data) : data; }},
-                    { 
-                        data: 'is_paid',
-                        name: 'is_paid',
-                        render: function (data, type, row) {
+<!-- html2canvas for downloading images -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        var table = $('.yajra-datatable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('customer.history.getData') }}",
+            order: [[0, 'desc']],
+            columns: [
+                { data: 'item_name', name: 'item_name' },
+                { data: 'pick_up_date', name: 'pick_up_date' },
+                { data: 'total_price', name: 'total_price', render: function(data) { return data && !isNaN(data) ? 'Rp ' + new Intl.NumberFormat('id-ID').format(data) : data; }},
+                { 
+                    data: 'is_paid',
+                    name: 'is_paid',
+                    render: function (data, type, row) {
                         var statusClass = data === 'Paid' ? 'badge bg-success' : 'badge bg-danger';
                         return '<span class="' + statusClass + '">' + data + '</span>';
-                        }
-                    },
-                    { data: 'status', name: 'status' },
-                    {
-                        data: null,
-                        orderable: false,
-                        searchable: false,
-                        render: function (data, type, row) {
-                            return '<button class="btn btn-link details-button" data-bs-toggle="modal" data-bs-target="#detailsModal" data-details="' + encodeURIComponent(JSON.stringify(row)) + '"><i class="fas fa-eye"></i></button>';
-                        }
                     }
-                ],
-                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
-                pageLength: 5,
-                language: {
-                    search: "_INPUT_",
-                    searchPlaceholder: "Search records",
                 },
-                drawCallback: function () {
-                    $('.dataTables_paginate > .pagination').addClass('pagination-rounded');
+                { data: 'status', name: 'status' },
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    render: function (data, type, row) {
+                        return `
+                            <button class="btn btn-link details-button" data-bs-toggle="modal" data-bs-target="#detailsModal" data-details="${encodeURIComponent(JSON.stringify(row))}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-link download-button" style="color: #4B49AC" data-details="${encodeURIComponent(JSON.stringify(row))}">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        `;
+                    }
                 }
-            });
-    
-            // Handle click on details button
-            $('.yajra-datatable').on('click', '.details-button', function () {
-                var data = JSON.parse(decodeURIComponent($(this).data('details')));
-                var modalBody = $('#detailsModal .modal-body');
-                modalBody.empty();
-                modalBody.append('<p><strong>Fullname:</strong> ' + data.fullname + '</p>');
-                modalBody.append('<p><strong>Phone Number:</strong> ' + data.phone_number + '</p>');
-                modalBody.append('<p><strong>Email:</strong> ' + data.email + '</p>');
-                modalBody.append('<p><strong>Item Name:</strong> ' + data.item_name + '</p>');
-                modalBody.append('<p><strong>Pick Up Date:</strong> ' + data.pick_up_date + '</p>');
-                modalBody.append('<p><strong>Weight:</strong> ' + data.weight + '</p>');
-                modalBody.append('<p><strong>Male Quantity:</strong> ' + data.male_quantity + '</p>');
-                modalBody.append('<p><strong>Female Quantity:</strong> ' + data.female_quantity + '</p>');
-                modalBody.append('<p><strong>Total Price:</strong>  ' + data.total_price + '</p>');
-                modalBody.append('<p><strong>Payment Status:</strong> ' + data.is_paid + '</p>');
-                modalBody.append('<p><strong>Status:</strong> ' + data.status + '</p>');
-                modalBody.append('<p><strong>Notes:</strong> ' + (data.notes ? data.notes : '-') + '</p>');
-            });
+            ],
+            lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+            pageLength: 5,
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search records",
+            },
+            drawCallback: function () {
+                $('.dataTables_paginate > .pagination').addClass('pagination-rounded');
+            }
         });
-    </script>
-    
-</body>
 
+        // Handle click on details button
+        $('.yajra-datatable').on('click', '.details-button', function () {
+            var data = JSON.parse(decodeURIComponent($(this).data('details')));
+            var modalBody = $('#detailsModal .modal-body');
+            modalBody.empty();
+            modalBody.append('<p><strong>Fullname:</strong> ' + data.fullname + '</p>');
+            modalBody.append('<p><strong>Phone Number:</strong> ' + data.phone_number + '</p>');
+            modalBody.append('<p><strong>Email:</strong> ' + data.email + '</p>');
+            modalBody.append('<p><strong>Item Name:</strong> ' + data.item_name + '</p>');
+            modalBody.append('<p><strong>Pick Up Date:</strong> ' + data.pick_up_date + '</p>');
+            modalBody.append('<p><strong>Weight:</strong> ' + data.weight + '</p>');
+            modalBody.append('<p><strong>Male Quantity:</strong> ' + data.male_quantity + '</p>');
+            modalBody.append('<p><strong>Female Quantity:</strong> ' + data.female_quantity + '</p>');
+            modalBody.append('<p><strong>Total Price:</strong>  ' + data.total_price + '</p>');
+            modalBody.append('<p><strong>Payment Status:</strong> ' + data.is_paid + '</p>');
+            modalBody.append('<p><strong>Status:</strong> ' + data.status + '</p>');
+            modalBody.append('<p><strong>Notes:</strong> ' + (data.notes ? data.notes : '-') + '</p>');
+        });
+
+        // Handle download details as PDF
+        $('.yajra-datatable').on('click', '.download-button', function () {
+            var data = JSON.parse(decodeURIComponent($(this).data('details')));
+
+            // Buat instance jsPDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Set font style dan ukuran
+            doc.setFont("Helvetica", "normal");
+            doc.setFontSize(12);
+
+            // Tambahkan judul untuk struk pembelian
+            doc.setFontSize(16);
+            doc.text("Receipt / Order Details", 105, 20, null, null, "center");
+            doc.setFontSize(12);
+
+            // Garis pemisah
+            doc.line(10, 25, 200, 25);
+
+            // Posisi label dan nilai
+            let labelX = 20;
+            let valueX = 80;
+            let lineHeight = 10;
+            let startY = 35;
+
+            // Isi PDF dengan data order yang dirapikan
+            doc.text("Fullname:", labelX, startY);
+            doc.text(data.fullname, valueX, startY);
+
+            startY += lineHeight;
+            doc.text("Phone Number:", labelX, startY);
+            doc.text(data.phone_number, valueX, startY);
+
+            startY += lineHeight;
+            doc.text("Email:", labelX, startY);
+            doc.text(data.email, valueX, startY);
+
+            startY += lineHeight;
+            doc.text("Item Name:", labelX, startY);
+            doc.text(data.item_name, valueX, startY);
+
+            startY += lineHeight;
+            doc.text("Pick Up Date:", labelX, startY);
+            doc.text(data.pick_up_date.toString(), valueX, startY);
+
+            startY += lineHeight;
+            doc.text("Weight:", labelX, startY);
+            doc.text(data.weight.toString() + " gr", valueX, startY);
+
+            startY += lineHeight;
+            doc.text("Male Quantity:", labelX, startY);
+            doc.text(data.male_quantity.toString(), valueX, startY);
+
+            startY += lineHeight;
+            doc.text("Female Quantity:", labelX, startY);
+            doc.text(data.female_quantity.toString(), valueX, startY);
+
+            startY += lineHeight;
+            doc.text("Total Price:", labelX, startY);
+            doc.text(data.total_price.toString(), valueX, startY);
+
+            startY += lineHeight;
+            doc.text("Payment Status:", labelX, startY);
+            doc.text(data.is_paid, valueX, startY);
+
+            startY += lineHeight;
+            doc.text("Status:", labelX, startY);
+            doc.text(data.status, valueX, startY);
+
+            startY += lineHeight;
+            doc.text("Notes:", labelX, startY);
+            // Cek apakah ada notes, jika ada, bagi teks menjadi beberapa baris
+            if (data.notes && data.notes.length > 0) {
+                // Split text untuk memastikan teks tidak melampaui batas lebar PDF
+                var splitNotes = doc.splitTextToSize(data.notes.toString(), 110); // 110 menentukan lebar kolom untuk teks Notes
+                doc.text(splitNotes, valueX, startY);  // Cetak teks notes dengan split
+                startY += lineHeight * splitNotes.length;  // Adjust posisi Y berdasarkan jumlah baris notes
+            } else {
+                doc.text("-", valueX, startY);  // Jika tidak ada notes, tampilkan "-"
+                startY += lineHeight;
+            }
+           // Garis pemisah untuk penutup
+            doc.line(10, startY + 10, 200, startY + 10);
+
+            // Tambahkan footer
+            doc.setFontSize(10);
+            doc.text("Thank you for your order!", 105, startY + 20, null, null, "center");
+            doc.text("Biofarma STAS-RG", 105, startY + 25, null, null, "center");
+
+            // Download file PDF
+            doc.save(`order-details-${data.fullname}.pdf`);
+        });
+    });
+</script>
+</body>
 </html>

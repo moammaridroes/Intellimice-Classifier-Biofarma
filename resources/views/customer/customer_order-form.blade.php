@@ -168,6 +168,10 @@
                                         <input type="number" class="form-control form-control-lg" id="totalQuantity" placeholder="Total" readonly>
                                     </div>
                                     <div class="form-group">
+                                        <label>Total Price (Rp)</label>
+                                        <input type="text" class="form-control form-control-lg" id="totalPrice" placeholder="Total Price" readonly>
+                                    </div>
+                                    <div class="form-group">
                                         <label for="notes">Notes</label>
                                         <textarea class="form-control" name="notes" rows="3" placeholder="Enter any additional notes (max 500 characters)" maxlength="500"></textarea>
                                     </div>
@@ -251,9 +255,13 @@
             var maleQuantity = parseInt(document.getElementById('maleQuantity').value) || 0;
             var femaleQuantity = parseInt(document.getElementById('femaleQuantity').value) || 0;
             var totalQuantity = maleQuantity + femaleQuantity;
+            var totalPrice = (maleQuantity * 4000) + (femaleQuantity * 5000);
+
             document.getElementById('totalQuantity').value = totalQuantity;
+            document.getElementById('totalPrice').value = totalPrice.toLocaleString('id-ID');
         }
     </script>
+
 </body>
 
 </html>

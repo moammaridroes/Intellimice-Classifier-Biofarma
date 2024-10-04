@@ -37,6 +37,25 @@
         <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-bs-toggle="minimize">
           <span class="icon-menu"></span>
         </button>
+        <div class="nav-item dropdown">
+          <span class="text-black font-weight-bold">{{ Auth::user()->name }}</span>
+          <a class="nav-link p-0" href="#" data-toggle="dropdown" id="profileDropdown">
+              <div class="ms-1 d-flex justify-content-center">
+                  <svg class="fill-current text-black" width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 111.414 1.414l-4 4a1 1 01-1.414 0l-4-4a1 1 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+              </div>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
+              <a class="dropdown-item" href="{{ route('profile.edit') }}">{{ __('Profile') }}</a>
+              <form method="POST" action="{{ route('logout') }}">
+                  @csrf
+                  <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();">
+                      {{ __('Log Out') }}
+                  </a>
+              </form>
+          </div>
+        </div>
       </div>
     </nav>
     <!-- Navbar ends -->
@@ -145,12 +164,7 @@
                 <h4 class="card-title">Operator Data</h4>
                 <div class="form-group">
                   <label for="operator_name">Full Name</label>
-                  <select class="form-control form-control-lg" id="operator_name" name="operator_name">
-                    <option value="" disabled selected>Select Operator</option>
-                    <option value="Admin1">Admin 1</option>
-                    <option value="Admin2">Admin 2</option>
-                    <option value="Admin3">Admin 3</option>
-                  </select>
+                  <input type="text" class="form-control" id="operator_name" name="operator_name" value="{{ Auth::user()->name }}" readonly>
                 </div>
 
                 <h4 class="card-title">Set Weight</h4>
@@ -296,7 +310,8 @@
       var totalQuantity = maleQuantity + femaleQuantity;
       document.getElementById('totalQuantity').value = totalQuantity;
     }
-
+    
+    //Logic ni ruwet kali
     document.addEventListener("DOMContentLoaded", () => {
       // Submit Order Button Clicked
       document.getElementById("submitOrderButton").addEventListener("click", function (e) {
@@ -308,7 +323,7 @@
           email: document.querySelector("input[name='email']").value,
           item_name: document.querySelector("input[name='item_name']").value,
           agency_name: document.querySelector("input[name='agency_name']").value,
-          operator_name: document.querySelector("select[name='operator_name']").value,
+          operator_name: document.querySelector("input[name='operator_name']").value,
           weight: document.querySelector("input[name='weight']").value,
           male_quantity: document.querySelector("input[name='male_quantity']").value || 0,
           female_quantity: document.querySelector("input[name='female_quantity']").value || 0,
@@ -359,7 +374,7 @@
           email: document.querySelector("input[name='email']").value,
           item_name: document.querySelector("input[name='item_name']").value,
           agency_name: document.querySelector("input[name='agency_name']").value,
-          operator_name: document.querySelector("select[name='operator_name']").value,
+          operator_name: document.querySelector("input[name='operator_name']").value,
           weight: document.querySelector("input[name='weight']").value,
           male_quantity: document.querySelector("input[name='male_quantity']").value || 0,
           female_quantity: document.querySelector("input[name='female_quantity']").value || 0,

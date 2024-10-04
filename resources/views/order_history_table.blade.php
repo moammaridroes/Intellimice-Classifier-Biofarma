@@ -122,6 +122,25 @@
                 <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
                     <span class="icon-menu"></span>
                 </button>
+                <div class="nav-item dropdown">
+                    <span class="text-black font-weight-bold">{{ Auth::user()->name }}</span>
+                    <a class="nav-link p-0" href="#" data-toggle="dropdown" id="profileDropdown">
+                        <div class="ms-1 d-flex justify-content-center">
+                            <svg class="fill-current text-black" width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 111.414 1.414l-4 4a1 1 01-1.414 0l-4-4a1 1 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
+                        <a class="dropdown-item" href="{{ route('profile.edit') }}">{{ __('Profile') }}</a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();">
+                                {{ __('Log Out') }}
+                            </a>
+                        </form>
+                    </div>
+                </div>
             </div>
         </nav>
 
@@ -177,7 +196,7 @@
 
             <div class="main-panel">
                 <div class="content-wrapper">
-                    <h4 class="card-title mb-4">Order History</h4>
+                    <h4 class="card-title mb-4">Offline Order History</h4>
                     <div class="card">
                         <div class="card-body">
                             <!-- Tampilkan pesan sukses -->
@@ -433,8 +452,20 @@
                     $.ajax({
                         url: `{{ url('orderhistory/delete') }}/${id}`,
                         type: 'DELETE',
+                        data: {
+                            _token: "{{ csrf_token() }}" // Kirim CSRF token untuk permintaan penghapusan
+                        },
                         success: function(response) {
-                            table.ajax.reload(); 
+                            if (response.success) {
+                                alert('Order deleted successfully');
+                                // Reload DataTable untuk memperbarui data
+                                $('.yajra-datatable').DataTable().ajax.reload();
+                            } else {
+                                alert('Failed to delete order');
+                            }
+                        },
+                        error: function(xhr) {
+                            alert('Error: ' + xhr.responseText);
                         }
                     });
                 }

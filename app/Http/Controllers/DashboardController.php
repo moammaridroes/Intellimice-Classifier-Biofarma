@@ -29,14 +29,14 @@ class DashboardController extends Controller
         $offlineOrdersToday = Order::whereDate('created_at', $today)->count();
 
         // Periksa jumlah order online hari ini
-        $onlineOrdersToday = CustomerOrder::whereDate('created_at', $today)->where('is_paid', 1)->count();
+        $onlineOrdersToday = CustomerOrder::whereDate('updated_at', $today)->where('is_paid', 1)->count();
 
         // Periksa total pendapatan hari ini
-        $totalRevenueToday = Order::whereDate('created_at', $today)->sum('total_price') + CustomerOrder::whereDate('created_at', $today)->where('is_paid', 1)->sum('total_price');
+        $totalRevenueToday = Order::whereDate('created_at', $today)->sum('total_price') + CustomerOrder::whereDate('updated_at', $today)->where('is_paid', 1)->sum('total_price');
 
         // Jumlah male dan female terjual hari ini
-        $totalMaleSoldToday = Order::whereDate('created_at', $today)->sum('male_quantity') + CustomerOrder::whereDate('created_at', $today)->where('is_paid', 1)->sum('male_quantity');
-        $totalFemaleSoldToday = Order::whereDate('created_at', $today)->sum('female_quantity') + CustomerOrder::whereDate('created_at', $today)->where('is_paid', 1)->sum('female_quantity');
+        $totalMaleSoldToday = Order::whereDate('created_at', $today)->sum('male_quantity') + CustomerOrder::whereDate('updated_at', $today)->where('is_paid', 1)->sum('male_quantity');
+        $totalFemaleSoldToday = Order::whereDate('created_at', $today)->sum('female_quantity') + CustomerOrder::whereDate('updated_at', $today)->where('is_paid', 1)->sum('female_quantity');
 
         return response()->json([
             'onlineOrdersToday' => $onlineOrdersToday,

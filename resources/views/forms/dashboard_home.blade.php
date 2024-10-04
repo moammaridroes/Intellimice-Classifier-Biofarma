@@ -18,6 +18,8 @@
     <script src="{{ asset('js/todolist.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 
     <style>
         /* Animasi untuk fade-in */
@@ -37,7 +39,7 @@
         .card:nth-child(4) { animation-delay: 0.8s; }
         .card:nth-child(5) { animation-delay: 1s; }
 
-        /* Styling layout */
+        /* Layout default untuk laptop/PC */
         .card-container {
             display: flex;
             flex-wrap: wrap;
@@ -64,16 +66,20 @@
             min-width: 250px;
             margin: 10px;
         }
-
         /* Styling tabel */
         .table-container {
             margin-top: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
         }
 
         table.dataTable {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
+            border-collapse: collapse;
+            border-radius: 10px;
+            overflow: hidden;
         }
 
         .dataTables_wrapper {
@@ -81,18 +87,24 @@
         }
 
         table.dataTable thead th {
-            background-color: #f8f9fa;
-            color: #333;
+            background-color: #4B49AC;
+            color: #fff;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             padding: 15px;
             border-bottom: 2px solid #dee2e6;
+            border-right: 1px solid #ffffff;
+        }
+
+        table.dataTable thead th:last-child {
+            border-right: none;
         }
 
         table.dataTable tbody td {
-            padding: 12px 15px;
+            padding: 15px;
             border-bottom: 1px solid #dee2e6;
+            transition: background-color 0.3s;
         }
 
         table.dataTable tbody tr:last-child td {
@@ -101,7 +113,58 @@
 
         table.dataTable tbody tr:hover {
             background-color: #f1f3f5;
+            transform: scale(1.01);
         }
+
+        .dataTables_info, .dataTables_paginate {
+            margin-top: 15px;
+            color: #4B49AC;
+        }
+
+        .dataTables_filter input, .dataTables_length select {
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            padding: 8px 12px;
+            transition: border-color 0.3s;
+        }
+
+        .dataTables_filter input:focus, .dataTables_length select:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .page-item.active .page-link {
+            background-color: #4B49AC;
+            border-color: #4B49AC;
+        }
+
+        /* Gaya untuk ikon */
+        .details-button, .edit-button, .delete-button {
+            cursor: pointer;
+            color: #4B49AC;
+            font-size: 1.2em;
+        }
+
+        .details-button:hover, .edit-button:hover, .delete-button:hover {
+            color: #0056b3;
+        }
+
+        /* Responsif */
+        @media (max-width: 767px) {
+        .table-container {
+            padding: 10px;
+        }
+
+        table.dataTable thead th, table.dataTable tbody td {
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .dataTables_wrapper {
+            padding: 10px;
+        }
+    }
     </style>
 </head>
 <body>
@@ -281,8 +344,7 @@
                 document.getElementById('offlineOrdersToday').innerText = data.offlineOrdersToday;
                 document.getElementById('totalRevenueToday').innerText = `Rp ${data.totalRevenueToday.toLocaleString('id-ID')}`;
                 document.getElementById('totalMaleSoldToday').innerText = data.totalMaleSoldToday;
-                document.getElementById('totalFemaleSoldToday').innerText = data.totalFemaleSoldToday;
-            })
+                document.getElementById('totalFemaleSoldToday').innerText = data.totalFemaleSoldToday;            })
             .catch(error => console.error('Error:', error));
 
         $(document).ready(function () {

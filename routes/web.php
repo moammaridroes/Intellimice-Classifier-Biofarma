@@ -12,6 +12,7 @@ use App\Http\Controllers\CustomerDashboardController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CustomerOrderController;
+use App\Http\Controllers\NotificationController;
 use App\Models\Order;
 
 Route::get('/', function () {
@@ -44,15 +45,20 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->g
     Route::post('home', [OrderController::class, 'store']);
 
     Route::get('/notification', [CustomerOrderController::class, 'notificationAdmin'])->name('admin.notification');
+    // Route::get('/admin/notification', [CustomerOrderController::class, 'getNotifications'])->name('admin.notification');
+    // Route::get('/admin/getNotificationCount', [CustomerOrderController::class, 'getNotificationCount'])->name('admin.getNotificationCount');
 
     // Route untuk menyetujui pesanan
     Route::post('/admin/customer-orders/{id}/approve', [CustomerOrderController::class, 'approve'])->name('admin.customer-orders.approve');
     // Route untuk menolak pesanan
     Route::post('/admin/customer-orders/{id}/reject', [CustomerOrderController::class, 'reject'])->name('admin.customer-orders.reject');
 
-    Route::get('/stok', [DetailMencitController::class, 'showData']);
-    Route::get('data-table', [DetailMencitController::class, 'showData'])->name('data.table');
+    Route::get('stok', [DetailMencitController::class, 'showData'])->name('data.table');
     Route::get('detailmencit/data', [DetailMencitController::class, 'getData'])->name('detailmencit.data');
+    Route::delete('/detailmencit/delete/{id}', [DetailMencitController::class, 'delete'])->name('detailmencit.delete');
+    Route::get('detailmencit/updateStockCounts', [DetailMencitController::class, 'updateStockCounts'])->name('detailmencit.updateStockCounts');
+
+    
 
     Route::get('orderhistory', [OrderHistoryController::class, 'index'])->name('orderhistory.index');
     Route::get('orderhistory/data', [OrderHistoryController::class, 'getData'])->name('orderhistory.getData');
@@ -63,6 +69,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->g
     Route::get('/online-history', [CustomerOrderController::class, 'showOnlineHistory'])->name('onlinehistory.index');
     Route::get('/online-history/data', [CustomerOrderController::class, 'getOnlineHistoryData'])->name('onlinehistory.getData');
     Route::post('/customer-orders/{id}/mark-as-paid', [CustomerOrderController::class, 'markAsPaid'])->name('customer-orders.markAsPaid');
+    Route::post('/customer-orders/{id}/mark-as-unpaid', [CustomerOrderController::class, 'markAsUnpaid'])->name('customer-orders.markAsUnpaid');
 
 
     Route::get('/datatable', function () {
@@ -73,7 +80,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->g
 
     Route::post('/admin/customer-orders/{id}/approve', [CustomerOrderController::class, 'approve'])->name('admin.customer-orders.approve');
 
-    Route::get('/invoice/{id}', [OrderController::class, 'showInvoice'])->name('invoice.show');
+    // Route::get('/invoice/{id}', [OrderController::class, 'showInvoice'])->name('invoice.show');
     Route::post('/submit-order', [OrderController::class, 'store'])->name('order.store');
     Route::post('/order/payment/{id}', [OrderController::class, 'payment'])->name('order.payment');
 
@@ -89,7 +96,8 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':customer'])
 
     Route::post('/customer/orders', [CustomerOrderController::class, 'store'])->name('customer.orders.store');
 
-    Route::post('submit-order-customer', [OrderController::class, 'store']);
+    // Route::post('submit-order-customer', [OrderController::class, 'store']);
+    Route::post('/customer/orders', [CustomerOrderController::class, 'store'])->name('customer.orders.store');
     Route::get('/customer/orderform', function () {
         return view('customer.customer_order-form');
     });

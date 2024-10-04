@@ -61,11 +61,11 @@ class OrderController extends Controller
         return datatables()->of($orders)->make(true);
     }
 
-    public function showInvoice($id)
-    {
-        $order = Order::findOrFail($id);
-        return view('invoice', compact('order'));
-    }
+    // public function showInvoice($id)
+    // {
+    //     $order = Order::findOrFail($id);
+    //     return view('invoice', compact('order'));
+    // }
 
     public function payment($id)
     {
@@ -90,9 +90,13 @@ class OrderController extends Controller
     }
 
     public function delete($id)
-    {
-        $order = Order::findOrFail($id);
-        $order->delete();
+{
+    $order = Order::findOrFail($id);
+    if ($order) {
+        $order->delete(); // Hapus data dari database
         return response()->json(['success' => true]);
     }
+    return response()->json(['success' => false, 'message' => 'Order not found.'], 404);
+}
+
 }

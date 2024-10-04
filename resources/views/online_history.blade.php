@@ -26,6 +26,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <style>
   .badge {
@@ -234,6 +235,7 @@
               @endif
               <!-- Tabel data order menggunakan Yajra DataTables -->
               <div class="table-container">
+                <div class="table-responsive">
                 <table class="table table-striped yajra-datatable">
                   <thead>
                     <tr>
@@ -312,94 +314,117 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script type="text/javascript">
-    $(function () {
-  var table = $('.yajra-datatable').DataTable({
-    processing: true,
-    serverSide: true,
-    ajax: "{{ route('onlinehistory.getData') }}",
-    order: [[0, 'desc']],
-    columns: [
-      {data: 'fullname', name: 'fullname'},
-      {data: 'item_name', name: 'item_name'},
-      {data: 'pick_up_date', name: 'pick_up_date'},
-      {data: 'total_price', name: 'total_price', render: $.fn.dataTable.render.number(',', '.', 2, 'Rp ')},
-      {
-        data: 'is_paid',
-        name: 'is_paid',
-        render: function (data, type, row) {
-          var statusClass = data === 'Paid' ? 'badge bg-success' : 'badge bg-danger';
-          return '<span class="' + statusClass + '">' + data + '</span>';
+   $(function () {
+    var table = $('.yajra-datatable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "{{ route('onlinehistory.getData') }}",
+        order: [[0, 'desc']],
+        columns: [
+            {data: 'fullname', name: 'fullname'},
+            {data: 'item_name', name: 'item_name'},
+            {data: 'pick_up_date', name: 'pick_up_date'},
+            {data: 'total_price', name: 'total_price', render: $.fn.dataTable.render.number(',', '.', 2, 'Rp ')},
+            {
+                data: 'is_paid',
+                name: 'is_paid',
+                render: function (data, type, row) {
+                    var statusClass = data === 'Paid' ? 'badge bg-success' : 'badge bg-danger';
+                    return '<span class="' + statusClass + '">' + data + '</span>';
+                }
+            },
+            {
+                data: null,
+                orderable: false,
+                searchable: false,
+                render: function (data, type, row) {
+                    return '<button class="btn btn-link details-button" data-bs-toggle="modal" data-bs-target="#detailsModal" data-details="' + encodeURIComponent(JSON.stringify(row)) + '"><i class="fas fa-eye"></i></button>';
+                }
+            }
+        ],
+        lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+        pageLength: 5,
+        language: {
+            search: "_INPUT_",
+            searchPlaceholder: "Search records",
+        },
+        drawCallback: function() {
+            $('.dataTables_paginate > .pagination').addClass('pagination-rounded');
         }
-      },
-      {
-        data: null,
-        orderable: false,
-        searchable: false,
-        render: function (data, type, row) {
-          return '<button class="btn btn-link details-button" data-bs-toggle="modal" data-bs-target="#detailsModal" data-details="' + encodeURIComponent(JSON.stringify(row)) + '"><i class="fas fa-eye"></i></button>';
+    });
+
+    // Handle click on details button
+    $('.yajra-datatable').on('click', '.details-button', function () {
+        var data = JSON.parse(decodeURIComponent($(this).data('details')));
+        var modalBody = $('#detailsModal .modal-body');
+        var modalFooter = $('#detailsModal .modal-footer');
+
+        // Kosongkan modal sebelum menambahkan data baru
+        modalBody.empty();
+        modalFooter.find('.mark-paid-button, .mark-unpaid-button').remove(); // Hapus tombol lama jika ada
+
+        modalBody.append('<p><strong>Fullname:</strong> ' + data.fullname + '</p>');
+        modalBody.append('<p><strong>Phone Number:</strong> ' + data.phone_number + '</p>');
+        modalBody.append('<p><strong>Email:</strong> ' + data.email + '</p>');
+        modalBody.append('<p><strong>Item Name:</strong> ' + data.item_name + '</p>');
+        modalBody.append('<p><strong>Pick Up Date:</strong> ' + data.pick_up_date + '</p>');
+        modalBody.append('<p><strong>Weight:</strong> ' + data.weight + ' gr</p>');
+        modalBody.append('<p><strong>Male Quantity:</strong> ' + data.male_quantity + '</p>');
+        modalBody.append('<p><strong>Female Quantity:</strong> ' + data.female_quantity + '</p>');
+        modalBody.append('<p><strong>Total Price:</strong> ' + data.total_price + '</p>');
+        modalBody.append('<p><strong>Payment Status:</strong> ' + data.is_paid + '</p>');
+
+        // Jika status pembayaran Unpaid, tampilkan tombol "Mark as Paid"
+        if (data.is_paid === 'Unpaid') {
+            var markPaidButton = $('<button type="button" class="btn btn-success mark-paid-button">Mark as Paid</button>');
+            modalFooter.prepend(markPaidButton);
+
+            // Event handler untuk tombol "Mark as Paid"
+            markPaidButton.on('click', function() {
+                $.ajax({
+                    url: '/customer-orders/' + data.id + '/mark-as-paid',
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        alert('Order has been marked as paid.');
+                        $('#detailsModal').modal('hide');
+                        table.ajax.reload(null, false);
+                    },
+                    error: function(xhr) {
+                        alert('An error occurred while updating the payment status.');
+                    }
+                });
+            });
         }
-      }
-    ],
+        // Jika status pembayaran Paid, tampilkan tombol "Mark as Unpaid"
+        else if (data.is_paid === 'Paid') {
+            var markUnpaidButton = $('<button type="button" class="btn btn-danger mark-unpaid-button">Mark as Unpaid</button>');
+            modalFooter.prepend(markUnpaidButton);
 
-    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
-    pageLength: 5,
-    language: {
-      search: "_INPUT_",
-      searchPlaceholder: "Search records",
-    },
-    drawCallback: function() {
-      $('.dataTables_paginate > .pagination').addClass('pagination-rounded');
-    }
-  });
-
-  // Handle click on details button
-  $('.yajra-datatable').on('click', '.details-button', function () {
-    var data = JSON.parse(decodeURIComponent($(this).data('details')));
-    var modalBody = $('#detailsModal .modal-body');
-    var modalFooter = $('#detailsModal .modal-footer');
-    modalBody.empty();
-    modalFooter.find('.mark-paid-button').remove(); // Hapus tombol sebelumnya jika ada
-
-    modalBody.append('<p><strong>Fullname:</strong> ' + data.fullname + '</p>');
-    modalBody.append('<p><strong>Phone Number:</strong> ' + data.phone_number + '</p>');
-    modalBody.append('<p><strong>Email:</strong> ' + data.email + '</p>');
-    modalBody.append('<p><strong>Item Name:</strong> ' + data.item_name + '</p>');
-    modalBody.append('<p><strong>Pick Up Date:</strong> ' + data.pick_up_date + '</p>');
-    modalBody.append('<p><strong>Weight:</strong> ' + data.weight + ' gr</p>');
-    modalBody.append('<p><strong>Male Quantity:</strong> ' + data.male_quantity + '</p>');
-    modalBody.append('<p><strong>Female Quantity:</strong> ' + data.female_quantity + '</p>');
-    modalBody.append('<p><strong>Total Price:</strong> ' + data.total_price + '</p>'); 
-    modalBody.append('<p><strong>Payment Status:</strong> ' + data.is_paid + '</p>');
-
-    // Jika status pembayaran adalah Unpaid, tambahkan tombol "Mark as Paid"
-    if (data.is_paid === 'Unpaid') {
-      var markPaidButton = $('<button type="button" class="btn" style="background-color: #4B49AC; border-color: #4B49AC; color: white;">Mark as Paid</button>');
-      modalFooter.prepend(markPaidButton);
-
-      // Event handler untuk tombol "Mark as Paid"
-      markPaidButton.on('click', function() {
-        $.ajax({
-          url: '/customer-orders/' + data.id + '/mark-as-paid',
-          type: 'POST',
-          data: {
-            _token: '{{ csrf_token() }}'
-          },
-          success: function(response) {
-            // Tampilkan pesan sukses
-            alert('Order has been marked as paid.');
-            // Tutup modal
-            $('#detailsModal').modal('hide');
-            // Refresh tabel data
-            table.ajax.reload(null, false);
-          },
-          error: function(xhr) {
-            alert('An error occurred while updating the payment status.');
-          }
-        });
-      });
-    }
-  });
+            // Event handler untuk tombol "Mark as Unpaid"
+            markUnpaidButton.on('click', function() {
+                $.ajax({
+                    url: '/customer-orders/' + data.id + '/mark-as-unpaid',
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        alert('Order has been marked as unpaid.');
+                        $('#detailsModal').modal('hide');
+                        table.ajax.reload(null, false);
+                    },
+                    error: function(xhr) {
+                        alert('An error occurred while updating the payment status.');
+                    }
+                });
+            });
+        }
+    });
 });
+
 
   </script>
 </body>
