@@ -126,38 +126,24 @@
         </button>
 
         <div class="nav-item dropdown">
-          <!-- Username Display -->
-          <span class="text-black font-weight-bold">
-            {{ Auth::user()->name }}
-          </span>
-
-          <!-- Trigger Button with SVG Icon -->
+          <span class="text-black font-weight-bold">{{ Auth::user()->name }}</span>
           <a class="nav-link p-0" href="#" data-toggle="dropdown" id="profileDropdown">
-            <div class="ms-1 d-flex justify-content-center">
-              <!-- Custom Black SVG Icon -->
-              <svg class="fill-current text-black" width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
-            </div>
+              <div class="ms-1 d-flex justify-content-center">
+                  <svg class="fill-current text-black" width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 111.414 1.414l-4 4a1 1 01-1.414 0l-4-4a1 1 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+              </div>
           </a>
-
-          <!-- Dropdown Menu -->
           <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
-            <!-- Profile Link -->
-            <a class="dropdown-item" href="{{ route('profile.edit') }}">
-              {{ __('Profile') }}
-            </a>
-
-            <!-- Logout Form -->
-            <form method="POST" action="{{ route('logout') }}">
-              @csrf
-              <a class="dropdown-item" href="{{ route('logout') }}"
-                onclick="event.preventDefault(); this.closest('form').submit();">
-                {{ __('Log Out') }}
-              </a>
-            </form>
+              {{-- <a class="dropdown-item" href="{{ route('profile.edit') }}">{{ __('Profile') }}</a> --}}
+              <form method="POST" action="{{ route('logout') }}">
+                  @csrf
+                  <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();">
+                      {{ __('Log Out') }}
+                  </a>
+              </form>
           </div>
-        </div>
+      </div>
     </nav>
 
     <!-- partial -->

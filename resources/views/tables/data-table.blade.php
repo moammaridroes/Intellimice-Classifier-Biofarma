@@ -44,9 +44,9 @@
   }
 
   h5 {
-      font-weight: 400; /* Not too bold */
+      font-weight: 400; 
       font-size: 16px;
-      color: #333; /* Darker gray color */
+      color: #333; 
   }
 
   .text-info {
@@ -59,7 +59,7 @@
 
   .summary-container {
       padding: 20px;
-      background-color: #f9f9f9; /* Light background */
+      background-color: #f9f9f9;
       border-radius: 5px;
       margin-bottom: 10px;
   }
@@ -99,7 +99,7 @@
                     </a>
 
                     <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
-                        <a class="dropdown-item" href="{{ route('profile.edit') }}">{{ __('Profile') }}</a>
+                        {{-- <a class="dropdown-item" href="{{ route('profile.edit') }}">{{ __('Profile') }}</a> --}}
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();">
@@ -231,28 +231,27 @@
         <!-- Initialize DataTables -->
         <script type="text/javascript">
             $(document).ready(function () {
-    var table = $('.yajra-datatable').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: "{{ route('detailmencit.data') }}",
-        columns: [
-            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-            { data: 'created_at', name: 'created_at' },
-            { data: 'berat', name: 'berat' },
-            { data: 'gender', name: 'gender' },
-            { data: 'health_status', name: 'health_status' },
-            {
-                data: 'action',
-                name: 'action',
-                orderable: false,
-                searchable: false,
-                render: function (data, type, row) {
-                    return `<button class="btn btn-danger btn-sm delete" data-id="${row.id}">Delete</button>`;
+            var table = $('.yajra-datatable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('detailmencit.data') }}",
+            columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'created_at', name: 'created_at' },
+                { data: 'berat', name: 'berat' },
+                { data: 'gender', name: 'gender' },
+                { data: 'health_status', name: 'health_status' },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false,
+                    render: function (data, type, row) {
+                        return `<button class="btn btn-danger btn-sm delete" data-id="${row.id}">Delete</button>`;
+                    }
                 }
-            }
-        ]
-    });
-
+            ]
+        });
     // Delete action
     $('body').on('click', '.delete', function () {
         var id = $(this).data('id');
@@ -294,6 +293,8 @@
                 $('.female-healthy-between-8-and-14').text(data.femaleHealthyCounts.between_8_and_14);
                 $('.female-healthy-between-14-and-18').text(data.femaleHealthyCounts.between_14_and_18);
                 $('.female-healthy-greater-18').text(data.femaleHealthyCounts.greater_equal_18);
+
+                $('.yajra-datatable').DataTable().ajax.reload();
             },
             error: function () {
                 alert('Failed to update stock counts.');

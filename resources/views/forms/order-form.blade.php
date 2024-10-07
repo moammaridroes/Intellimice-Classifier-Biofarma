@@ -47,7 +47,6 @@
               </div>
           </a>
           <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
-              <a class="dropdown-item" href="{{ route('profile.edit') }}">{{ __('Profile') }}</a>
               <form method="POST" action="{{ route('logout') }}">
                   @csrf
                   <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();">
@@ -61,22 +60,6 @@
     <!-- Navbar ends -->
 
     <div class="container-fluid page-body-wrapper">
-      <!-- Settings Panel -->
-      <div class="theme-setting-wrapper">
-        <div id="settings-trigger"><i class="ti-settings"></i></div>
-        <div id="theme-settings" class="settings-panel">
-          <i class="settings-close ti-close"></i>
-          <p class="settings-heading">SIDEBAR SKINS</p>
-          <div class="sidebar-bg-options selected" id="sidebar-light-theme">
-            <div class="img-ss rounded-circle bg-light border mr-3"></div>Light
-          </div>
-          <div class="sidebar-bg-options" id="sidebar-dark-theme">
-            <div class="img-ss rounded-circle bg-dark border mr-3"></div>Dark
-          </div>
-        </div>
-      </div>
-      <!-- Settings Panel ends -->
-
       <!-- Sidebar -->
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <ul class="nav">
@@ -153,197 +136,203 @@
                       <label for="agency_name">Agency Name</label>
                       <input type="text" class="form-control" name="agency_name" id="agency_name" placeholder="Agency Name" required>
                     </div>
-                </form>
+                    <h4 class="card-title">Operator Data</h4>
+                  <div class="form-group">
+                    <label for="operator_name">Full Name</label>
+                    <input type="text" class="form-control" id="operator_name" name="operator_name" value="{{ Auth::user()->name }}" readonly>
+                  </div>
+                  </form>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="col-md-6 grid-margin stretch-card">
-            <div class="card">
-              <div class="card-body">
-                <h4 class="card-title">Operator Data</h4>
-                <div class="form-group">
-                  <label for="operator_name">Full Name</label>
-                  <input type="text" class="form-control" id="operator_name" name="operator_name" value="{{ Auth::user()->name }}" readonly>
-                </div>
+            <div class="col-md-6 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">Set Weight</h4>
+                  <div class="form-group">
+                    <label>Weight Category</label>
+                    <select class="form-control" name="weight" id="weightSelect" onchange="fetchStockCount()">
+                      <option value="" selected disabled>Select Weight</option>
+                      <option value="less_than_8">&lt;8g</option>
+                      <option value="between_8_and_14">8-14g</option>
+                      <option value="between_14_and_18">14-18g</option>
+                      <option value="greater_equal_18">&gt;18g</option>
+                    </select>
+                    <div id="weightError" class="error-message">Please select a weight</div>
+                  </div>
 
-                <h4 class="card-title">Set Weight</h4>
-                <div class="form-group">
-                  <label>Fill in the required amount of order</label>
-                  <div class="input-group">
-                    <input type="number" class="form-control" name="weight" id="weightInput" placeholder="Weight Ordered" oninput="validateWeight()">
-                    <div class="input-group-append">
-                      <span class="input-group-text bg-transparent text-black font-semibold">gr</span>
+                  <h4 class="card-title">Set amount of order</h4>
+                  <div class="form-group">
+                    <div class="form-check form-check-flat form-check-primary">
+                      <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" id="maleCheckbox" onchange="toggleInput('maleQuantity', this.checked)"> Male
+                      </label>
                     </div>
+                    <input type="number" class="form-control form-control-lg" id="maleQuantity" name="male_quantity" placeholder="Quantity" min="1" value="0" disabled>
+                    <div id="maleStock">Stock: -</div>
                   </div>
-                  <div id="weightError" class="error-message">Please input weight more than 0</div>
-                </div>
 
-                <h4 class="card-title">Set amount of order</h4>
-                <div class="form-group">
-                  <div class="form-check form-check-flat form-check-primary">
-                    <label class="form-check-label">
-                      <input type="checkbox" class="form-check-input" id="maleCheckbox"> Male
-                    </label>
+                  <div class="form-group">
+                    <div class="form-check form-check-flat form-check-primary">
+                      <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" id="femaleCheckbox" onchange="toggleInput('femaleQuantity', this.checked)"> Female
+                      </label>
+                    </div>
+                    <input type="number" class="form-control form-control-lg" id="femaleQuantity" name="female_quantity" placeholder="Quantity" min="1" value="0" disabled>
+                    <div id="femaleStock">Stock: -</div>
                   </div>
-                  <input type="number" class="form-control form-control-lg" id="maleQuantity" name="male_quantity" placeholder="Quantity" min="1" value="0" oninput="validateAndCalculate(this)" disabled>
-                </div>
-                <div class="form-group">
-                  <div class="form-check form-check-flat form-check-primary">
-                    <label class="form-check-label">
-                      <input type="checkbox" class="form-check-input" id="femaleCheckbox"> Female
-                    </label>
+
+                  <div class="form-group">
+                    <label>Total</label>
+                    <input type="number" class="form-control form-control-lg" id="totalQuantity" placeholder="Total" readonly>
                   </div>
-                  <input type="number" class="form-control form-control-lg" id="femaleQuantity" name="female_quantity" placeholder="Quantity" min="1" value="0" oninput="validateAndCalculate(this)" disabled>
+                  <button type="submit" class="btn btn-primary mr-2" style="background-color: #4B49AC; border-color: #4B49AC;" id="submitOrderButton">Submit</button>
                 </div>
-                <div class="form-group">
-                  <label>Total</label>
-                  <input type="number" class="form-control form-control-lg" id="totalQuantity" placeholder="Total" readonly>
-                </div>
-                <button type="submit" class="btn btn-primary mr-2" style="background-color: #4B49AC; border-color: #4B49AC;" id="submitOrderButton">Submit</button>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <!-- Main Content ends -->
-
-      <!-- Invoice Modal -->
-      <div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="invoiceModalLabel">Invoice</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <!-- Invoice nnti disini -->
-              <div id="invoiceContent"></div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary" style="background-color: #4B49AC; border-color: #4B49AC;" id="payButton">Bayar</button>
-            </div>
-          </div>
-        </div>
       </div>
-      <!-- Invoice Modal ends -->
 
       <footer class="footer">
         <div class="d-sm-flex justify-content-center justify-content-sm-between">
           <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2024, Biofarma. STAS-RG. All rights reserved.</span>
-          <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"></span>
         </div>
       </footer>
-      <!-- footer ends -->
-
     </div>
-    <!-- main-panel ends -->
   </div>
   <!-- page-body-wrapper ends -->
   </div>
   <!-- container-scroller -->
 
+  <!-- Invoice Modal -->
+  <div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="invoiceModalLabel">Invoice</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="invoiceContent"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" style="background-color: #4B49AC; border-color: #4B49AC;" id="payButton">Bayar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Invoice Modal ends -->
+
   <!-- plugins:js -->
   <script src="{{ asset('vendors/js/vendor.bundle.base.js') }}"></script>
-  <!-- Plugin js for this page -->
   <script src="{{ asset('vendors/typeahead.js/typeahead.bundle.min.js') }}"></script>
   <script src="{{ asset('vendors/select2/select2.min.js') }}"></script>
-  <!-- inject:js -->
   <script src="{{ asset('js/off-canvas.js') }}"></script>
   <script src="{{ asset('js/hoverable-collapse.js') }}"></script>
   <script src="{{ asset('js/template.js') }}"></script>
   <script src="{{ asset('js/settings.js') }}"></script>
   <script src="{{ asset('js/todolist.js') }}"></script>
-  <!-- Custom js for this page-->
-  <script src="{{ asset('js/file-upload.js') }}"></script>
-  <script src="{{ asset('js/typeahead.js') }}"></script>
-  <script src="{{ asset('js/select2.js') }}"></script>
-  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Custom JS -->
+
   <script>
-    function validateWeight() {
-      var weightInput = document.getElementById('weightInput');
-      var errorDiv = document.getElementById('weightError');
-      var weightValue = parseInt(weightInput.value) || 0;
+    function fetchStockCount() {
+    var selectedWeight = document.getElementById('weightSelect').value;
 
-      if (weightValue <= 0) {
-        weightInput.style.borderColor = 'red';
-        errorDiv.style.display = 'block'; 
-      } else {
-        weightInput.style.borderColor = '';
-        errorDiv.style.display = 'none'; 
-      }
-    }
+    fetch(`/detailmencit/updateStockCounts?weight=${selectedWeight}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('maleStock').textContent = `Stock: ${data.maleStock}`;
+            document.getElementById('femaleStock').textContent = `Stock: ${data.femaleStock}`;
+            
+            // Simpan data stok dalam variabel global
+            window.maleStockAvailable = data.maleStock;
+            window.femaleStockAvailable = data.femaleStock;
+        })
+        .catch(error => {
+            console.error('Error fetching stock counts:', error);
+        });
+}
 
-    document.getElementById('maleCheckbox').addEventListener('change', function () {
-      toggleInput('maleQuantity', this.checked);
-    });
-
-    document.getElementById('femaleCheckbox').addEventListener('change', function () {
-      toggleInput('femaleQuantity', this.checked);
-    });
-
-    function toggleInput(inputId, isChecked) {
-      var input = document.getElementById(inputId);
-      input.disabled = !isChecked;
-      if (isChecked) {
+function toggleInput(inputId, isChecked) {
+    var input = document.getElementById(inputId);
+    input.disabled = !isChecked;
+    if (isChecked) {
         input.value = '';
         input.focus();
-      } else {
+    } else {
         input.value = 0;
-        calculateTotal();
-      }
     }
+    calculateTotal();
+}
 
-    function validateAndCalculate(input) {
-      if (input.value < 0) {
-        input.value = 0;
-      }
-      calculateTotal();
-    }
-
-    function calculateTotal() {
-      var maleQuantity = parseInt(document.getElementById('maleQuantity').value) || 0;
-      var femaleQuantity = parseInt(document.getElementById('femaleQuantity').value) || 0;
-      var totalQuantity = maleQuantity + femaleQuantity;
-      document.getElementById('totalQuantity').value = totalQuantity;
-    }
+function validateQuantity(inputId, maxStock) {
+    var input = document.getElementById(inputId);
+    var value = parseInt(input.value) || 0;
     
-    //Logic ni ruwet kali
-    document.addEventListener("DOMContentLoaded", () => {
-      // Submit Order Button Clicked
-      document.getElementById("submitOrderButton").addEventListener("click", function (e) {
+    if (value < 0 || value > maxStock) {
+        input.value = 0; // Kembalikan ke 0 jika lebih dari stok atau negatif
+        alert(`Jumlah tidak valid! Jumlah harus antara 0 dan ${maxStock}`);
+    }
+}
+
+function calculateTotal() {
+    var maleQuantity = parseInt(document.getElementById('maleQuantity').value) || 0;
+    var femaleQuantity = parseInt(document.getElementById('femaleQuantity').value) || 0;
+    
+    // Validasi input male berdasarkan stok
+    validateQuantity('maleQuantity', window.maleStockAvailable || 0);
+    
+    // Validasi input female berdasarkan stok
+    validateQuantity('femaleQuantity', window.femaleStockAvailable || 0);
+    
+    var totalQuantity = maleQuantity + femaleQuantity;
+    document.getElementById('totalQuantity').value = totalQuantity;
+}
+
+document.getElementById('maleQuantity').addEventListener('input', function () {
+    calculateTotal();
+});
+
+document.getElementById('femaleQuantity').addEventListener('input', function () {
+    calculateTotal();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("submitOrderButton").addEventListener("click", function (e) {
         e.preventDefault(); // Prevent form from submitting
+        console.log("Submit button clicked");
+
         // Fetch form data
         const orderData = {
-          fullname: document.querySelector("input[name='fullname']").value,
-          phone_number: document.querySelector("input[name='phone_number']").value,
-          email: document.querySelector("input[name='email']").value,
-          item_name: document.querySelector("input[name='item_name']").value,
-          agency_name: document.querySelector("input[name='agency_name']").value,
-          operator_name: document.querySelector("input[name='operator_name']").value,
-          weight: document.querySelector("input[name='weight']").value,
-          male_quantity: document.querySelector("input[name='male_quantity']").value || 0,
-          female_quantity: document.querySelector("input[name='female_quantity']").value || 0,
-          total_price: calculateTotalPrice() 
+            fullname: document.querySelector("input[name='fullname']").value,
+            phone_number: document.querySelector("input[name='phone_number']").value,
+            email: document.querySelector("input[name='email']").value,
+            item_name: document.querySelector("input[name='item_name']").value,
+            agency_name: document.querySelector("input[name='agency_name']").value,
+            operator_name: document.querySelector("input[name='operator_name']").value,
+            weight: document.querySelector("select[name='weight']").value, // Now a string
+            male_quantity: document.querySelector("input[name='male_quantity']").value || 0,
+            female_quantity: document.querySelector("input[name='female_quantity']").value || 0,
+            total_price: calculateTotalPrice()
         };
+
         // Show invoice modal with fetched data
         showInvoiceModal(orderData);
-      });
+    });
 
-      // Calculate total price based on the input data
-      function calculateTotalPrice() {
+    function calculateTotalPrice() {
         const maleQuantity = parseInt(document.querySelector("input[name='male_quantity']").value) || 0;
         const femaleQuantity = parseInt(document.querySelector("input[name='female_quantity']").value) || 0;
         const malePrice = 4000; 
         const femalePrice = 5000; 
         return (maleQuantity * malePrice) + (femaleQuantity * femalePrice);
-      }
+    }
 
-      // Function to show invoice modal with order data
-      function showInvoiceModal(order) {
+    function showInvoiceModal(order) {
         const invoiceContent = `
           <h5 class="card-title">Order Details</h5>
           <p><strong>Fullname:</strong> ${order.fullname}</p>
@@ -362,49 +351,146 @@
         document.getElementById("payButton").disabled = false; // Enable pay button
         var invoiceModal = new bootstrap.Modal(document.getElementById('invoiceModal'));
         invoiceModal.show(); // Show modal using Bootstrap 5
-      }
+    }
 
-      // Pay button click event
-      document.getElementById("payButton").addEventListener("click", function () {
-        // Send AJAX request to store order in the database
+    document.getElementById("payButton").addEventListener("click", function () {
+    // Tambahkan konfirmasi sebelum pembayaran
+    const confirmation = confirm("Apakah kamu yakin ingin melakukan pembayaran?");
+    
+    if (confirmation) {
+      window.location.reload();
+        // Jika konfirmasi diterima, lanjutkan dengan proses pembayaran
         const orderData = {
-          _token: '{{ csrf_token() }}',
-          fullname: document.querySelector("input[name='fullname']").value,
-          phone_number: document.querySelector("input[name='phone_number']").value,
-          email: document.querySelector("input[name='email']").value,
-          item_name: document.querySelector("input[name='item_name']").value,
-          agency_name: document.querySelector("input[name='agency_name']").value,
-          operator_name: document.querySelector("input[name='operator_name']").value,
-          weight: document.querySelector("input[name='weight']").value,
-          male_quantity: document.querySelector("input[name='male_quantity']").value || 0,
-          female_quantity: document.querySelector("input[name='female_quantity']").value || 0,
-          total_price: calculateTotalPrice()
+            _token: '{{ csrf_token() }}',
+            fullname: document.querySelector("input[name='fullname']").value,
+            phone_number: document.querySelector("input[name='phone_number']").value,
+            email: document.querySelector("input[name='email']").value,
+            item_name: document.querySelector("input[name='item_name']").value,
+            agency_name: document.querySelector("input[name='agency_name']").value,
+            operator_name: document.querySelector("input[name='operator_name']").value,
+            weight: document.querySelector("select[name='weight']").value,
+            male_quantity: document.querySelector("input[name='male_quantity']").value || 0,
+            female_quantity: document.querySelector("input[name='female_quantity']").value || 0,
+            total_price: calculateTotalPrice()
         };
 
         fetch('{{ url('submit-order') }}', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': orderData._token
-          },
-          body: JSON.stringify(orderData)
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': orderData._token
+            },
+            body: JSON.stringify(orderData)
         })
-          .then(response => response.json())
-          .then(data => {
+        .then(response => response.json())
+        .then(data => {
             if (data.success) {
-              alert("Order has been paid successfully!");
-              document.getElementById("payButton").disabled = true;
-              document.getElementById("invoiceContent").innerHTML += "<p><strong>Status:</strong> Paid</p>";
-              var invoiceModal = bootstrap.Modal.getInstance(document.getElementById('invoiceModal'));
-              invoiceModal.hide(); 
+                console.log("Order sukses", data);
+                alert("Order has been paid successfully!");
+
+                // Update stok secara otomatis di tampilan setelah pembayaran berhasil
+                updateStockCounts();
+
+                // Nonaktifkan tombol "Bayar"
+                document.getElementById("payButton").disabled = true;
+                document.getElementById("invoiceContent").innerHTML += "<p><strong>Status:</strong> Paid</p>";
+
+                // Tutup modal setelah sukses
+                var invoiceModal = bootstrap.Modal.getInstance(document.getElementById('invoiceModal'));
+                invoiceModal.hide();
+
+                // Reset form setelah pembayaran sukses
+                document.getElementById("orderForm").reset();
+
+                // Reset tampilan stok setelah pembayaran
+                document.getElementById('maleStock').textContent = "Stock: -";
+                document.getElementById('femaleStock').textContent = "Stock: -";
+                document.getElementById('totalQuantity').value = 0;
+
+                // Refresh halaman setelah form di-reset
+                window.location.reload(); // Ini akan memuat ulang halaman
             } else {
-              alert("Failed to process payment!");
+                alert("Failed to process payment!");
             }
-          })
-          .catch(error => console.error('Error:', error));
-      });
-    });
+        })
+        .catch(error => console.error('Error:', error));
+    } else {
+        // Jika konfirmasi ditolak, tidak melakukan apa-apa
+        console.log("Pembayaran dibatalkan oleh pengguna.");
+    }
+});
+
+
+
+// Function to update stock counts (calls the backend to get updated stock)
+function updateStockCounts() {
+    fetch("{{ route('detailmencit.updateStockCounts') }}")
+        .then(response => response.json())
+        .then(data => {
+            // Update Male Stock Counts
+            let maleSickElement = document.querySelector('.male-sick-count');
+            if (maleSickElement) {
+                maleSickElement.textContent = data.maleSickCount;
+            }
+
+            let maleHealthyLessThan8 = document.querySelector('.male-healthy-less-than-8');
+            if (maleHealthyLessThan8) {
+                maleHealthyLessThan8.textContent = data.maleHealthyCounts.less_than_8;
+            }
+
+            let maleHealthyBetween8And14 = document.querySelector('.male-healthy-between-8-and-14');
+            if (maleHealthyBetween8And14) {
+                maleHealthyBetween8And14.textContent = data.maleHealthyCounts.between_8_and_14;
+            }
+
+            let maleHealthyBetween14And18 = document.querySelector('.male-healthy-between-14-and-18');
+            if (maleHealthyBetween14And18) {
+                maleHealthyBetween14And18.textContent = data.maleHealthyCounts.between_14_and_18;
+            }
+
+            let maleHealthyGreater18 = document.querySelector('.male-healthy-greater-18');
+            if (maleHealthyGreater18) {
+                maleHealthyGreater18.textContent = data.maleHealthyCounts.greater_equal_18;
+            }
+
+            // Update Female Stock Counts
+            let femaleSickElement = document.querySelector('.female-sick-count');
+            if (femaleSickElement) {
+                femaleSickElement.textContent = data.femaleSickCount;
+            }
+
+            let femaleHealthyLessThan8 = document.querySelector('.female-healthy-less-than-8');
+            if (femaleHealthyLessThan8) {
+                femaleHealthyLessThan8.textContent = data.femaleHealthyCounts.less_than_8;
+            }
+
+            let femaleHealthyBetween8And14 = document.querySelector('.female-healthy-between-8-and-14');
+            if (femaleHealthyBetween8And14) {
+                femaleHealthyBetween8And14.textContent = data.femaleHealthyCounts.between_8_and_14;
+            }
+
+            let femaleHealthyBetween14And18 = document.querySelector('.female-healthy-between-14-and-18');
+            if (femaleHealthyBetween14And18) {
+                femaleHealthyBetween14And18.textContent = data.femaleHealthyCounts.between_14_and_18;
+            }
+
+            let femaleHealthyGreater18 = document.querySelector('.female-healthy-greater-18');
+            if (femaleHealthyGreater18) {
+                femaleHealthyGreater18.textContent = data.femaleHealthyCounts.greater_equal_18;
+            }
+
+            // Reload DataTable if available
+            // $('.yajra-datatable').DataTable().ajax.reload();
+        })
+        .catch(error => {
+            console.error('Error fetching stock counts:', error);
+        });
+}
+});
+
   </script>
 </body>
 
 </html>
+
+       

@@ -58,6 +58,7 @@
                 </div>
                 <div class="form-group">
                     <label for="password" class="text-muted">Password</label>
+                    <span class="password-toggle-icon"><i class="fas fa-eye"></i></span>
                     <input id="password" name="password" type="password" required class="form-control @error('password') is-invalid @enderror" placeholder="Enter your password">
                     @error('password')
                         <span class="invalid-feedback" role="alert">
@@ -81,5 +82,6 @@
     </div>
 
     <script src="vendors/js/vendor.bundle.base.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

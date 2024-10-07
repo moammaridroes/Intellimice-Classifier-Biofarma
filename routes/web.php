@@ -56,9 +56,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->g
     Route::get('stok', [DetailMencitController::class, 'showData'])->name('data.table');
     Route::get('detailmencit/data', [DetailMencitController::class, 'getData'])->name('detailmencit.data');
     Route::delete('/detailmencit/delete/{id}', [DetailMencitController::class, 'delete'])->name('detailmencit.delete');
-    Route::get('detailmencit/updateStockCounts', [DetailMencitController::class, 'updateStockCounts'])->name('detailmencit.updateStockCounts');
-
-    
+    Route::get('detailmencit/updateStockCountss', [DetailMencitController::class, 'updateStockCounts'])->name('detailmencit.updateStockCounts');
 
     Route::get('orderhistory', [OrderHistoryController::class, 'index'])->name('orderhistory.index');
     Route::get('orderhistory/data', [OrderHistoryController::class, 'getData'])->name('orderhistory.getData');
@@ -71,17 +69,16 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->g
     Route::post('/customer-orders/{id}/mark-as-paid', [CustomerOrderController::class, 'markAsPaid'])->name('customer-orders.markAsPaid');
     Route::post('/customer-orders/{id}/mark-as-unpaid', [CustomerOrderController::class, 'markAsUnpaid'])->name('customer-orders.markAsUnpaid');
 
-
     Route::get('/datatable', function () {
         return view('tables.data-table');
     });
 
     Route::get('/admin/customer-orders', [CustomerOrderController::class, 'index'])->name('admin.customer-orders.index');
-
     Route::post('/admin/customer-orders/{id}/approve', [CustomerOrderController::class, 'approve'])->name('admin.customer-orders.approve');
 
     // Route::get('/invoice/{id}', [OrderController::class, 'showInvoice'])->name('invoice.show');
     Route::post('/submit-order', [OrderController::class, 'store'])->name('order.store');
+    Route::get('/detailmencit/updateStockCounts', [OrderController::class, 'fetchStock']);
     Route::post('/order/payment/{id}', [OrderController::class, 'payment'])->name('order.payment');
 
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -94,9 +91,6 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':customer'])
         return view('customer.customer_home');
     })->name('customer.home');
 
-    Route::post('/customer/orders', [CustomerOrderController::class, 'store'])->name('customer.orders.store');
-
-    // Route::post('submit-order-customer', [OrderController::class, 'store']);
     Route::post('/customer/orders', [CustomerOrderController::class, 'store'])->name('customer.orders.store');
     Route::get('/customer/orderform', function () {
         return view('customer.customer_order-form');
