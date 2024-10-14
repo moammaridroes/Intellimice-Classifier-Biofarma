@@ -169,11 +169,14 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{{ url('notification') }}">
-              <i class="ti-bell menu-icon"></i>
-              <span class="menu-title">Notification</span>
+            <a class="nav-link" href="{{ route('admin.notification') }}">
+                <i class="ti-bell menu-icon"></i>
+                <span class="menu-title">Notification</span>
+                @if($unreadNotificationsCount > 0)
+                    <span class="badge badge-danger">{{ $unreadNotificationsCount }}</span>
+                @endif
             </a>
-          </li>
+        </li>
           <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
               <i class="icon-columns menu-icon"></i>
@@ -354,7 +357,7 @@
         modalBody.append('<p><strong>Email:</strong> ' + data.email + '</p>');
         modalBody.append('<p><strong>Item Name:</strong> ' + data.item_name + '</p>');
         modalBody.append('<p><strong>Pick Up Date:</strong> ' + data.pick_up_date + '</p>');
-        modalBody.append('<p><strong>Weight:</strong> ' + data.weight + ' gr</p>');
+        modalBody.append('<p><strong>Weight:</strong> ' + data.weight + '</p>');
         modalBody.append('<p><strong>Male Quantity:</strong> ' + data.male_quantity + '</p>');
         modalBody.append('<p><strong>Female Quantity:</strong> ' + data.female_quantity + '</p>');
         modalBody.append('<p><strong>Total Price:</strong> ' + data.total_price + '</p>');
@@ -385,29 +388,29 @@
             });
         }
         // Jika status pembayaran Paid, tampilkan tombol "Mark as Unpaid"
-        else if (data.is_paid === 'Paid') {
-            var markUnpaidButton = $('<button type="button" class="btn btn-danger mark-unpaid-button">Mark as Unpaid</button>');
-            modalFooter.prepend(markUnpaidButton);
+        // else if (data.is_paid === 'Paid') {
+        //     var markUnpaidButton = $('<button type="button" class="btn btn-danger mark-unpaid-button">Mark as Unpaid</button>');
+        //     modalFooter.prepend(markUnpaidButton);
 
-            // Event handler untuk tombol "Mark as Unpaid"
-            markUnpaidButton.on('click', function() {
-                $.ajax({
-                    url: '/customer-orders/' + data.id + '/mark-as-unpaid',
-                    type: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        alert('Order has been marked as unpaid.');
-                        $('#detailsModal').modal('hide');
-                        table.ajax.reload(null, false);
-                    },
-                    error: function(xhr) {
-                        alert('An error occurred while updating the payment status.');
-                    }
-                });
-            });
-        }
+        //     // Event handler untuk tombol "Mark as Unpaid"
+        //     markUnpaidButton.on('click', function() {
+        //         $.ajax({
+        //             url: '/customer-orders/' + data.id + '/mark-as-unpaid',
+        //             type: 'POST',
+        //             data: {
+        //                 _token: '{{ csrf_token() }}'
+        //             },
+        //             success: function(response) {
+        //                 alert('Order has been marked as unpaid.');
+        //                 $('#detailsModal').modal('hide');
+        //                 table.ajax.reload(null, false);
+        //             },
+        //             error: function(xhr) {
+        //                 alert('An error occurred while updating the payment status.');
+        //             }
+        //         });
+        //     });
+        // }
     });
 });
 

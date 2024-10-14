@@ -24,10 +24,10 @@
         <!-- partial:_navbar.blade.php -->
         <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
             <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
-                <a class="navbar-brand brand-logo mr-5" href="{{ url('/') }}">
+                <a class="navbar-brand brand-logo mr-5" href="{{ url('/customer/home') }}">
                     <img src="{{ asset('images/Logo_Bio_Farma.png') }}" style="width: 65%; height: 65%;" class="mr-2" alt="logo" />
                 </a>
-                <a class="navbar-brand brand-logo-mini" href="{{ url('/') }}">
+                <a class="navbar-brand brand-logo-mini" href="{{ url('/customer/home') }}">
                     <img src="{{ asset('images/logobiofarmakecil.png') }}" alt="logo" />
                 </a>
             </div>

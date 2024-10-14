@@ -156,9 +156,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('notification') }}">
+                        <a class="nav-link" href="{{ route('admin.notification') }}">
                             <i class="ti-bell menu-icon"></i>
                             <span class="menu-title">Notification</span>
+                            @if($unreadNotificationsCount > 0)
+                                <span class="badge badge-danger">{{ $unreadNotificationsCount }}</span>
+                            @endif
                         </a>
                     </li>
                     <li class="nav-item">
@@ -469,7 +472,7 @@
                         }
                     });
                 }
-            });
+            });        
         });
     </script>
 </body>

@@ -53,22 +53,62 @@
 
 <body>
     <div class="container-scroller">
-        <!-- Navbar -->
+        <!-- partial:_navbar.blade.php -->
         <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
             <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
-                <a class="navbar-brand brand-logo mr-5" href="{{ url('/') }}">
-                    <img src="{{ asset('images/Logo_Bio_Farma.png') }}" style="width: 65%; height: 65%;" class="mr-2" alt="logo" />
+                <a class="navbar-brand brand-logo mr-5" href="{{ url('/customer/home') }}">
+                    <img src="{{ asset('images/Logo_Bio_Farma.png') }}" style="width: 65%; height: 65%;" class="mr-2"
+                        alt="logo" />
                 </a>
-                <a class="navbar-brand brand-logo-mini" href="{{ url('/') }}">
+                <a class="navbar-brand brand-logo-mini" href="{{ url('/customer/home') }}">
                     <img src="{{ asset('images/logobiofarmakecil.png') }}" alt="logo" />
                 </a>
             </div>
+
             <div class="navbar-menu-wrapper d-flex align-items-center justify-content-between">
                 <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
                     <span class="icon-menu"></span>
                 </button>
+
+                <div class="nav-item dropdown">
+                    <!-- Username Display -->
+                    <span class="text-black font-weight-bold">
+                        {{ Auth::user()->name }}
+                    </span>
+
+                    <!-- Trigger Button with SVG Icon -->
+                    <a class="nav-link p-0" href="#" data-toggle="dropdown" id="profileDropdown">
+                        <div class="ms-1 d-flex justify-content-center">
+                            <!-- Custom Black SVG Icon -->
+                            <svg class="fill-current text-black" width="20" height="20"
+                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 011.414 1.414l-4 4a1 1 01-1.414 0l-4-4a1 1 010-1.414z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                    </a>
+
+                    <!-- Dropdown Menu -->
+                    <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
+                        <!-- Profile Link -->
+                        <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                            {{ __('Profile') }}
+                        </a>
+
+                        <!-- Logout Form -->
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <a class="dropdown-item" href="{{ route('logout') }}"
+                                onclick="event.preventDefault(); this.closest('form').submit();">
+                                {{ __('Log Out') }}
+                            </a>
+                        </form>
+                    </div>
+                </div>
             </div>
         </nav>
+
 
         <div class="container-fluid page-body-wrapper">
             <!-- Sidebar -->
@@ -143,14 +183,19 @@
                                 <div class="form-section">
                                     <div class="form-group">
                                         <label for="weight">Weight (gr)</label>
-                                        <input type="number" class="form-control" name="weight" id="weightInput" placeholder="Weight Ordered (gr)" required oninput="validateWeight()">
-                                        <div id="weightError" class="error-message">Please input weight more than 0</div>
+                                        <select class="form-control" name="weight" id="weightSelect">
+                                            <option value="" selected disabled>Select Weight</option>
+                                            <option value="less_than_8">&lt;8g</option>
+                                            <option value="between_8_and_14">8-14g</option>
+                                            <option value="between_14_and_18">14-18g</option>
+                                            <option value="greater_equal_18">&gt;18g</option>
+                                          </select>
                                     </div>
                                     <h4 class="card-title">Set amount of order</h4>
                                     <div class="form-group">
                                         <div class="form-check form-check-flat form-check-primary">
                                             <label class="form-check-label">
-                                                <input type="checkbox" class="form-check-input" id="maleCheckbox"> Male
+                                                <input type="checkbox" class="form-check-input" id="maleCheckbox">Male
                                             </label>
                                         </div>
                                         <input type="number" class="form-control form-control-lg" id="maleQuantity" name="male_quantity" placeholder="Quantity" min="1" value="0" oninput="validateAndCalculate(this)" disabled>

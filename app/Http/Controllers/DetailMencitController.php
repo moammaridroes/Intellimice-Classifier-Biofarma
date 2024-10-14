@@ -18,16 +18,16 @@ class DetailMencitController extends Controller
         $maleHealthyCounts = [
             'less_than_8' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->where('berat', '<', 8)->count(),
             'between_8_and_14' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->whereBetween('berat', [8, 14])->count(),
-            'between_14_and_18' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->whereBetween('berat', [14, 18])->count(),
-            'greater_equal_18' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->where('berat', '>=', 18)->count(),
+            'between_14_and_18' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->whereBetween('berat', [14.01, 18])->count(),
+            'greater_equal_18' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->where('berat', '>', 18)->count(),
         ];
 
         // Female Healthy with weight conditions
         $femaleHealthyCounts = [
             'less_than_8' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->where('berat', '<', 8)->count(),
             'between_8_and_14' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->whereBetween('berat', [8, 14])->count(),
-            'between_14_and_18' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->whereBetween('berat', [14, 18])->count(),
-            'greater_equal_18' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->where('berat', '>=', 18)->count(),
+            'between_14_and_18' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->whereBetween('berat', [14.01, 18])->count(),
+            'greater_equal_18' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->where('berat', '>', 18)->count(),
         ];
 
         return view('tables.data-table', compact(
@@ -60,6 +60,18 @@ class DetailMencitController extends Controller
         }
     }
 
+    public function deleteAll()
+    {
+        try {
+            // Menghapus semua data dari tabel DetailMencit
+            DetailMencit::truncate(); // Menghapus semua data
+
+            return response()->json(['success' => true, 'message' => 'All records deleted successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to delete all records.']);
+        }
+    }
+
     public function delete($id)
     {
         $detailMencit = DetailMencit::find($id);
@@ -80,15 +92,15 @@ class DetailMencitController extends Controller
         $maleHealthyCounts = [
             'less_than_8' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->where('berat', '<', 8)->count(),
             'between_8_and_14' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->whereBetween('berat', [8, 14])->count(),
-            'between_14_and_18' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->whereBetween('berat', [14, 18])->count(),
-            'greater_equal_18' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->where('berat', '>=', 18)->count(),
+            'between_14_and_18' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->whereBetween('berat', [14.01, 18])->count(),
+            'greater_equal_18' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->where('berat', '>', 18)->count(),
         ];
 
         $femaleHealthyCounts = [
             'less_than_8' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->where('berat', '<', 8)->count(),
             'between_8_and_14' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->whereBetween('berat', [8, 14])->count(),
-            'between_14_and_18' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->whereBetween('berat', [14, 18])->count(),
-            'greater_equal_18' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->where('berat', '>=', 18)->count(),
+            'between_14_and_18' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->whereBetween('berat', [14.01, 18])->count(),
+            'greater_equal_18' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->where('berat', '>', 18)->count(),
         ];
 
         return response()->json([

@@ -56,6 +56,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->g
     Route::get('stok', [DetailMencitController::class, 'showData'])->name('data.table');
     Route::get('detailmencit/data', [DetailMencitController::class, 'getData'])->name('detailmencit.data');
     Route::delete('/detailmencit/delete/{id}', [DetailMencitController::class, 'delete'])->name('detailmencit.delete');
+    Route::delete('/detailmencit/deleteAll', [DetailMencitController::class, 'deleteAll']);
     Route::get('detailmencit/updateStockCountss', [DetailMencitController::class, 'updateStockCounts'])->name('detailmencit.updateStockCounts');
 
     Route::get('orderhistory', [OrderHistoryController::class, 'index'])->name('orderhistory.index');

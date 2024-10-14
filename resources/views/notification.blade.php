@@ -105,8 +105,12 @@
                         <a class="nav-link" href="{{ route('admin.notification') }}">
                             <i class="ti-bell menu-icon"></i>
                             <span class="menu-title">Notification</span>
+                            @if($unreadNotificationsCount > 0)
+                                <span class="badge badge-danger">{{ $unreadNotificationsCount }}</span>
+                            @endif
                         </a>
                     </li>
+                    
                     <li class="nav-item">
                         <a class="nav-link" data-toggle="collapse" href="#form-elements" aria-expanded="false"
                             aria-controls="form-elements">
@@ -274,7 +278,7 @@
                 <p><strong>Item Name:</strong> ${order.item_name}</p>
                 <p><strong>Agency Name:</strong> ${order.agency_name}</p>
                 <p><strong>Pick Up Date:</strong> ${new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(order.pick_up_date))}</p>
-                <p><strong>Weight:</strong> ${order.weight} gr</p>
+                <p><strong>Weight:</strong> ${order.weight}</p>
                 <p><strong>Male Quantity:</strong> ${order.male_quantity}</p>
                 <p><strong>Female Quantity:</strong> ${order.female_quantity}</p>
                 <p><strong>Total Price:</strong> Rp ${new Intl.NumberFormat('id-ID').format(order.total_price)}</p>

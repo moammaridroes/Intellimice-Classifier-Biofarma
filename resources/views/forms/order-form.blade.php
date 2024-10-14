@@ -70,11 +70,14 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{{ url('notification') }}">
-              <i class="ti-bell menu-icon"></i>
-              <span class="menu-title">Notification</span>
+            <a class="nav-link" href="{{ route('admin.notification') }}">
+                <i class="ti-bell menu-icon"></i>
+                <span class="menu-title">Notification</span>
+                @if($unreadNotificationsCount > 0)
+                    <span class="badge badge-danger">{{ $unreadNotificationsCount }}</span>
+                @endif
             </a>
-          </li>
+        </li>
           <li class="nav-item">
             <a class="nav-link" data-bs-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
               <i class="icon-columns menu-icon"></i>
@@ -333,6 +336,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function showInvoiceModal(order) {
+      const weightMap = {
+        'less_than_8': '<8g',
+        'between_8_and_14': '8-14g',
+        'between_14_and_18': '14-18g',
+        'greater_equal_18': '>18g'
+        };
+        
         const invoiceContent = `
           <h5 class="card-title">Order Details</h5>
           <p><strong>Fullname:</strong> ${order.fullname}</p>
@@ -341,7 +351,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <p><strong>Item Name:</strong> ${order.item_name}</p>
           <p><strong>Agency Name:</strong> ${order.agency_name}</p>
           <p><strong>Operator Name:</strong> ${order.operator_name}</p>
-          <p><strong>Weight:</strong> ${order.weight} gr</p>
+          <p><strong>Weight:</strong> ${weightMap[order.weight] || order.weight}</p>
           <p><strong>Male Quantity:</strong> ${order.male_quantity}</p>
           <p><strong>Female Quantity:</strong> ${order.female_quantity}</p>
           <h5 class="card-text">Total Price: Rp ${order.total_price.toLocaleString('id-ID')}</h5>
@@ -488,7 +498,7 @@ function updateStockCounts() {
 }
 });
 
-  </script>
+</script>
 </body>
 
 </html>

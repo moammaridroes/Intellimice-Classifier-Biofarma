@@ -216,11 +216,15 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url('notification') }}">
+                    <a class="nav-link" href="{{ route('admin.notification') }}">
                         <i class="ti-bell menu-icon"></i>
                         <span class="menu-title">Notification</span>
+                        @if($unreadNotificationsCount > 0)
+                            <span class="badge badge-danger">{{ $unreadNotificationsCount }}</span>
+                        @endif
                     </a>
                 </li>
+                
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
                         <i class="icon-columns menu-icon"></i>
@@ -334,6 +338,8 @@
     <!-- page-body-wrapper ends -->
 </div>
 <!-- container-scroller -->
+<!-- Include Notification Script -->
+@include('partials.notification-script')
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {

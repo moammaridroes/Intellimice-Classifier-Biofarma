@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Http\Request;
 use App\Models\CustomerOrder;
+use App\Models\DetailMencit;
 use Carbon\Carbon;
 
 class CustomerOrderController extends Controller
@@ -20,11 +21,19 @@ class CustomerOrderController extends Controller
             'agency_name' => 'required|string|max:255',
             'item_name' => 'required|string|max:255',
             'pick_up_date' => 'required|date',
-            'weight' => 'required|numeric|min:1',
+            'weight' => 'required|string|max:255',
             'male_quantity' => 'nullable|numeric|min:0',
             'female_quantity' => 'nullable|numeric|min:0',
             'notes' => 'nullable|string|max:500',
         ]);
+
+        // Pemetaan value weight ke format yang diinginkan
+        $weightMap = [
+            'less_than_8' => '<8g',
+            'between_8_and_14' => '8-14g',
+            'between_14_and_18' => '14-18g',
+            'greater_equal_18' => '>18g'
+        ];
 
         // Hitung total harga
         $totalPrice = ($request->male_quantity * 4000) + ($request->female_quantity * 5000);
@@ -38,7 +47,8 @@ class CustomerOrderController extends Controller
         $order->item_name = $validated['item_name'];
         $order->agency_name = $validated['agency_name'];
         $order->pick_up_date = $validated['pick_up_date'];
-        $order->weight = $validated['weight'];
+        // $order->weight = $validated['weight'];
+        $order->weight = $weightMap[$validated['weight']];
         $order->male_quantity = $validated['male_quantity'] ?? 0;
         $order->female_quantity = $validated['female_quantity'] ?? 0;
         $order->total_price = $totalPrice;
@@ -52,27 +62,25 @@ class CustomerOrderController extends Controller
         return redirect()->back()->with('success', 'Order has been placed successfully!');
     }
 
-    // public function payment($id)
-    // {
-    //     $order = CustomerOrder::findOrFail($id);
-    //     $order->update([
-    //         'is_paid' => true, // Set kolom is_paid menjadi true
-    //     ]);
-    //     return redirect()->route('customer.history')->with('success', 'Order has been paid successfully!');
-    // }
 
     // Method untuk menampilkan pesanan ke admin
     public function index()
     {
         $orders = CustomerOrder::where('status', 'pending')->get();
         return view('admin.orders.index', compact('orders'));
+        
     }
 
     // Method untuk notifikasi admin
     public function notificationAdmin()
     {
+        // Ambil semua pesanan yang statusnya masih pending
         $orders = CustomerOrder::where('status', 'pending')->get();
-        return view('notification', compact('orders'));
+        
+        // Hitung jumlah pesanan pending
+        $unreadNotificationsCount = $orders->count();
+
+        return view('notification', compact('orders', 'unreadNotificationsCount'));
     }
 
     // Method untuk menyetujui pesanan
@@ -146,42 +154,14 @@ class CustomerOrderController extends Controller
             ->make(true);
     }
 
-    // Method untuk melakukan pembayaran
-    // public function payment(Request $request, $id)
-    // {
-    //     $order = CustomerOrder::find($id);
-    //     if ($order) {
-    //         $order->is_paid = true;
-    //         $order->save();
-
-    //         return response()->json(['success' => true, 'message' => 'Payment successful']);
-    //     }
-
-    //     return response()->json(['success' => false, 'message' => 'Order not found'], 404);
-    // }
-
-    // Method untuk melakukan pembayaran
-    // public function payment(Request $request, $id)
-    // {
-    //     $order = CustomerOrder::find($id);
-    //     if ($order) {
-    //         $order->is_paid = false; // Tandai sebagai blm dibayar
-    //         $order->save(); // Simpan perubahan
-
-    //         return response()->json(['success' => true, 'message' => 'Payment successful']);
-    //     }
-
-    //     return response()->json(['success' => false, 'message' => 'Order not found'], 404);
-    // }
-    
-
-
     // Method untuk menampilkan notifikasi customer
     public function showCustomerNotifications()
     {
         $orders = CustomerOrder::where('customer_id', auth()->id())->get();
         return view('customer.customer_notification', compact('orders'));
     }
+
+    
 
     // Method untuk menampilkan history customer
     public function showCustomerHistory()
@@ -226,31 +206,170 @@ class CustomerOrderController extends Controller
 
     // Menandai pesanan sebagai telah dibayar
     public function markAsPaid($id)
-    {
-        $order = CustomerOrder::find($id);
-        if ($order) {
+{
+    $order = CustomerOrder::find($id);
+    if ($order) {
+        // Pastikan pesanan belum dibayar sebelumnya
+        if (!$order->is_paid) {
+            // Update status pembayaran menjadi paid
             $order->is_paid = true;
             $order->save();
 
-            return response()->json(['success' => true]);
-        }
+            // Kurangi stok mencit berdasarkan pesanan
+            $this->reduceStock($order->male_quantity, $order->female_quantity, $order->weight);
 
-        return response()->json(['success' => false, 'message' => 'Order not found.'], 404);
+            return response()->json(['success' => true, 'message' => 'Order marked as paid and stock updated.']);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Order is already paid.']);
+        }
     }
 
+    return response()->json(['success' => false, 'message' => 'Order not found.'], 404);
+}
+
+private function reduceStock($maleQuantity, $femaleQuantity, $weightCategory)
+{
+    // Pemetaan kategori berat dari format tampilan ke value blade asli
+    $weightMap = [
+        '<8g' => 'less_than_8',
+        '8-14g' => 'between_8_and_14',
+        '14-18g' => 'between_14_and_18',
+        '>18g' => 'greater_equal_18',
+    ];
+
+    // Cek apakah kategori berat valid
+    if (!isset($weightMap[$weightCategory])) {
+        return; // Jika kategori berat tidak valid, hentikan eksekusi
+    }
+
+    // Tentukan kondisi berdasarkan kategori berat yang dipilih
+    $weightConditions = [];
+    switch ($weightMap[$weightCategory]) {
+        case 'less_than_8':
+            $weightConditions = ['<', 8];
+            break;
+        case 'between_8_and_14':
+            $weightConditions = ['between', [8, 14]];
+            break;
+        case 'between_14_and_18':
+            $weightConditions = ['between', [14.01, 18]];
+            break;
+        case 'greater_equal_18':
+            $weightConditions = ['>', 18];
+            break;
+        default:
+            return; // Jika kategori berat tidak valid, hentikan eksekusi
+    }
+
+    // Kurangi stok mencit pria
+    $this->updateStock('Male', $maleQuantity, $weightConditions);
+
+    // Kurangi stok mencit wanita
+    $this->updateStock('Female', $femaleQuantity, $weightConditions);
+}
+
+
+private function updateStock($gender, $quantity, $weightConditions)
+{
+    // Ambil mencit sehat berdasarkan gender dan kondisi berat
+    $mencitQuery = DetailMencit::where('gender', $gender)
+        ->where('health_status', 'Healthy');
+
+    // Tambahkan kondisi berat
+    if ($weightConditions[0] == 'between') {
+        $mencitQuery->whereBetween('berat', $weightConditions[1]);
+    } else {
+        $mencitQuery->where('berat', $weightConditions[0], $weightConditions[1]);
+    }
+
+    // Ambil mencit sebanyak jumlah yang dipesan
+    $mencitToDelete = $mencitQuery->take($quantity)->get();
+
+    // Hapus mencit dari stok
+    foreach ($mencitToDelete as $mencit) {
+        $mencit->delete();
+    }
+}
     // Menandai pesanan sebagai belum dibayar
-    public function markAsUnpaid($id)
-    {
-        $order = CustomerOrder::find($id);
-        if ($order) {
-            $order->is_paid = false;
-            $order->save();
+// public function markAsUnpaid($id)
+// {
+//     $order = CustomerOrder::find($id);
+//     if ($order) {
+//         // Pastikan pesanan sudah dibayar sebelumnya
+//         if ($order->is_paid) {
+//             // Update status pembayaran menjadi unpaid
+//             $order->is_paid = false;
+//             $order->save();
 
-            return response()->json(['success' => true]);
-        }
+//             // Kembalikan stok mencit berdasarkan pesanan
+//             $this->restoreStock($order->male_quantity, $order->female_quantity, $order->weight);
 
-        return response()->json(['success' => false, 'message' => 'Order not found.'], 404);
-    }
+//             return response()->json(['success' => true, 'message' => 'Order marked as unpaid and stock restored.']);
+//         } else {
+//             return response()->json(['success' => false, 'message' => 'Order is already unpaid.']);
+//         }
+//     }
+
+//     return response()->json(['success' => false, 'message' => 'Order not found.'], 404);
+// }
+
+// // Method untuk mengembalikan stok mencit yang sudah di-reduce
+// private function restoreStock($maleQuantity, $femaleQuantity, $weightCategory)
+// {
+//     // Tentukan kondisi berdasarkan kategori berat yang dipilih
+//     $weightConditions = [];
+//     switch ($weightCategory) {
+//         case 'less_than_8':
+//             $weightConditions = ['<', 8];
+//             break;
+//         case 'between_8_and_14':
+//             $weightConditions = ['between', [8, 14]];
+//             break;
+//         case 'between_14_and_18':
+//             $weightConditions = ['between', [14.01, 18]];
+//             break;
+//         case 'greater_equal_18':
+//             $weightConditions = ['>', 18];
+//             break;
+//         default:
+//             return; // Jika kategori berat tidak valid, hentikan eksekusi
+//     }
+
+//     // Kembalikan stok mencit pria
+//     $this->addStock('Male', $maleQuantity, $weightConditions);
+
+//     // Kembalikan stok mencit wanita
+//     $this->addStock('Female', $femaleQuantity, $weightConditions);
+// }
+
+// // Method untuk menambahkan stok mencit
+// private function addStock($gender, $quantity, $weightConditions)
+// {
+//     // Lakukan pengembalian stok mencit dengan menambah kembali jumlah mencit
+//     for ($i = 0; $i < $quantity; $i++) {
+//         // Tambahkan mencit baru ke stok
+//         $newMencit = new DetailMencit();
+//         $newMencit->gender = $gender;
+//         $newMencit->health_status = 'Healthy';
+
+//         // Tentukan berat sesuai kategori
+//         switch ($weightConditions[0]) {
+//             case '<':
+//                 $newMencit->berat = rand(1, 7); // Misalkan mencit yang kurang dari 8g
+//                 break;
+//             case 'between':
+//                 $newMencit->berat = rand($weightConditions[1][0], $weightConditions[1][1]); // Berat di antara batas
+//                 break;
+//             case '>':
+//                 $newMencit->berat = rand(19, 25); // Misalkan mencit lebih dari 18g
+//                 break;
+//         }
+
+//         // Simpan mencit baru ke database
+//         $newMencit->save();
+//     }
+// }
+
 
     // Method untuk menampilkan form order customer
     public function create()

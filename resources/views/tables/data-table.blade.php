@@ -5,16 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Collecting</title>
-    <!-- plugins:css -->
+
+    <!-- Plugins: CSS -->
     <link rel="stylesheet" href="{{ asset('vendors/feather/feather.css') }}">
     <link rel="stylesheet" href="{{ asset('vendors/ti-icons/css/themify-icons.css') }}">
     <link rel="stylesheet" href="{{ asset('vendors/css/vendor.bundle.base.css') }}">
     <!-- Plugin css for this page -->
     <link rel="stylesheet" href="{{ asset('vendors/select2/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('vendors/select2-bootstrap-theme/select2-bootstrap.min.css') }}">
-    <!-- inject:css -->
+    <!-- Inject:css -->
     <link rel="stylesheet" href="{{ asset('css/vertical-layout-light/style.css') }}">
-    <!-- endinject -->
+    <!-- End inject -->
     <link rel="shortcut icon" href="{{ asset('images/logobiofarmakecil.png') }}" />
 
     <!-- Bootstrap CSS -->
@@ -27,43 +28,47 @@
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js"></script>
+
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <style>
-      .summary-item {
+        .summary-item {
             display: grid;
-            grid-template-columns: 200px auto; /* Lebar 200px untuk kolom label dan sisanya untuk nilai */
+            grid-template-columns: 200px auto;
             align-items: center;
-            gap: 10px; /* Spasi antara label dan nilai */
+            gap: 10px;
         }
 
         .summary-item strong {
-            text-align: left; /* Agar teks label rata kanan */
+            text-align: left;
         }
-    body {
-      font-family: 'Roboto', sans-serif;
-  }
 
-  h5 {
-      font-weight: 400; 
-      font-size: 16px;
-      color: #333; 
-  }
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
 
-  .text-info {
-      color: #007bff;
-  }
+        h5 {
+            font-weight: 400;
+            font-size: 16px;
+            color: #333;
+        }
 
-  .text-success {
-      color: #28a745;
-  }
+        .text-info {
+            color: #007bff;
+        }
 
-  .summary-container {
-      padding: 20px;
-      background-color: #f9f9f9;
-      border-radius: 5px;
-      margin-bottom: 10px;
-  }
-</style>
+        .text-success {
+            color: #28a745;
+        }
+
+        .summary-container {
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 
 <body>
@@ -89,7 +94,6 @@
                         {{ Auth::user()->name }}
                     </span>
 
-                    <!-- Trigger Button with SVG Icon -->
                     <a class="nav-link p-0" href="#" data-toggle="dropdown" id="profileDropdown">
                         <div class="ms-1 d-flex justify-content-center">
                             <svg class="fill-current text-black" width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -99,7 +103,6 @@
                     </a>
 
                     <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
-                        {{-- <a class="dropdown-item" href="{{ route('profile.edit') }}">{{ __('Profile') }}</a> --}}
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();">
@@ -111,6 +114,7 @@
             </div>
         </nav>
 
+        <!-- Main Content -->
         <div class="container-scroller">
             <div class="container-fluid page-body-wrapper">
                 <!-- Sidebar -->
@@ -123,9 +127,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url('notification') }}">
+                            <a class="nav-link" href="{{ route('admin.notification') }}">
                                 <i class="ti-bell menu-icon"></i>
                                 <span class="menu-title">Notification</span>
+                                @if($unreadNotificationsCount > 0)
+                                    <span class="badge badge-danger">{{ $unreadNotificationsCount }}</span>
+                                @endif
                             </a>
                         </li>
                         <li class="nav-item">
@@ -150,61 +157,64 @@
                             </a>
                             <div class="collapse" id="tables">
                                 <ul class="nav flex-column sub-menu">
-                                    <li class="nav-item"> <a class="nav-link" href="{{ url('stok') }}">Data Table</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="{{ url('stok') }}">Data Table</a></li>
                                 </ul>
                             </div>
                         </li>
                     </ul>
                 </nav>
 
-                <!-- Main Content -->
+                <!-- Main Panel -->
                 <div class="main-panel">
                     <div class="content-wrapper">
                         <h4 class="mb-4">Data Collecting</h4>
-                        <div class="card">
-                          <div class="card-body">
-                            <!-- Display Summary as Text in Two Columns -->
-                            <div class="container mt-4">
-                              <div class="row">
-                                <div class="col-lg-6 mb-3">
-                                  <h5 class="summary-item"><strong>Male Sick:</strong> <span class="text-info male-sick-count">{{ $maleSickCount }}</span></h5>
-                                  <h5 class="summary-item"><strong>Male Healthy (&lt;8g):</strong> <span class="text-success male-healthy-less-than-8">{{ $maleHealthyCounts['less_than_8'] }}</span></h5>
-                                  <h5 class="summary-item"><strong>Male Healthy (8-14g):</strong> <span class="text-success male-healthy-between-8-and-14">{{ $maleHealthyCounts['between_8_and_14'] }}</span></h5>
-                                  <h5 class="summary-item"><strong>Male Healthy (14-18g):</strong> <span class="text-success male-healthy-between-14-and-18">{{ $maleHealthyCounts['between_14_and_18'] }}</span></h5>
-                                  <h5 class="summary-item"><strong>Male Healthy (&gt;18g):</strong> <span class="text-success male-healthy-greater-18">{{ $maleHealthyCounts['greater_equal_18'] }}</span></h5>
-                              </div>
-                              <div class="col-lg-6 mb-3">
-                                  <h5 class="summary-item"><strong>Female Sick:</strong> <span class="text-info female-sick-count">{{ $femaleSickCount }}</span></h5>
-                                  <h5 class="summary-item"><strong>Female Healthy (&lt;8g):</strong> <span class="text-success female-healthy-less-than-8">{{ $femaleHealthyCounts['less_than_8'] }}</span></h5>
-                                  <h5 class="summary-item"><strong>Female Healthy (8-14g):</strong> <span class="text-success female-healthy-between-8-and-14">{{ $femaleHealthyCounts['between_8_and_14'] }}</span></h5>
-                                  <h5 class="summary-item"><strong>Female Healthy (14-18g):</strong> <span class="text-success female-healthy-between-14-and-18">{{ $femaleHealthyCounts['between_14_and_18'] }}</span></h5>
-                                  <h5 class="summary-item"><strong>Female Healthy (&gt;18g):</strong> <span class="text-success female-healthy-greater-18">{{ $femaleHealthyCounts['greater_equal_18'] }}</span></h5>
-                              </div>
-                              
-                              </div>
-                          </div>
-                          
+
+                        <!-- Summary Section -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-lg-6 mb-3">
+                                        <h5 class="summary-item"><strong>Male Sick:</strong> <span class="text-info male-sick-count">{{ $maleSickCount }}</span></h5>
+                                        <h5 class="summary-item"><strong>Male Healthy (&lt;8g):</strong> <span class="text-success male-healthy-less-than-8">{{ $maleHealthyCounts['less_than_8'] }}</span></h5>
+                                        <h5 class="summary-item"><strong>Male Healthy (8-14g):</strong> <span class="text-success male-healthy-between-8-and-14">{{ $maleHealthyCounts['between_8_and_14'] }}</span></h5>
+                                        <h5 class="summary-item"><strong>Male Healthy (14-18g):</strong> <span class="text-success male-healthy-between-14-and-18">{{ $maleHealthyCounts['between_14_and_18'] }}</span></h5>
+                                        <h5 class="summary-item"><strong>Male Healthy (&gt;18g):</strong> <span class="text-success male-healthy-greater-18">{{ $maleHealthyCounts['greater_equal_18'] }}</span></h5>
+                                    </div>
+                                    <div class="col-lg-6 mb-3">
+                                        <h5 class="summary-item"><strong>Female Sick:</strong> <span class="text-info female-sick-count">{{ $femaleSickCount }}</span></h5>
+                                        <h5 class="summary-item"><strong>Female Healthy (&lt;8g):</strong> <span class="text-success female-healthy-less-than-8">{{ $femaleHealthyCounts['less_than_8'] }}</span></h5>
+                                        <h5 class="summary-item"><strong>Female Healthy (8-14g):</strong> <span class="text-success female-healthy-between-8-and-14">{{ $femaleHealthyCounts['between_8_and_14'] }}</span></h5>
+                                        <h5 class="summary-item"><strong>Female Healthy (14-18g):</strong> <span class="text-success female-healthy-between-14-and-18">{{ $femaleHealthyCounts['between_14_and_18'] }}</span></h5>
+                                        <h5 class="summary-item"><strong>Female Healthy (&gt;18g):</strong> <span class="text-success female-healthy-greater-18">{{ $femaleHealthyCounts['greater_equal_18'] }}</span></h5>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        
-                        <!-- Data Table -->
+
+                        <!-- Data Table Section -->
                         <div class="card">
                             <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-striped yajra-datatable">
-                                        <thead>
-                                            <tr>
-                                                <th>NO</th>
-                                                <th>DATE</th>
-                                                <th>WEIGHT</th>
-                                                <th>GENDER</th>
-                                                <th>HEALTH STATUS</th>
-                                                <th>ACTION</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <!-- Data will be populated by DataTables -->
-                                        </tbody>
-                                    </table>
+                                <div class="container mt-4">
+                                    <div class="container-fluid">
+                                        <button id="deleteAll" class="btn btn-danger mb-4">Delete All</button>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped yajra-datatable">
+                                            <thead>
+                                                <tr>
+                                                    <th>NO</th>
+                                                    <th>DATE</th>
+                                                    <th>WEIGHT</th>
+                                                    <th>GENDER</th>
+                                                    <th>HEALTH STATUS</th>
+                                                    <th>ACTION</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- Data will be populated by DataTables -->
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -213,16 +223,16 @@
             </div>
         </div>
 
-        <!-- plugins:js -->
+        <!-- Plugins:JS -->
         <script src="{{ asset('vendors/js/vendor.bundle.base.js') }}"></script>
-        <!-- endinject -->
-        <!-- inject:js -->
+        <!-- End inject -->
+        <!-- Inject:JS -->
         <script src="{{ asset('js/off-canvas.js') }}"></script>
         <script src="{{ asset('js/hoverable-collapse.js') }}"></script>
         <script src="{{ asset('js/template.js') }}"></script>
         <script src="{{ asset('js/settings.js') }}"></script>
         <script src="{{ asset('js/todolist.js') }}"></script>
-        <!-- endinject -->
+        <!-- End inject -->
 
         <!-- DataTables Scripts -->
         <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
@@ -231,79 +241,98 @@
         <!-- Initialize DataTables -->
         <script type="text/javascript">
             $(document).ready(function () {
-            var table = $('.yajra-datatable').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{{ route('detailmencit.data') }}",
-            columns: [
-                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-                { data: 'created_at', name: 'created_at' },
-                { data: 'berat', name: 'berat' },
-                { data: 'gender', name: 'gender' },
-                { data: 'health_status', name: 'health_status' },
-                {
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false,
-                    render: function (data, type, row) {
-                        return `<button class="btn btn-danger btn-sm delete" data-id="${row.id}">Delete</button>`;
+                var table = $('.yajra-datatable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: "{{ route('detailmencit.data') }}",
+                    columns: [
+                        { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                        { data: 'created_at', name: 'created_at' },
+                        { data: 'berat', name: 'berat' },
+                        { data: 'gender', name: 'gender' },
+                        { data: 'health_status', name: 'health_status' },
+                        {
+                            data: 'action',
+                            name: 'action',
+                            orderable: false,
+                            searchable: false,
+                            render: function (data, type, row) {
+                                return `<button class="btn btn-danger btn-sm delete" data-id="${row.id}">Delete</button>`;
+                            }
+                        }
+                    ]
+                });
+
+                $('#deleteAll').click(function () {
+                    if (confirm("Are you sure you want to delete all records?")) {
+                        $.ajax({
+                            url: '/detailmencit/deleteAll',
+                            type: 'DELETE',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function (response) {
+                                table.ajax.reload();
+                                updateStockCounts();
+                                alert('All records deleted successfully!');
+                            },
+                            error: function (response) {
+                                alert('Failed to delete all records.');
+                            }
+                        });
                     }
-                }
-            ]
-        });
-    // Delete action
-    $('body').on('click', '.delete', function () {
-        var id = $(this).data('id');
-        if (confirm("Are you sure you want to delete this record?")) {
-            $.ajax({
-                url: `/detailmencit/delete/${id}`,
-                type: 'DELETE',
-                data: {
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function (response) {
-                    table.ajax.reload(); // Reload table after deletion
-                    updateStockCounts();  // Update stock counts
-                    alert('Record deleted successfully!');
-                },
-                error: function (response) {
-                    alert('Failed to delete the record.');
+                });
+
+                // Delete individual record
+                $('body').on('click', '.delete', function () {
+                    var id = $(this).data('id');
+                    if (confirm("Are you sure you want to delete this record?")) {
+                        $.ajax({
+                            url: `/detailmencit/delete/${id}`,
+                            type: 'DELETE',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function (response) {
+                                table.ajax.reload();
+                                updateStockCounts();
+                                alert('Record deleted successfully!');
+                            },
+                            error: function (response) {
+                                alert('Failed to delete the record.');
+                            }
+                        });
+                    }
+                });
+
+                // Function to update stock counts
+                function updateStockCounts() {
+                    $.ajax({
+                        url: "{{ route('detailmencit.updateStockCounts') }}",
+                        type: 'GET',
+                        success: function (data) {
+                            // Update Male Stock Counts
+                            $('.male-sick-count').text(data.maleSickCount);
+                            $('.male-healthy-less-than-8').text(data.maleHealthyCounts.less_than_8);
+                            $('.male-healthy-between-8-and-14').text(data.maleHealthyCounts.between_8_and_14);
+                            $('.male-healthy-between-14-and-18').text(data.maleHealthyCounts.between_14_and_18);
+                            $('.male-healthy-greater-18').text(data.maleHealthyCounts.greater_equal_18);
+
+                            // Update Female Stock Counts
+                            $('.female-sick-count').text(data.femaleSickCount);
+                            $('.female-healthy-less-than-8').text(data.femaleHealthyCounts.less_than_8);
+                            $('.female-healthy-between-8-and-14').text(data.femaleHealthyCounts.between_8_and_14);
+                            $('.female-healthy-between-14-and-18').text(data.femaleHealthyCounts.between_14_and_18);
+                            $('.female-healthy-greater-18').text(data.femaleHealthyCounts.greater_equal_18);
+
+                            table.ajax.reload();
+                        },
+                        error: function () {
+                            alert('Failed to update stock counts.');
+                        }
+                    });
                 }
             });
-        }
-    });
-
-    // Function to update stock counts
-    function updateStockCounts() {
-        $.ajax({
-            url: "{{ route('detailmencit.updateStockCounts') }}", // Route to update stock counts
-            type: 'GET',
-            success: function (data) {
-                // Update Male Stock Counts
-                $('.male-sick-count').text(data.maleSickCount);
-                $('.male-healthy-less-than-8').text(data.maleHealthyCounts.less_than_8);
-                $('.male-healthy-between-8-and-14').text(data.maleHealthyCounts.between_8_and_14);
-                $('.male-healthy-between-14-and-18').text(data.maleHealthyCounts.between_14_and_18);
-                $('.male-healthy-greater-18').text(data.maleHealthyCounts.greater_equal_18);
-
-                // Update Female Stock Counts
-                $('.female-sick-count').text(data.femaleSickCount);
-                $('.female-healthy-less-than-8').text(data.femaleHealthyCounts.less_than_8);
-                $('.female-healthy-between-8-and-14').text(data.femaleHealthyCounts.between_8_and_14);
-                $('.female-healthy-between-14-and-18').text(data.femaleHealthyCounts.between_14_and_18);
-                $('.female-healthy-greater-18').text(data.femaleHealthyCounts.greater_equal_18);
-
-                $('.yajra-datatable').DataTable().ajax.reload();
-            },
-            error: function () {
-                alert('Failed to update stock counts.');
-            }
-        });
-    }
-});
-
         </script>
-</body>
-
+    </body>
 </html>

@@ -45,6 +45,16 @@ class OrderHistoryController extends Controller
             ->editColumn('updated_at', function($order) {
                 return $order->updated_at->format('d-m-Y'); // Format tanggal untuk kolom 'updated_at'
             })
+            ->editColumn('weight', function($order) {
+                // Pemetaan nilai weight ke format string yang diinginkan
+                $weightMap = [
+                    'less_than_8' => '<8g',
+                    'between_8_and_14' => '8-14g',
+                    'between_14_and_18' => '14-18g',
+                    'greater_equal_18' => '>18g'
+                ];
+                return $weightMap[$order->weight] ?? $order->weight; // Jika tidak ada di map, tampilkan aslinya
+            })
             ->make(true); // Mengembalikan data dalam format JSON untuk DataTables
     }
 }
