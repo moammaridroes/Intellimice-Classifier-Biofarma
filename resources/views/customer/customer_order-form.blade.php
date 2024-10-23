@@ -16,7 +16,20 @@
     <link rel="shortcut icon" href="{{ asset('images/logobiofarmakecil.png') }}" />
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
     <style>
+        .custom-swal-icon {
+            margin-top: 20px; /* Adjust this to move the icon down */
+        }
+        .custom-swal-popup {
+            padding-top: 40px; /* Adjust to increase spacing between title and icon */
+        }
+        .language-icon {
+            font-size: 1.5rem; /* Atur ukuran ikon */
+            margin-right: 7px; /* Spasi antara ikon dan teks */
+            color: #000000; /* Warna ikon */
+        }
         .form-group {
             margin-bottom: 1rem;
         }
@@ -69,41 +82,49 @@
                 <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
                     <span class="icon-menu"></span>
                 </button>
-
-                <div class="nav-item dropdown">
-                    <!-- Username Display -->
-                    <span class="text-black font-weight-bold">
-                        {{ Auth::user()->name }}
-                    </span>
-
-                    <!-- Trigger Button with SVG Icon -->
-                    <a class="nav-link p-0" href="#" data-toggle="dropdown" id="profileDropdown">
-                        <div class="ms-1 d-flex justify-content-center">
-                            <!-- Custom Black SVG Icon -->
-                            <svg class="fill-current text-black" width="20" height="20"
-                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 011.414 1.414l-4 4a1 1 01-1.414 0l-4-4a1 1 010-1.414z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                    </a>
-
-                    <!-- Dropdown Menu -->
-                    <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
-                        <!-- Profile Link -->
-                        <a class="dropdown-item" href="{{ route('profile.edit') }}">
-                            {{ __('Profile') }}
+                <div class="d-flex align-items-center ml-auto">
+                    <div class="nav-item dropdown mr-4">
+                        <a class="nav-link p-0" href="#" data-toggle="dropdown" id="languageDropdown">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-globe language-icon mr-1"></i> 
+                                {{-- <span style="color: black;">@lang('messages.languages')</span> --}}
+                            </div>
                         </a>
-
-                        <!-- Logout Form -->
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <a class="dropdown-item" href="{{ route('logout') }}"
-                                onclick="event.preventDefault(); this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </a>
-                        </form>
+                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="languageDropdown">
+                            <a class="dropdown-item" href="{{ url('locale/en') }}">English</a>
+                            <a class="dropdown-item" href="{{ url('locale/id') }}">Bahasa Indonesia</a>
+                        </div>
+                    </div>
+        
+                    <div class="nav-item dropdown">
+                        <span class="text-black font-weight-bold mr-2">
+                            {{ Auth::user()->name }}
+                        </span>
+        
+                        <a class="nav-link p-0" href="#" data-toggle="dropdown" id="profileDropdown">
+                            <div class="d-flex justify-content-center">
+                                <svg class="fill-current text-black" width="20" height="20"
+                                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 01-1.414 0l-4-4a1 1 010-1.414z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </a>
+        
+                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
+                            {{-- <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                                {{ __('Profile') }}
+                            </a> --}}
+        
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <a class="dropdown-item" href="{{ route('logout') }}"
+                                    onclick="event.preventDefault(); this.closest('form').submit();">
+                                    {{ __('Log Out') }}
+                                </a>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -147,42 +168,42 @@
                 <div class="content-wrapper">
                     <div class="row">
                         <div class="col-lg-12">
-                            <h4 class="card-title">Order Form</h4>
+                            <h4 class="card-title">@lang('messages.order_form')</h4>
                             <div class="form-container">
                                 <div class="form-section">
                                     <h5>Customer Information</h5>
-                                    <form method="POST" action="{{ route('customer.orders.store') }}">
+                                    <form id="orderForm" method="POST" action="{{ route('customer.orders.store') }}">
                                         @csrf
                                         <div class="form-group">
-                                            <label for="fullname">Fullname</label>
-                                            <input type="text" class="form-control" name="fullname" placeholder="Fullname" required>
+                                            <label for="fullname">@lang('messages.fullname')</label>
+                                            <input type="text" class="form-control" name="fullname" placeholder="@lang('messages.fullname')" required>
                                         </div>
                                         <div class="form-group">
-                                            <label for="phone_number">Phone Number</label>
-                                            <input type="number" class="form-control" name="phone_number" placeholder="Phone Number" required>
+                                            <label for="phone_number">@lang('messages.phone_number')</label>
+                                            <input type="number" class="form-control" name="phone_number" placeholder="@lang('messages.phone_number')" required>
                                         </div>
                                         <div class="form-group">
-                                            <label for="email">Email</label>
-                                            <input type="email" class="form-control" name="email" placeholder="Email" required>
+                                            <label for="email">@lang('messages.email')</label>
+                                            <input type="email" class="form-control" name="email" placeholder="@lang('messages.email')" required>
                                         </div>
                                         <div class="form-group">
-                                            <label for="agency_name">Agency Name</label>
-                                            <input type="text" class="form-control" name="agency_name" placeholder="Agency Name" required>
+                                            <label for="agency_name">@lang('messages.agency_name')</label>
+                                            <input type="text" class="form-control" name="agency_name" placeholder="@lang('messages.agency_name')" required>
                                         </div>
                                         <h5>Order Information</h5>
                                         <div class="form-group">
-                                            <label for="item_name">Name of item ordered</label>
-                                            <input type="text" class="form-control" name="item_name" placeholder="Name of item ordered" required>
+                                            <label for="item_name">@lang('messages.item_name')</label>
+                                            <input type="text" class="form-control" name="item_name" placeholder="@lang('messages.item_name')" required>
                                         </div>
                                         <div class="form-group">
-                                            <label for="pick_up_date">Pick Up Date</label>
-                                            <input type="date" class="form-control" name="pick_up_date" placeholder="Pick Up Date" required>
+                                            <label for="pick_up_date">@lang('messages.pick_up_date')</label>
+                                            <input type="date" class="form-control" name="pick_up_date" placeholder="@lang('messages.pick_up_date')" required>
                                         </div>
                                 </div>
 
                                 <div class="form-section">
                                     <div class="form-group">
-                                        <label for="weight">Weight (gr)</label>
+                                        <label for="weight">@lang('messages.weight')</label>
                                         <select class="form-control" name="weight" id="weightSelect">
                                             <option value="" selected disabled>Select Weight</option>
                                             <option value="less_than_8">&lt;8g</option>
@@ -195,32 +216,32 @@
                                     <div class="form-group">
                                         <div class="form-check form-check-flat form-check-primary">
                                             <label class="form-check-label">
-                                                <input type="checkbox" class="form-check-input" id="maleCheckbox">Male
+                                                <input type="checkbox" class="form-check-input" id="maleCheckbox">@lang('messages.male')
                                             </label>
                                         </div>
-                                        <input type="number" class="form-control form-control-lg" id="maleQuantity" name="male_quantity" placeholder="Quantity" min="1" value="0" oninput="validateAndCalculate(this)" disabled>
+                                        <input type="number" class="form-control form-control-lg" id="maleQuantity" name="male_quantity" placeholder="@lang('messages.quantity')" min="1" value="0" oninput="validateAndCalculate(this)" disabled>
                                     </div>
                                     <div class="form-group">
                                         <div class="form-check form-check-flat form-check-primary">
                                             <label class="form-check-label">
-                                                <input type="checkbox" class="form-check-input" id="femaleCheckbox"> Female
+                                                <input type="checkbox" class="form-check-input" id="femaleCheckbox"> @lang('messages.female')
                                             </label>
                                         </div>
-                                        <input type="number" class="form-control form-control-lg" id="femaleQuantity" name="female_quantity" placeholder="Quantity" min="1" value="0" oninput="validateAndCalculate(this)" disabled>
+                                        <input type="number" class="form-control form-control-lg" id="femaleQuantity" name="female_quantity" placeholder="@lang('messages.quantity')" min="1" value="0" oninput="validateAndCalculate(this)" disabled>
                                     </div>
                                     <div class="form-group">
-                                        <label>Total</label>
-                                        <input type="number" class="form-control form-control-lg" id="totalQuantity" placeholder="Total" readonly>
+                                        <label>@lang('messages.total')</label>
+                                        <input type="number" class="form-control form-control-lg" id="totalQuantity" placeholder="@lang('messages.total')" readonly>
                                     </div>
                                     <div class="form-group">
-                                        <label>Total Price (Rp)</label>
-                                        <input type="text" class="form-control form-control-lg" id="totalPrice" placeholder="Total Price" readonly>
+                                        <label>@lang('messages.total_price')</label>
+                                        <input type="text" class="form-control form-control-lg" id="totalPrice" placeholder="@lang('messages.total_price')" readonly>
                                     </div>
                                     <div class="form-group">
-                                        <label for="notes">Notes</label>
-                                        <textarea class="form-control" name="notes" rows="3" placeholder="Enter any additional notes (max 500 characters)" maxlength="500"></textarea>
+                                        <label for="notes">@lang('messages.notes')</label>
+                                        <textarea class="form-control" name="notes" rows="3" placeholder="@lang('messages.notes')" maxlength="500"></textarea>
                                     </div>
-                                    <button type="submit" class="btn btn-primary mr-2" style="background-color: #4B49AC; border-color: #4B49AC;">Submit</button>
+                                    <button type="submit" class="btn btn-primary mr-2" style="background-color: #4B49AC; border-color: #4B49AC;">@lang('messages.submit')</button>
                                     <button type="reset" class="btn btn-light">Reset</button>
                                 </form>
                                 </div>
@@ -253,7 +274,46 @@
     <!-- endinject -->
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
+        document.getElementById('orderForm').addEventListener('submit', function (e) {
+        // Prevent the form from submitting immediately
+        e.preventDefault();
+        
+        // Show SweetAlert confirmation
+        Swal.fire({
+        title: "Do you want to submit this order?",
+        text: "Please confirm your order details before submitting.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#4B49AC",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, submit it!",
+        customClass: {
+            popup: 'custom-swal-popup', // Apply this class to the entire popup for layout adjustments
+            icon: 'custom-swal-icon' // Adjust the icon specifically
+        }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Order Submitted!",
+                    text: "Your order has been submitted successfully.",
+                    icon: "success",
+                    customClass: {
+                        popup: 'custom-swal-popup',
+                        icon: 'custom-swal-icon'
+                    }
+                }).then(() => {
+                    e.target.submit();
+                });
+            } else {
+                Swal.fire("Order was not submitted!", "", "info");
+            }
+        });
+    });
+
+
         // JavaScript functions for the form interactions
         function validateWeight() {
             var weightInput = document.getElementById('weightInput');

@@ -12,18 +12,28 @@ use App\Http\Controllers\CustomerDashboardController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CustomerOrderController;
-use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\LanguageController ;
 use App\Models\Order;
+use App\Models\CustomerOrder;
+use App\Events\OrderCreated;
+use Illuminate\Support\Facades\App;
+// use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect('/login');
 });
+// Route::get('/test-event', function () {
+//     $order = CustomerOrder::first(); // Ambil order contoh
+//     OrderCreated::dispatch($order); // Picu event
+//     return 'Event dispatched!';
+// });
 
 Route::middleware(['auth'])->group(function () {
     // Semua route yang membutuhkan autentikasi dapat ditaruh di sini tp ni ga kepake si.
 });
 
 Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->group(function () {
+    
     // Route khusus admin
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -61,14 +71,19 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->g
 
     Route::get('orderhistory', [OrderHistoryController::class, 'index'])->name('orderhistory.index');
     Route::get('orderhistory/data', [OrderHistoryController::class, 'getData'])->name('orderhistory.getData');
-    Route::get('orderhistory/edit/{id}', [OrderController::class, 'edit']);
+
+    // order offline
+    Route::get('orderhistory/details/{id}', [OrderHistoryController::class, 'details'])->name('orderhistory.details');    Route::get('orderhistory/edit/{id}', [OrderController::class, 'edit']);
     Route::put('orderhistory/update/{id}', [OrderController::class, 'update']);
     Route::delete('orderhistory/delete/{id}', [OrderController::class, 'delete']);
 
+    // order online
     Route::get('/online-history', [CustomerOrderController::class, 'showOnlineHistory'])->name('onlinehistory.index');
     Route::get('/online-history/data', [CustomerOrderController::class, 'getOnlineHistoryData'])->name('onlinehistory.getData');
     Route::post('/customer-orders/{id}/mark-as-paid', [CustomerOrderController::class, 'markAsPaid'])->name('customer-orders.markAsPaid');
     Route::post('/customer-orders/{id}/mark-as-unpaid', [CustomerOrderController::class, 'markAsUnpaid'])->name('customer-orders.markAsUnpaid');
+    Route::get('/orderonline/details/{id}', [CustomerOrderController::class, 'details']);
+
 
     Route::get('/datatable', function () {
         return view('tables.data-table');
@@ -83,14 +98,23 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->g
     Route::post('/order/payment/{id}', [OrderController::class, 'payment'])->name('order.payment');
 
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+    Route::get('/test-log', function () {
+        \Log::info('This is a test log entry!');
+        return 'Log entry added';
+    });
+    
 });
 
 Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':customer'])->group(function () {
     // Route khusus customer
     Route::get('/customer/home', [CustomerDashboardController::class, 'index'])->name('customer.home');
-    Route::get('/customer/home', function () {
-        return view('customer.customer_home');
-    })->name('customer.home');
+    Route::get('/customer/home/most-ordered-items', [CustomerOrderController::class, 'mostOrderedItems'])->name('customer.mostOrderedItems');
+    // Route::get('/customer/home', function () {
+    //     return view('customer.customer_home');
+    // })->name('customer.home');
+
+    Route::get('locale/{lang}',[LanguageController::class,'setLocale']);
+    // Route::get('/customer/home', [CustomerHomeController::class, 'index'])->name('customer.home');
 
     Route::post('/customer/orders', [CustomerOrderController::class, 'store'])->name('customer.orders.store');
     Route::get('/customer/orderform', function () {

@@ -16,6 +16,7 @@
     <link rel="shortcut icon" href="{{ asset('images/logobiofarmakecil.png') }}" />
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 </head>
 <style> 
     .modal-body p {
@@ -176,7 +177,7 @@
                                                     <td>{{ $order->item_name }}</td>
                                                     <td>{{ $order->agency_name }}</td>
                                                     <td>{{ ($order->pick_up_date)->format('d-m-Y') }}</td>
-                                                    <td>Rp. {{ $order->total_price }}</td>
+                                                    <td>Rp. {{ number_format($order->total_price, 0, ',', '.') }}</td>
                                                     <td>
                                                         <span class="badge rounded-pill bg-{{ $order->status == 'approved' ? 'success' : ($order->status == 'rejected' ? 'danger' : 'warning') }}">
                                                             {{ ucfirst($order->status) }}
@@ -262,31 +263,113 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
+    <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pusher/7.2.0/pusher.min.js"></script>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.11.1/dist/echo.iife.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js"></script>
+
+
+    {{-- <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging.js"></script> --}}
+
     <script>
-        // Load Order Details into Modal
+        const firebaseConfig = {
+            apiKey: "AIzaSyDPlx_sWOnTJSPzezDPYEUGOeLvgMw4Beg",
+            authDomain: "intelmice-classifier.firebaseapp.com",
+            databaseURL: "https://intelmice-classifier-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "intelmice-classifier",
+            storageBucket: "intelmice-classifier.appspot.com",
+            messagingSenderId: "787318778123",
+            appId: "1:787318778123:web:0cb47c592906ba51fada0e",
+            measurementId: "G-QZV1QYHFRP"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // Reference to orders in the database
+    const ordersRef = firebase.database().ref('orders');
+
+    // Listen for new orders
+    ordersRef.on('child_added', function(data) {
+        const order = data.val();
+        alert(`New order from ${order.customer_name}: ${order.item_name}`);
+        // You can customize this to update your table or show notifications in a nicer way
+    });
+    // <script type="module">
+
+// import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+//             import { getMessaging, onMessage } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging.js";
+
+//             // Firebase configuration
+//             const firebaseConfig = {
+//                 apiKey: "AIzaSyDPlx_sWOnTJSPzezDPYEUGOeLvgMw4Beg",
+//                 authDomain: "intelmice-classifier.firebaseapp.com",
+//                 databaseURL: "https://intelmice-classifier-default-rtdb.asia-southeast1.firebasedatabase.app",
+//                 projectId: "intelmice-classifier",
+//                 storageBucket: "intelmice-classifier.appspot.com",
+//                 messagingSenderId: "787318778123",
+//                 appId: "1:787318778123:web:ce2b870ce9a77614fada0e",
+//                 measurementId: "G-SDV61SQNCR"
+//             };
+
+//             // Initialize Firebase
+//             const app = initializeApp(firebaseConfig);
+//             const messaging = getMessaging(app);
+
+//             // Handle incoming messages
+//             onMessage(messaging, (payload) => {
+//                 console.log('Message received. ', payload);
+//                 alert(`Notification: ${payload.notification.body}`);
+//             });
+
+// // Enable pusher logging - don't include this in production
+    // Pusher.logToConsole = true;
+
+    // var pusher = new Pusher('{{ env('PUSHER_APP_KEY') }}', {
+    //     cluster: '{{ env('PUSHER_APP_CLUSTER') }}',
+    //     forceTLS: true
+    // });
+
+    // // Subscribe ke channel "orders"
+    // var channel = pusher.subscribe('orders');
+
+    // // Listen untuk event "OrderCreated"
+    // channel.bind('App\\Events\\OrderCreated', function(data) {
+    //     console.log('Order Created:', data);
+    //     if (data.order) {
+    //         alert(`Order baru dari ${data.order.fullname}`);
+    //     }
+    // });
+    
+        // Menampilkan detail order di modal
         const orderDetailsModal = document.getElementById('orderDetailsModal');
         orderDetailsModal.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
-            const order = JSON.parse(button.getAttribute('data-order'));
-            const modalBody = orderDetailsModal.querySelector('.modal-body');
-
-            // Populate modal with order details
-            modalBody.innerHTML = `
-                <p><strong>Customer Name:</strong> ${order.fullname}</p>
-                <p><strong>Phone Number:</strong> ${order.phone_number}</p>
-                <p><strong>Email:</strong> ${order.email}</p>
-                <p><strong>Item Name:</strong> ${order.item_name}</p>
-                <p><strong>Agency Name:</strong> ${order.agency_name}</p>
-                <p><strong>Pick Up Date:</strong> ${new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(order.pick_up_date))}</p>
-                <p><strong>Weight:</strong> ${order.weight}</p>
-                <p><strong>Male Quantity:</strong> ${order.male_quantity}</p>
-                <p><strong>Female Quantity:</strong> ${order.female_quantity}</p>
-                <p><strong>Total Price:</strong> Rp ${new Intl.NumberFormat('id-ID').format(order.total_price)}</p>
-                <p><strong>Status:</strong> ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</p>
-                <p><strong>Notes:</strong> ${order.notes ? order.notes : '-'}</p>
-            `;
+            const order = JSON.parse(button.getAttribute('data-order')); // Data order dari button
+    
+            // Memastikan bahwa data order tersedia dan valid
+            if (order) {
+                const modalBody = orderDetailsModal.querySelector('.modal-body');
+                modalBody.innerHTML = `
+                    <p><strong>Customer Name:</strong> ${order.fullname}</p>
+                    <p><strong>Phone Number:</strong> ${order.phone_number}</p>
+                    <p><strong>Email:</strong> ${order.email}</p>
+                    <p><strong>Item Name:</strong> ${order.item_name}</p>
+                    <p><strong>Agency Name:</strong> ${order.agency_name}</p>
+                    <p><strong>Pick Up Date:</strong> ${new Date(order.pick_up_date).toLocaleDateString('id-ID')}</p>
+                    <p><strong>Weight:</strong> ${order.weight}</p>
+                    <p><strong>Male Quantity:</strong> ${order.male_quantity}</p>
+                    <p><strong>Female Quantity:</strong> ${order.female_quantity}</p>
+                    <p><strong>Total Price:</strong> Rp ${new Intl.NumberFormat('id-ID').format(order.total_price)}</p>
+                    <p><strong>Status:</strong> ${order.status}</p>
+                    <p><strong>Notes:</strong> ${order.notes || '-'}</p>`;
+            } else {
+                console.error('Tidak ada data order yang ditemukan.');
+            }
         });
     </script>
-</body>
-
+    </body>
 </html>

@@ -6,6 +6,21 @@
 
 import './bootstrap';
 import { createApp } from 'vue';
+import Echo from "laravel-echo";
+window.Pusher = require("pusher-js");
+
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: process.env.MIX_PUSHER_APP_KEY, // '8cbd4f91c8538d308c05'
+    cluster: 'ap1',
+    forceTLS: true
+});
+
+window.Echo.channel('orders')
+    .listen('OrderCreated', (e) => {
+        console.log('Order Created:', e);
+        alert(`Order baru dari ${e.order.fullname}`);
+    });
 
 /**
  * Next, we will create a fresh Vue application instance. You may then begin

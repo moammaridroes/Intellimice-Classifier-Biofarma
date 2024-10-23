@@ -28,8 +28,15 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
 
     <style>
+         .language-icon {
+            font-size: 1.5rem; /* Atur ukuran ikon */
+            margin-right: 7px; /* Spasi antara ikon dan teks */
+            color: #000000; /* Warna ikon */
+        }
         .badge {
         padding: 0.5em 0.75em;
         font-size: 0.875em;
@@ -58,7 +65,7 @@
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 0 20px rgba(140, 72, 72, 0.1);
-            overflow: hidden;
+            overflow: auto;
         }
 
         .yajra-datatable {
@@ -144,39 +151,54 @@
                     <span class="icon-menu"></span>
                 </button>
 
-                <div class="nav-item dropdown">
-                    <!-- Username Display -->
-                    <span class="text-black font-weight-bold">
-                        {{ Auth::user()->name }}
-                    </span>
-
-                    <!-- Trigger Button with SVG Icon -->
-                    <a class="nav-link p-0" href="#" data-toggle="dropdown" id="profileDropdown">
-                        <div class="ms-1 d-flex justify-content-center">
-                            <!-- Custom Black SVG Icon -->
-                            <svg class="fill-current text-black" width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 011.414 1.414l-4 4a1 1 01-1.414 0l-4-4a1 1 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                    </a>
-
-                    <!-- Dropdown Menu -->
-                    <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
-                        <!-- Profile Link -->
-                        <a class="dropdown-item" href="{{ route('profile.edit') }}">
-                            {{ __('Profile') }}
+                <div class="d-flex align-items-center ml-auto">
+                    <div class="nav-item dropdown mr-4">
+                        <a class="nav-link p-0" href="#" data-toggle="dropdown" id="languageDropdown">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-globe language-icon mr-1"></i> 
+                                {{-- <span style="color: black;">@lang('messages.languages')</span> --}}
+                            </div>
                         </a>
-
-                        <!-- Logout Form -->
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </a>
-                        </form>
+                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="languageDropdown">
+                            <a class="dropdown-item" href="{{ url('locale/en') }}">English</a>
+                            <a class="dropdown-item" href="{{ url('locale/id') }}">Bahasa Indonesia</a>
+                        </div>
+                    </div>
+        
+                    <div class="nav-item dropdown">
+                        <span class="text-black font-weight-bold mr-2">
+                            {{ Auth::user()->name }}
+                        </span>
+        
+                        <a class="nav-link p-0" href="#" data-toggle="dropdown" id="profileDropdown">
+                            <div class="d-flex justify-content-center">
+                                <svg class="fill-current text-black" width="20" height="20"
+                                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 01-1.414 0l-4-4a1 1 010-1.414z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </a>
+        
+                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
+                            {{-- <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                                {{ __('Profile') }}
+                            </a> --}}
+        
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <a class="dropdown-item" href="{{ route('logout') }}"
+                                    onclick="event.preventDefault(); this.closest('form').submit();">
+                                    {{ __('Log Out') }}
+                                </a>
+                            </form>
+                        </div>
                     </div>
                 </div>
+            </div>
         </nav>
+
 
         <!-- partial -->
         <div class="container-fluid page-body-wrapper">
@@ -232,7 +254,7 @@
 
             <div class="main-panel">
                 <div class="content-wrapper">
-                    <h4 class="card-title mb-4">Order History</h4>
+                    <h4 class="card-title mb-4">@lang('messages.order_history')</h4>
                     <div class="card">
                         <div class="card-body">
                             <!-- Tampilkan pesan sukses -->
@@ -249,13 +271,13 @@
                                             {{-- <th>Fullname</th>
                                             <th>Phone Number</th> --}}
                                             {{-- <th>Email</th> --}}
-                                            <th>Item Name</th>
-                                            <th>Pick Up Date</th>
+                                            <th>@lang('messages.item_name')</th>
+                                            <th>@lang('messages.pick_up_date')</th>
                                             {{-- <th>Weight</th> --}}
-                                            <th>Total Price</th>
-                                            <th>Payment Status</th>
-                                            <th>Status</th>
-                                            <th>Details</th>
+                                            <th>@lang('messages.total_price')</th>
+                                            <th>@lang('messages.payment_status')</th>
+                                            <th>@lang('messages.status')</th>
+                                            <th>@lang('messages.details')</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -295,7 +317,7 @@
             </div>
             <!-- Modal Footer -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@lang('messages.close')</button>
                 <!-- Tombol untuk mendownload detail order sebagai gambar -->
                 {{-- <button type="button" class="btn btn-primary download-details">Download as Image</button> --}}
             </div>
@@ -339,8 +361,7 @@
                 { data: 'item_name', name: 'item_name' },
                 { data: 'pick_up_date', name: 'pick_up_date' },
                 { data: 'total_price', name: 'total_price', render: function(data) { return data && !isNaN(data) ? 'Rp ' + new Intl.NumberFormat('id-ID').format(data) : data; }},
-                { 
-                    data: 'is_paid',
+                {                     data: 'is_paid',
                     name: 'is_paid',
                     render: function (data, type, row) {
                         var statusClass = data === 'Paid' ? 'badge bg-success' : 'badge bg-danger';
@@ -368,7 +389,7 @@
             pageLength: 5,
             language: {
                 search: "_INPUT_",
-                searchPlaceholder: "Search records",
+                searchPlaceholder: "@lang('messages.search_records')",
             },
             drawCallback: function () {
                 $('.dataTables_paginate > .pagination').addClass('pagination-rounded');
@@ -380,18 +401,18 @@
             var data = JSON.parse(decodeURIComponent($(this).data('details')));
             var modalBody = $('#detailsModal .modal-body');
             modalBody.empty();
-            modalBody.append('<p><strong>Fullname:</strong> ' + data.fullname + '</p>');
-            modalBody.append('<p><strong>Phone Number:</strong> ' + data.phone_number + '</p>');
-            modalBody.append('<p><strong>Email:</strong> ' + data.email + '</p>');
-            modalBody.append('<p><strong>Item Name:</strong> ' + data.item_name + '</p>');
-            modalBody.append('<p><strong>Pick Up Date:</strong> ' + data.pick_up_date + '</p>');
-            modalBody.append('<p><strong>Weight:</strong> ' + data.weight + '</p>');
-            modalBody.append('<p><strong>Male Quantity:</strong> ' + data.male_quantity + '</p>');
-            modalBody.append('<p><strong>Female Quantity:</strong> ' + data.female_quantity + '</p>');
-            modalBody.append('<p><strong>Total Price:</strong>  ' + data.total_price + '</p>');
-            modalBody.append('<p><strong>Payment Status:</strong> ' + data.is_paid + '</p>');
-            modalBody.append('<p><strong>Status:</strong> ' + data.status + '</p>');
-            modalBody.append('<p><strong>Notes:</strong> ' + (data.notes ? data.notes : '-') + '</p>');
+            modalBody.append('<p><strong>@lang('messages.fullname'):</strong> ' + data.fullname + '</p>');
+            modalBody.append('<p><strong>@lang('messages.phone_number') :</strong> ' + data.phone_number + '</p>');
+            modalBody.append('<p><strong>@lang('messages.email'):</strong> ' + data.email + '</p>');
+            modalBody.append('<p><strong>@lang('messages.item_name'):</strong> ' + data.item_name + '</p>');
+            modalBody.append('<p><strong>@lang('messages.pick_up_date'):</strong> ' + data.pick_up_date + '</p>');
+            modalBody.append('<p><strong>@lang('messages.weight'):</strong> ' + data.weight + '</p>');
+            modalBody.append('<p><strong>@lang('messages.male_quantity'):</strong> ' + data.male_quantity + '</p>');
+            modalBody.append('<p><strong>@lang('messages.female_quantity'):</strong> ' + data.female_quantity + '</p>');
+            modalBody.append('<p><strong>@lang('messages.total_price'):</strong>  ' + data.total_price + '</p>');
+            modalBody.append('<p><strong>@lang('messages.is_paid'):</strong> ' + data.is_paid + '</p>');
+            modalBody.append('<p><strong>@lang('messages.status'):</strong> ' + data.status + '</p>');
+            modalBody.append('<p><strong>@lang('messages.notes'):</strong> ' + (data.notes ? data.notes : '-') + '</p>');
         });
 
         // Handle download details as PDF
@@ -442,7 +463,7 @@
 
             startY += lineHeight;
             doc.text("Weight:", labelX, startY);
-            doc.text(data.weight.toString() + " gr", valueX, startY);
+            doc.text(data.weight.toString(), valueX, startY);
 
             startY += lineHeight;
             doc.text("Male Quantity:", labelX, startY);

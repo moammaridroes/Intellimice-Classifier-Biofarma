@@ -7,7 +7,7 @@ use App\Models\Order;
 use App\Models\CustomerOrder;
 use App\Http\Controllers\CustomerOrderController;
 use App\Models\DetailMencit;
-// use Carbon\Carbon
+use Carbon\Carbon;
 
 class OrderController extends Controller
 {
@@ -44,11 +44,13 @@ class OrderController extends Controller
         $order->total_price = $totalPrice;
         $order->is_paid = true; // Default value
         $order->save();
+        $order->created_at = Carbon::now('Asia/Jakarta');
+        $order->updated_at = Carbon::now('Asia/Jakarta');
     
         // Simpan ID mencit yang dihapus
         $deletedMiceIds = [];
     
-        // Kurangi stok mencit pria
+        // Kurangi stok mencit jantan
         if ($request->male_quantity > 0) {
             $query = DetailMencit::where('gender', 'Male')
                 ->where('health_status', 'Healthy');
@@ -77,7 +79,7 @@ class OrderController extends Controller
             }
         }
     
-        // Kurangi stok mencit wanita
+        // Kurangi stok mencit betina
         if ($request->female_quantity > 0) {
             $query = DetailMencit::where('gender', 'Female')
                 ->where('health_status', 'Healthy');
@@ -111,8 +113,10 @@ class OrderController extends Controller
         $order->save();
     }
     
-
-
+    // Fungsi untuk menghitung stok mencit berdasarkan parameter weight.
+    // Fungsi ini digunakan untuk mengupdate stok mencit di halaman order.
+    // Weight dapat berupa 'less_than_8', 'between_8_and_14', 'between_14_and_18', atau 'greater_equal_18'
+    // Fungsi ini akan menghitung stok mencit jantan dan betina berdasarkan parameter weight yang diberikan
     public function fetchStock(Request $request)
     {
         $weight = $request->input('weight');
@@ -163,12 +167,6 @@ class OrderController extends Controller
         return datatables()->of($orders)->make(true);
     }
 
-    // public function showInvoice($id)
-    // {
-    //     $order = Order::findOrFail($id);
-    //     return view('invoice', compact('order'));
-    // }
-
     public function payment($id)
     {
         $order = Order::findOrFail($id);
@@ -192,37 +190,50 @@ class OrderController extends Controller
     }
 
     public function delete($id)
-{
-    $order = Order::findOrFail($id);
+    {
+        // Cari order berdasarkan ID
+        $order = Order::findOrFail($id);
 
-    if ($order && $order->deleted_mice_ids) {
-        // Kembalikan stok mencit berdasarkan ID yang disimpan
-        $this->restoreStock(json_decode($order->deleted_mice_ids));
+        // Ambil tanggal saat ini
+        $today = Carbon::now('Asia/Jakarta')->format('Y-m-d');
+        
+        // Ambil tanggal order (hanya tanggal tanpa waktu)
+        $orderDate = Carbon::parse($order->created_at)->format('Y-m-d');
 
-        // Hapus order setelah stok dikembalikan
-        $order->delete();
+        // Cek apakah tanggal order adalah hari ini
+        if ($orderDate === $today) {
+            // Jika tanggal order adalah hari ini, lanjutkan untuk menghapus
+            if ($order && $order->deleted_mice_ids) {
+                // Kembalikan stok mencit berdasarkan ID yang disimpan
+                $this->restoreStock(json_decode($order->deleted_mice_ids));
 
-        return response()->json(['success' => true, 'message' => 'Order deleted and stock restored successfully']);
+                // Hapus order setelah stok dikembalikan
+                $order->delete();
+
+                return response()->json(['success' => true, 'message' => 'Order deleted and stock restored successfully']);
+            }
+
+            return response()->json(['success' => false, 'message' => 'Order not found or no mice IDs to restore.'], 404);
+        } else {
+            // Jika tanggal order bukan hari ini, jangan izinkan penghapusan
+            return response()->json(['success' => false, 'message' => 'You can only delete orders created today.'], 403);
+        }
     }
 
-    return response()->json(['success' => false, 'message' => 'Order not found or no mice IDs to restore.'], 404);
-}
 
-private function restoreStock($miceIds)
-{
-    if (!empty($miceIds)) {
-        // Kembalikan mencit yang dihapus berdasarkan ID
-        foreach ($miceIds as $id) {
-            // Temukan mencit yang telah dihapus menggunakan soft delete
-            $mencit = DetailMencit::withTrashed()->find($id);
+    private function restoreStock($miceIds)
+    {
+        if (!empty($miceIds)) {
+            // Kembalikan mencit yang dihapus berdasarkan ID
+            foreach ($miceIds as $id) {
+                // Temukan mencit yang telah dihapus menggunakan soft delete
+                $mencit = DetailMencit::withTrashed()->find($id);
 
-            if ($mencit) {
-                // Kembalikan mencit yang dihapus
-                $mencit->restore();
+                if ($mencit) {
+                     // Kembalikan mencit yang dihapus
+                    $mencit->restore();
+                }
             }
         }
     }
-}
-
-
 }

@@ -4,12 +4,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Dashboard</title>
+        <!-- plugins:css -->
     <link rel="stylesheet" href="{{ asset('vendors/feather/feather.css') }}">
     <link rel="stylesheet" href="{{ asset('vendors/ti-icons/css/themify-icons.css') }}">
     <link rel="stylesheet" href="{{ asset('vendors/css/vendor.bundle.base.css') }}">
+    <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="{{ asset('vendors/select2/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendors/select2-bootstrap-theme/select2-bootstrap.min.css') }}">
+        
     <link rel="stylesheet" href="{{ asset('css/vertical-layout-light/style.css') }}">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
     <link rel="shortcut icon" href="{{ asset('images/logobiofarmakecil.png') }}">
+    
     <script src="{{ asset('vendors/js/vendor.bundle.base.js') }}"></script>
     <script src="{{ asset('js/off-canvas.js') }}"></script>
     <script src="{{ asset('js/hoverable-collapse.js') }}"></script>
@@ -261,21 +267,21 @@
                 <div class="card-container">
                     <!-- Row 1 -->
                     <div class="card-row-1">
-                        <div class="card bg-primary text-white text-center shadow">
+                        <div class="card bg-primary text-white text-center shadow p-6 rounded shadow-md w-60">
                             <div class="card-body">
                                 <p class="mb-2">Online Orders Today</p>
                                 <h4 id="onlineOrdersToday">0</h4>
                             </div>
                         </div>
 
-                        <div class="card bg-danger text-white text-center shadow">
+                        <div class="card bg-danger text-white text-center shadow p-6 rounded shadow-md w-60">
                             <div class="card-body">
                                 <p class="mb-2">Offline Orders Today</p>
                                 <h4 id="offlineOrdersToday">0</h4>
                             </div>
                         </div>
 
-                        <div class="card bg-success text-white text-center shadow">
+                        <div class="card bg-success text-white text-center shadow p-6 rounded shadow-md w-60">
                             <div class="card-body">
                                 <p class="mb-2">Revenue Today</p>
                                 <h4 id="totalRevenueToday">Rp 0</h4>
@@ -285,14 +291,14 @@
 
                     <!-- Row 2 -->
                     <div class="card-row-2">
-                        <div class="card bg-warning text-white text-center shadow">
+                        <div class="card bg-warning text-white text-center shadow p-6 rounded shadow-md w-60">
                             <div class="card-body">
                                 <p class="mb-2">Male Quantity Sold Today</p>
                                 <h4 id="totalMaleSoldToday">0</h4>
                             </div>
                         </div>
 
-                        <div class="card bg-warning text-white text-center shadow">
+                        <div class="card bg-warning text-white text-center shadow p-6 rounded shadow-md w-60    ">
                             <div class="card-body">
                                 <p class="mb-2">Female Quantity Sold Today</p>
                                 <h4 id="totalFemaleSoldToday">0</h4>

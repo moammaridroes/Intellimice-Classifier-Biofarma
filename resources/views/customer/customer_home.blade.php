@@ -17,7 +17,31 @@
   <link rel="stylesheet" href="{{ asset('css/vertical-layout-light/style.css') }}">
   <!-- endinject -->
   <link rel="shortcut icon" href="{{ asset('images/logobiofarmakecil.png') }}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 </head>
+
+{{-- <style>
+    .rules-list li {
+        margin-bottom: 20px; /* Adjusts the space between items */
+    }
+
+    .icon-md {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+    }
+
+    .rules-list h6 {
+        margin-bottom: 5px;
+    }
+
+    .rules-list span {
+        color: #6c757d;
+    }
+</style> --}}
+
 
 <body>
     <div class="container-scroller">
@@ -57,9 +81,9 @@
                 <!-- Dropdown Menu -->
                 <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
                     <!-- Profile Link -->
-                    <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                    {{-- <a class="dropdown-item" href="{{ route('profile.edit') }}">
                         {{ __('Profile') }}
-                    </a>
+                    </a> --}}
 
                     <!-- Logout Form -->
                     <form method="POST" action="{{ route('logout') }}">
@@ -141,89 +165,67 @@
                         <div class="row">
                             <div class="col-8">
                                 <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Today's Orders</p>
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Pending Orders</p>
                                     <h5 class="font-weight-bolder mb-0">
-                                        53
-                                        <span class="text-success text-sm font-weight-bolder">+55%</span>
-                                    </h5>
-                                </div>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
-                                    <i class="ti-shopping-cart text-lg opacity-10" aria-hidden="true"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-sm-6 mb-4">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">New Users</p>
-                                    <h5 class="font-weight-bolder mb-0">
-                                        2,300
-                                        <span class="text-success text-sm font-weight-bolder">+3%</span>
-                                    </h5>
-                                </div>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-danger shadow text-center border-radius-md">
-                                    <i class="ti-user text-lg opacity-10" aria-hidden="true"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-sm-6 mb-4">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">New Clients</p>
-                                    <h5 class="font-weight-bolder mb-0">
-                                        +3,462
-                                        <span class="text-danger text-sm font-weight-bolder">-2%</span>
-                                    </h5>
-                                </div>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-success shadow text-center border-radius-md">
-                                    <i class="ti-user-plus text-lg opacity-10" aria-hidden="true"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-sm-6 mb-4">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Sales</p>
-                                    <h5 class="font-weight-bolder mb-0">
-                                        $103,430
-                                        <span class="text-success text-sm font-weight-bolder">+5%</span>
+                                        {{ $pendingCount }}
+                                        <span class="text-warning text-sm font-weight-bolder">Pending</span>
                                     </h5>
                                 </div>
                             </div>
                             <div class="col-4 text-end">
                                 <div class="icon icon-shape bg-gradient-warning shadow text-center border-radius-md">
-                                    <i class="ti-wallet text-lg opacity-10" aria-hidden="true"></i>
+                                    <<i class="ti-alert text-lg opacity-10" aria-hidden="true"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+            <div class="col-xl-3 col-sm-6 mb-4">
+                <div class="card">
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="numbers">
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Approved Orders</p>
+                                    <h5 class="font-weight-bolder mb-0">
+                                        {{ $approvedCount }}
+                                        <span class="text-success text-sm font-weight-bolder">Approved</span>
+                                    </h5>
+                                </div>
+                            </div>
+                            <div class="col-4 text-end">
+                                <div class="icon icon-shape bg-gradient-success shadow text-center border-radius-md">
+                                    <i class="ti-check-box text-lg opacity-10" aria-hidden="true"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 mb-4">
+                <div class="card">
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="numbers">
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Rejected Orders</p>
+                                    <h5 class="font-weight-bolder mb-0">
+                                        {{ $rejectedCount }}
+                                        <span class="text-danger text-sm font-weight-bolder">Rejected</span>
+                                    </h5>
+                                </div>
+                            </div>
+                            <div class="col-4 text-end">
+                                <div class="icon icon-shape bg-gradient-danger shadow text-center border-radius-md">
+                                    <i class="ti-close text-lg opacity-10" aria-hidden="true"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
         <div class="row mt-4">
             <div class="col-lg-7 mb-lg-0 mb-4">
                 <div class="card z-index-2 h-100">
@@ -241,59 +243,57 @@
                     </div>
                 </div>
             </div>
+            
             <div class="col-lg-5">
                 <div class="card">
                     <div class="card-header pb-0 p-3">
-                        <h6 class="mb-0">Categories</h6>
+                        <h6 class="mb-0">Rules</h6>
                     </div>
                     <div class="card-body p-3">
-                        <ul class="list-group">
-                            <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                                <div class="d-flex align-items-center">
-                                    <div class="icon icon-shape icon-sm me-3 bg-gradient-dark shadow text-center">
-                                        <i class="ti-mobile text-white opacity-10"></i>
-                                    </div>
-                                    <div class="d-flex flex-column">
-                                        <h6 class="mb-1 text-dark text-sm">Devices</h6>
-                                        <span class="text-xs">250 in stock, <span class="font-weight-bold">346+ sold</span></span>
-                                    </div>
+                        <ul class="list-group rules-list space-y-6">
+                            <li class="flex items-center space-x-4">
+                                <div class="bg-blue-500 icon-md flex items-center justify-center shadow-lg">
+                                    <i class="fas fa-clipboard-check text-xl"></i>
                                 </div>
-                                <div class="d-flex">
-                                    <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto"><i class="ti-arrow-right"></i></button>
+                                <div>
+                                    <h6 class="text-lg font-semibold">Order Carefully</h6>
+                                    <p class="text-sm text-gray-500">Please place orders according to your needs.</p>
                                 </div>
                             </li>
-                            <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                                <div class="d-flex align-items-center">
-                                    <div class="icon icon-shape icon-sm me-3 bg-gradient-dark shadow text-center">
-                                        <i class="ti-tag text-white opacity-10"></i>
-                                    </div>
-                                    <div class="d-flex flex-column">
-                                        <h6 class="mb-1 text-dark text-sm">Tickets</h6>
-                                        <span class="text-xs">123 closed, <span class="font-weight-bold">15 open</span></span>
-                                    </div>
+                            <li class="flex items-center space-x-4">
+                                <div class="bg-indigo-500 icon-md flex items-center justify-center shadow-lg">
+                                    <i class="fas fa-tasks text-xl"></i>
                                 </div>
-                                <div class="d-flex">
-                                    <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto"><i class="ti-arrow-right"></i></button>
+                                <div>
+                                    <h6 class="text-lg font-semibold">Check Status</h6>
+                                    <p class="text-sm text-gray-500">Wait for admin approval/rejection. Check regularly.</p>
                                 </div>
                             </li>
-                            <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
-                                <div class="d-flex align-items-center">
-                                    <div class="icon icon-shape icon-sm me-3 bg-gradient-dark shadow text-center">
-                                        <i class="ti-file text-white opacity-10"></i>
-                                    </div>
-                                    <div class="d-flex flex-column">
-                                        <h6 class="mb-1 text-dark text-sm">Error logs</h6>
-                                        <span class="text-xs">1 is active, <span class="font-weight-bold">40 closed</span></span>
-                                    </div>
+                            <li class="flex items-center space-x-4">
+                                <div class="bg-yellow-500 icon-md flex items-center justify-center shadow-lg">
+                                    <i class="fas fa-clock text-xl"></i>
                                 </div>
-                                <div class="d-flex">
-                                    <button class="btn btn-link btn-icon-only btn-rounded btn-sm text-dark icon-move-right my-auto"><i class="ti-arrow-right"></i></button>
+                                <div>
+                                    <h6 class="text-lg font-semibold">Pick Up On Time</h6>
+                                    <p class="text-sm text-gray-500">Please collect your order on the scheduled date. Late pickups will be canceled.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-center space-x-4">
+                                <div class="bg-green-500 icon-md flex items-center justify-center shadow-lg">
+                                    <i class="fas fa-wallet text-xl"></i>                                
+                                </div>
+                                <div>
+                                    <h6 class="text-lg font-semibold">Pay On Site</h6>
+                                    <p class="text-sm text-gray-500">Payment is made directly at the pickup location.</p>
                                 </div>
                             </li>
                         </ul>
                     </div>
                 </div>
             </div>
+            
+            
+            
         </div>
     </div>
                       <!-- content-wrapper ends -->

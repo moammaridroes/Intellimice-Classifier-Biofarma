@@ -21,6 +21,15 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
+<style>
+    .custom-swal-icon {
+            margin-top: 30px; /* Adjust this to move the icon down */
+        }
+        .custom-swal-popup {
+        padding-top: 40px; /* Adjust to increase spacing between title and icon */
+        }
+</style>
+
 <body>
   <div class="container-scroller">
     <!-- Navbar -->
@@ -240,6 +249,7 @@
   <script src="{{ asset('js/settings.js') }}"></script>
   <script src="{{ asset('js/todolist.js') }}"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script>
     function fetchStockCount() {
@@ -257,75 +267,83 @@
         })
         .catch(error => {
             console.error('Error fetching stock counts:', error);
-        });
-}
-
-function toggleInput(inputId, isChecked) {
-    var input = document.getElementById(inputId);
-    input.disabled = !isChecked;
-    if (isChecked) {
-        input.value = '';
-        input.focus();
-    } else {
-        input.value = 0;
+        }); 
     }
-    calculateTotal();
-}
 
-function validateQuantity(inputId, maxStock) {
-    var input = document.getElementById(inputId);
-    var value = parseInt(input.value) || 0;
-    
-    if (value < 0 || value > maxStock) {
-        input.value = 0; // Kembalikan ke 0 jika lebih dari stok atau negatif
-        alert(`Jumlah tidak valid! Jumlah harus antara 0 dan ${maxStock}`);
+    function toggleInput(inputId, isChecked) {
+        var input = document.getElementById(inputId);
+        input.disabled = !isChecked;
+        if (isChecked) {
+            input.value = '';
+            input.focus();
+        } else {
+            input.value = 0;
+        }
+        calculateTotal();
     }
-}
 
-function calculateTotal() {
-    var maleQuantity = parseInt(document.getElementById('maleQuantity').value) || 0;
-    var femaleQuantity = parseInt(document.getElementById('femaleQuantity').value) || 0;
-    
-    // Validasi input male berdasarkan stok
-    validateQuantity('maleQuantity', window.maleStockAvailable || 0);
-    
-    // Validasi input female berdasarkan stok
-    validateQuantity('femaleQuantity', window.femaleStockAvailable || 0);
-    
-    var totalQuantity = maleQuantity + femaleQuantity;
-    document.getElementById('totalQuantity').value = totalQuantity;
-}
+    function validateQuantity(inputId, maxStock) {
+        var input = document.getElementById(inputId);
+        var value = parseInt(input.value) || 0;
+        
+        if (value < 0 || value > maxStock) {
+            input.value = 0; // Kembalikan ke 0 jika lebih dari stok atau negatif
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: `Jumlah tidak valid! Jumlah harus antara 0 dan ${maxStock}`,
+                customClass: {
+                            popup: 'custom-swal-popup',
+                            icon: 'custom-swal-icon'
+                        }
+            });
+        }
+    }
 
-document.getElementById('maleQuantity').addEventListener('input', function () {
-    calculateTotal();
-});
+    function calculateTotal() {
+        var maleQuantity = parseInt(document.getElementById('maleQuantity').value) || 0;
+        var femaleQuantity = parseInt(document.getElementById('femaleQuantity').value) || 0;
+        
+        // Validasi input male berdasarkan stok
+        validateQuantity('maleQuantity', window.maleStockAvailable || 0);
+        
+        // Validasi input female berdasarkan stok
+        validateQuantity('femaleQuantity', window.femaleStockAvailable || 0);
+        
+        var totalQuantity = maleQuantity + femaleQuantity;
+        document.getElementById('totalQuantity').value = totalQuantity;
+    }
 
-document.getElementById('femaleQuantity').addEventListener('input', function () {
-    calculateTotal();
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("submitOrderButton").addEventListener("click", function (e) {
-        e.preventDefault(); // Prevent form from submitting
-        console.log("Submit button clicked");
-
-        // Fetch form data
-        const orderData = {
-            fullname: document.querySelector("input[name='fullname']").value,
-            phone_number: document.querySelector("input[name='phone_number']").value,
-            email: document.querySelector("input[name='email']").value,
-            item_name: document.querySelector("input[name='item_name']").value,
-            agency_name: document.querySelector("input[name='agency_name']").value,
-            operator_name: document.querySelector("input[name='operator_name']").value,
-            weight: document.querySelector("select[name='weight']").value, // Now a string
-            male_quantity: document.querySelector("input[name='male_quantity']").value || 0,
-            female_quantity: document.querySelector("input[name='female_quantity']").value || 0,
-            total_price: calculateTotalPrice()
-        };
-
-        // Show invoice modal with fetched data
-        showInvoiceModal(orderData);
+    document.getElementById('maleQuantity').addEventListener('input', function () {
+        calculateTotal();
     });
+
+    document.getElementById('femaleQuantity').addEventListener('input', function () {
+        calculateTotal();
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("submitOrderButton").addEventListener("click", function (e) {
+            e.preventDefault(); // Prevent form from submitting
+            console.log("Submit button clicked");
+
+            // Fetch form data
+            const orderData = {
+                fullname: document.querySelector("input[name='fullname']").value,
+                phone_number: document.querySelector("input[name='phone_number']").value,
+                email: document.querySelector("input[name='email']").value,
+                item_name: document.querySelector("input[name='item_name']").value,
+                agency_name: document.querySelector("input[name='agency_name']").value,
+                operator_name: document.querySelector("input[name='operator_name']").value,
+                weight: document.querySelector("select[name='weight']").value, // Now a string
+                male_quantity: document.querySelector("input[name='male_quantity']").value || 0,
+                female_quantity: document.querySelector("input[name='female_quantity']").value || 0,
+                total_price: calculateTotalPrice()
+            };
+
+            // Show invoice modal with fetched data
+            showInvoiceModal(orderData);
+        });
 
     function calculateTotalPrice() {
         const maleQuantity = parseInt(document.querySelector("input[name='male_quantity']").value) || 0;

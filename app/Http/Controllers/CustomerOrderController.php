@@ -7,6 +7,14 @@ use Illuminate\Http\Request;
 use App\Models\CustomerOrder;
 use App\Models\DetailMencit;
 use Carbon\Carbon;
+use Kreait\Firebase\Database;
+use App\Events\OrderCreated;
+use Illuminate\Support\Facades\Log;
+use Kreait\Firebase\Factory;
+use Kreait\Firebase\ServiceAccount;
+use App\Notifications\OrderCreatedNotification;
+// use App\Events\OrderCreated;
+
 
 class CustomerOrderController extends Controller
 {
@@ -26,6 +34,7 @@ class CustomerOrderController extends Controller
             'female_quantity' => 'nullable|numeric|min:0',
             'notes' => 'nullable|string|max:500',
         ]);
+        
 
         // Pemetaan value weight ke format yang diinginkan
         $weightMap = [
@@ -39,28 +48,78 @@ class CustomerOrderController extends Controller
         $totalPrice = ($request->male_quantity * 4000) + ($request->female_quantity * 5000);
 
         // Simpan data ke dalam model CustomerOrder
-        $order = new CustomerOrder();
-        $order->customer_id = auth()->id();
-        $order->fullname = $validated['fullname'];
-        $order->phone_number = $validated['phone_number'];
-        $order->email = $validated['email'];
-        $order->item_name = $validated['item_name'];
-        $order->agency_name = $validated['agency_name'];
-        $order->pick_up_date = $validated['pick_up_date'];
-        // $order->weight = $validated['weight'];
-        $order->weight = $weightMap[$validated['weight']];
-        $order->male_quantity = $validated['male_quantity'] ?? 0;
-        $order->female_quantity = $validated['female_quantity'] ?? 0;
-        $order->total_price = $totalPrice;
-        $order->notes = $validated['notes'] ?? '';
-        $order->status = 'pending';
-        $order->is_paid = false;
+        $order = CustomerOrder::create([
+            'customer_id' => auth()->id(),
+            'fullname' => $validated['fullname'],
+            'phone_number' => $validated['phone_number'],
+            'email' => $validated['email'],
+            'item_name' => $validated['item_name'],
+            'agency_name' => $validated['agency_name'],
+            'pick_up_date' => $validated['pick_up_date'],
+            'weight' => $weightMap[$validated['weight']],
+            'male_quantity' => $validated['male_quantity'] ?? 0,
+            'female_quantity' => $validated['female_quantity'] ?? 0,
+            'total_price' => $totalPrice,
+            'notes' => $validated['notes'] ?? '',
+            'status' => 'pending',
+            'is_paid' => false,
+        ]);
 
-        // Simpan data ke database
-        $order->save();
 
-        return redirect()->back()->with('success', 'Order has been placed successfully!');
-    }
+        
+        // Memicu event broadcasting
+        // Memicu event broadcasting
+        // // Log::info('Order Created Event Triggered: ', ['order' => $order]);
+        // event(new OrderCreated($order));
+        //  // Kirim notifikasi ke user (atau admin)
+        // $user = auth()->user(); // atau bisa juga admin atau pihak tertentu
+        // $user->notify(new OrderCreatedNotification($order));
+
+        //     $firebase = (new Factory)
+        //     ->withServiceAccount(storage_path('\laragon\www\Intellimice-Classifier-Biofarma\storage\app\intelimice-classifier-firebase.json')) // Path ke file JSON service account
+        //     ->withDatabaseUri('https://intelmice-classifier-default-rtdb.asia-southeast1.firebasedatabase.app/') // Ganti dengan URI Firebase yang benar
+        //     ->create();
+
+        // $database = $firebase->getDatabase();
+
+        // $newOrderData = [
+        //     'customer_name' => $validated['fullname'],
+        //     'phone_number' => $validated['phone_number'],
+        //     'email' => $validated['email'],
+        //     'item_name' => $validated['item_name'],
+        //     'status' => 'pending',
+        //     'created_at' => now(),
+        // ];
+
+        // // Simpan data order ke Firebase
+        // $database->getReference('orders')->push($newOrderData);
+
+         // Inisialisasi Firebase
+    // // Inisialisasi Firebase
+    // $factory = (new Factory)
+    //     ->withServiceAccount(config('firebase.credentials_file')) // Ambil path dari konfigurasi
+    //     ->withDatabaseUri(config('firebase.database.url')); // Ambil URL dari konfigurasi
+
+    // $database = $factory->createDatabase(); // Menggunakan createDatabase() untuk mendapatkan instance database
+
+    // // Siapkan data notifikasi
+    // $notificationData = [
+    //     'customer_name' => $validated['fullname'],
+    //     'item_name' => $validated['item_name'],
+    //     'agency_name' => $validated['agency_name'],
+    //     'pick_up_date' => $validated['pick_up_date'],
+    //     'total_price' => $totalPrice,
+    //     'status' => 'pending',
+    //     'created_at' => now(),
+    // ];
+
+    // // Simpan data order ke Firebase
+    // $database->getReference('orders')->push($notificationData);
+
+    // Redirect back with success message
+    return redirect()->back()->with('success', 'Order has been placed and saved to Firebase!');
+}
+    
 
 
     // Method untuk menampilkan pesanan ke admin
@@ -188,6 +247,7 @@ class CustomerOrderController extends Controller
                 'status',
                 'notes'
             ])
+            
             ->orderBy('created_at', 'desc');
 
         return DataTables::of($orders)
@@ -206,90 +266,156 @@ class CustomerOrderController extends Controller
 
     // Menandai pesanan sebagai telah dibayar
     public function markAsPaid($id)
-{
-    $order = CustomerOrder::find($id);
-    if ($order) {
-        // Pastikan pesanan belum dibayar sebelumnya
-        if (!$order->is_paid) {
-            // Update status pembayaran menjadi paid
-            $order->is_paid = true;
-            $order->save();
+    {
+        $order = CustomerOrder::find($id);
+        if ($order) {
+            // Pastikan pesanan belum dibayar sebelumnya
+            if (!$order->is_paid) {
+                // Validasi stok mencit terlebih dahulu
+                $isStockAvailable = $this->checkStockAvailability(
+                    $order->male_quantity, 
+                    $order->female_quantity, 
+                    $order->weight
+                );
 
-            // Kurangi stok mencit berdasarkan pesanan
-            $this->reduceStock($order->male_quantity, $order->female_quantity, $order->weight);
+                if (!$isStockAvailable) {
+                    return response()->json([
+                        'success' => false, 
+                        'message' => 'Insufficient stock to mark the order as paid.'
+                    ], 400);
+                }
 
-            return response()->json(['success' => true, 'message' => 'Order marked as paid and stock updated.']);
+                // Jika stok tersedia, lanjutkan dengan perubahan status
+                $order->is_paid = true;
+                $order->save();
+
+                // Kurangi stok mencit berdasarkan pesanan
+                $this->reduceStock($order->male_quantity, $order->female_quantity, $order->weight);
+
+                return response()->json([
+                    'success' => true, 
+                    'message' => 'Order marked as paid and stock updated.'
+                ]);
+            } 
+        }
+
+        return response()->json(['success' => false, 'message' => 'Order not found.'], 404);
+    }
+
+    private function checkStockAvailability($maleQuantity, $femaleQuantity, $weightCategory)
+    {
+        $weightMap = [
+            '<8g' => 'less_than_8',
+            '8-14g' => 'between_8_and_14',
+            '14-18g' => 'between_14_and_18',
+            '>18g' => 'greater_equal_18',
+        ];
+
+        if (!isset($weightMap[$weightCategory])) {
+            return false; // Jika kategori berat tidak valid
+        }
+
+        $weightConditions = [];
+        switch ($weightMap[$weightCategory]) {
+            case 'less_than_8':
+                $weightConditions = ['<', 8];
+                break;
+            case 'between_8_and_14':
+                $weightConditions = ['between', [8, 14]];
+                break;
+            case 'between_14_and_18':
+                $weightConditions = ['between', [14.01, 18]];
+                break;
+            case 'greater_equal_18':
+                $weightConditions = ['>', 18];
+                break;
+        }
+
+        $maleStock = $this->getStockCount('Male', $weightConditions);
+        $femaleStock = $this->getStockCount('Female', $weightConditions);
+
+        return $maleStock >= $maleQuantity && $femaleStock >= $femaleQuantity;
+    }
+
+    private function getStockCount($gender, $weightConditions)
+    {
+        $query = DetailMencit::where('gender', $gender)
+            ->where('health_status', 'Healthy');
+
+        if ($weightConditions[0] === 'between') {
+            $query->whereBetween('berat', $weightConditions[1]);
         } else {
-            return response()->json(['success' => false, 'message' => 'Order is already paid.']);
+            $query->where('berat', $weightConditions[0], $weightConditions[1]);
+        }
+
+        return $query->count();
+    }
+
+
+
+    private function reduceStock($maleQuantity, $femaleQuantity, $weightCategory)
+    {
+        // Pemetaan kategori berat dari format tampilan ke value blade asli
+        $weightMap = [
+            '<8g' => 'less_than_8',
+            '8-14g' => 'between_8_and_14',
+            '14-18g' => 'between_14_and_18',
+            '>18g' => 'greater_equal_18',
+        ];
+
+        // Cek apakah kategori berat valid
+        if (!isset($weightMap[$weightCategory])) {
+            return; // Jika kategori berat tidak valid, hentikan eksekusi
+        }
+
+        // Tentukan kondisi berdasarkan kategori berat yang dipilih
+        $weightConditions = [];
+        switch ($weightMap[$weightCategory]) {
+            case 'less_than_8':
+                $weightConditions = ['<', 8];
+                break;
+            case 'between_8_and_14':
+                $weightConditions = ['between', [8, 14]];
+                break;
+            case 'between_14_and_18':
+                $weightConditions = ['between', [14.01, 18]];
+                break;
+            case 'greater_equal_18':
+                $weightConditions = ['>', 18];
+                break;
+            default:
+                return; // Jika kategori berat tidak valid, hentikan eksekusi
+        }
+
+        // Kurangi stok mencit pria
+        $this->updateStock('Male', $maleQuantity, $weightConditions);
+
+        // Kurangi stok mencit wanita
+        $this->updateStock('Female', $femaleQuantity, $weightConditions);
+    }
+
+
+    private function updateStock($gender, $quantity, $weightConditions)
+    {
+        // Ambil mencit sehat berdasarkan gender dan kondisi berat
+        $mencitQuery = DetailMencit::where('gender', $gender)
+            ->where('health_status', 'Healthy');
+
+        // Tambahkan kondisi berat
+        if ($weightConditions[0] == 'between') {
+            $mencitQuery->whereBetween('berat', $weightConditions[1]);
+        } else {
+            $mencitQuery->where('berat', $weightConditions[0], $weightConditions[1]);
+        }
+
+        // Ambil mencit sebanyak jumlah yang dipesan
+        $mencitToDelete = $mencitQuery->take($quantity)->get();
+
+        // Hapus mencit dari stok
+        foreach ($mencitToDelete as $mencit) {
+            $mencit->delete();
         }
     }
-
-    return response()->json(['success' => false, 'message' => 'Order not found.'], 404);
-}
-
-private function reduceStock($maleQuantity, $femaleQuantity, $weightCategory)
-{
-    // Pemetaan kategori berat dari format tampilan ke value blade asli
-    $weightMap = [
-        '<8g' => 'less_than_8',
-        '8-14g' => 'between_8_and_14',
-        '14-18g' => 'between_14_and_18',
-        '>18g' => 'greater_equal_18',
-    ];
-
-    // Cek apakah kategori berat valid
-    if (!isset($weightMap[$weightCategory])) {
-        return; // Jika kategori berat tidak valid, hentikan eksekusi
-    }
-
-    // Tentukan kondisi berdasarkan kategori berat yang dipilih
-    $weightConditions = [];
-    switch ($weightMap[$weightCategory]) {
-        case 'less_than_8':
-            $weightConditions = ['<', 8];
-            break;
-        case 'between_8_and_14':
-            $weightConditions = ['between', [8, 14]];
-            break;
-        case 'between_14_and_18':
-            $weightConditions = ['between', [14.01, 18]];
-            break;
-        case 'greater_equal_18':
-            $weightConditions = ['>', 18];
-            break;
-        default:
-            return; // Jika kategori berat tidak valid, hentikan eksekusi
-    }
-
-    // Kurangi stok mencit pria
-    $this->updateStock('Male', $maleQuantity, $weightConditions);
-
-    // Kurangi stok mencit wanita
-    $this->updateStock('Female', $femaleQuantity, $weightConditions);
-}
-
-
-private function updateStock($gender, $quantity, $weightConditions)
-{
-    // Ambil mencit sehat berdasarkan gender dan kondisi berat
-    $mencitQuery = DetailMencit::where('gender', $gender)
-        ->where('health_status', 'Healthy');
-
-    // Tambahkan kondisi berat
-    if ($weightConditions[0] == 'between') {
-        $mencitQuery->whereBetween('berat', $weightConditions[1]);
-    } else {
-        $mencitQuery->where('berat', $weightConditions[0], $weightConditions[1]);
-    }
-
-    // Ambil mencit sebanyak jumlah yang dipesan
-    $mencitToDelete = $mencitQuery->take($quantity)->get();
-
-    // Hapus mencit dari stok
-    foreach ($mencitToDelete as $mencit) {
-        $mencit->delete();
-    }
-}
     // Menandai pesanan sebagai belum dibayar
 // public function markAsUnpaid($id)
 // {
@@ -369,7 +495,26 @@ private function updateStock($gender, $quantity, $weightConditions)
 //         $newMencit->save();
 //     }
 // }
+    // function untuk print
+    public function details($id)
+    {
+        $order = CustomerOrder::find($id);
 
+        if (!$order) {
+            return response()->json(['error' => 'Order not found'], 404);
+        }
+
+        $weightMap = [
+            'less_than_8' => '<8g',
+            'between_8_and_14' => '8-14g',
+            'between_14_and_18' => '14-18g',
+            'greater_equal_18' => '>18g',
+        ];
+
+        $order->weight = $weightMap[$order->weight] ?? $order->weight;
+
+        return response()->json($order);
+    }
 
     // Method untuk menampilkan form order customer
     public function create()

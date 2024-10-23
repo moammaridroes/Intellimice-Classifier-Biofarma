@@ -15,8 +15,20 @@
     <link rel="stylesheet" href="{{ asset('css/vertical-layout-light/style.css') }}">
     <!-- endinject -->
     <link rel="shortcut icon" href="{{ asset('images/logobiofarmakecil.png') }}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+
     <!-- Custom CSS for Notifications -->
     <style>
+        .language-icon {
+            font-size: 1.5rem; /* Atur ukuran ikon */
+            margin-right: 7px; /* Spasi antara ikon dan teks */
+            color: #000000; /* Warna ikon */
+        }
+
+
+
         .notification-card {
             padding: 8px 15px; 
             margin-bottom: 8px; 
@@ -87,40 +99,49 @@
                     <span class="icon-menu"></span>
                 </button>
 
-                <div class="nav-item dropdown">
-                    <!-- Username Display -->
-                    <span class="text-black font-weight-bold">
-                        {{ Auth::user()->name }}
-                    </span>
-
-                    <!-- Trigger Button with SVG Icon -->
-                    <a class="nav-link p-0" href="#" data-toggle="dropdown" id="profileDropdown">
-                        <div class="ms-1 d-flex justify-content-center">
-                            <!-- Custom Black SVG Icon -->
-                            <svg class="fill-current text-black" width="20" height="20"
-                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 011.414 1.414l-4 4a1 1 01-1.414 0l-4-4a1 1 010-1.414z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                    </a>
-
-                    <!-- Dropdown Menu -->
-                    <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
-                        <!-- Profile Link -->
-                        <a class="dropdown-item" href="{{ route('profile.edit') }}">
-                            {{ __('Profile') }}
+                <div class="d-flex align-items-center ml-auto">
+                    <div class="nav-item dropdown mr-4">
+                        <a class="nav-link p-0" href="#" data-toggle="dropdown" id="languageDropdown">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-globe language-icon mr-1"></i> 
+                                {{-- <span style="color: black;">@lang('messages.languages')</span> --}}
+                            </div>
                         </a>
-
-                        <!-- Logout Form -->
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <a class="dropdown-item" href="{{ route('logout') }}"
-                                onclick="event.preventDefault(); this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </a>
-                        </form>
+                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="languageDropdown">
+                            <a class="dropdown-item" href="{{ url('locale/en') }}">English</a>
+                            <a class="dropdown-item" href="{{ url('locale/id') }}">Bahasa Indonesia</a>
+                        </div>
+                    </div>
+        
+                    <div class="nav-item dropdown">
+                        <span class="text-black font-weight-bold mr-2">
+                            {{ Auth::user()->name }}
+                        </span>
+        
+                        <a class="nav-link p-0" href="#" data-toggle="dropdown" id="profileDropdown">
+                            <div class="d-flex justify-content-center">
+                                <svg class="fill-current text-black" width="20" height="20"
+                                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 01-1.414 0l-4-4a1 1 010-1.414z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </a>
+        
+                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
+                            {{-- <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                                {{ __('Profile') }}
+                            </a> --}}
+        
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <a class="dropdown-item" href="{{ route('logout') }}"
+                                    onclick="event.preventDefault(); this.closest('form').submit();">
+                                    {{ __('Log Out') }}
+                                </a>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -173,7 +194,7 @@
                     <div class="row">
                         <div class="col-lg-12 grid-margin stretch-card">
                             <div>
-                                <h4 class="card-title">Your Notifications</h4>
+                                <h4 class="card-title">@lang('messages.notifications') </h4>
                                 <div class="row">
                                     @php
                                     // Urutkan orders berdasarkan created_at secara descending dan kelompokkan berdasarkan tanggal
@@ -191,15 +212,13 @@
                                         <div class="notification-card status-{{ $order->status }}">
                                             <div class="notification-info">
                                                 <h5>{{ $order->item_name }}</h5>
-                                                <p><strong>Status:</strong> {{ ucfirst($order->status) }}</p>
-                                                <p>
+                                                <p><strong>@lang('messages.status') :</strong> {{ ucfirst($order->status) }}</p>                                                <p>
                                                     @if($order->status == 'approved')
-                                                    Pesanan Anda telah diterima. Mohon ambil sesuai tanggal: <strong>{{ \Carbon\Carbon::parse($order->pick_up_date)->format('d-m-Y') }}</strong>
+                                                        @lang('messages.approved_message')  <strong>{{ \Carbon\Carbon::parse($order->pick_up_date)->format('d-m-Y') }}</strong>
                                                     @elseif($order->status == 'rejected')
-                                                    Pesanan Anda telah ditolak. Mohon hubungi admin untuk informasi lebih
-                                                    lanjut.
+                                                        @lang('messages.rejected_message') 
                                                     @else
-                                                    Pesanan Anda akan diproses. Mohon tunggu info selanjutnya.
+                                                        @lang('messages.pending_message') 
                                                     @endif
                                                 </p>
                                             </div>

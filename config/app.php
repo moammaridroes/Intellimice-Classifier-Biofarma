@@ -54,6 +54,9 @@ return [
     */
 
     'url' => env('APP_URL', 'http://localhost'),
+    // 'providers' => [App\Providers\BroadcastServiceProvider::class, ],
+
+
 
     /*
     |--------------------------------------------------------------------------

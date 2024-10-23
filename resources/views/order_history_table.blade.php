@@ -30,6 +30,26 @@
 
     <!-- Custom CSS for responsive table -->
     <style>
+        .custom-swal-icon {
+            margin-top: 30px; /* Adjust this to move the icon down */
+        }
+        .custom-swal-popup {
+        padding-top: 40px; /* Adjust to increase spacing between title and icon */
+        }
+        #printContent table {
+        width: 100%;
+        margin-top: 10px;
+        }
+        #printContent th {
+            background-color: #f8f9fa;
+            text-align: left;
+        }
+        #printContent td {
+            text-align: right;
+        }
+        #printContent .text-center {
+            margin-top: 20px;
+        }
         .dataTables_wrapper {
             padding: 20px;
         }
@@ -264,8 +284,25 @@
         </div>
     </div>
 
+     <!-- Print Modal -->
+     <div class="modal fade" id="printModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Print Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="printContent"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" style="background-color: #4B49AC; border-color: #4B49AC;" id="printButton">Print</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal untuk mengedit order -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    {{-- <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -307,13 +344,13 @@
                         <div class="form-group">
                             <label for="edit_item_name">Female Quantity</label>
                             <input type="text" class="form-control" id="edit_female_quantity" name="female_quantity" required>
-                        </div> --}}
+                        </div> 
                         <button type="button" class="btn btn-primary" style="background-color: #4B49AC; border-color: #4B49AC;" id="updateOrderButton">Update</button>
                     </form>
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <!-- plugins:js -->
     <script src="{{ asset('vendors/js/vendor.bundle.base.js') }}"></script>
@@ -338,6 +375,7 @@
 
     <!-- Moment.js untuk format tanggal -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script type="text/javascript">
         $(function () {
@@ -361,7 +399,9 @@
                         orderable: false,
                         searchable: false,
                         render: function (data, type, row) {
-                            return '<button class="btn btn-link details-button" data-bs-toggle="modal" data-bs-target="#detailsModal" data-details="' + encodeURIComponent(JSON.stringify(row)) + '"><i class="fas fa-eye"></i></button>';
+                            return `
+                            <button class="btn btn-link details-button" data-bs-toggle="modal" data-bs-target="#detailsModal" data-details="${encodeURIComponent(JSON.stringify(row))}"><i class="fas fa-eye"></i></button>
+                            `;
                         }
                     },
                     {
@@ -370,8 +410,8 @@
                         searchable: false,
                         render: function (data, type, row) {
                             return `
-                                <button class="btn btn-link edit-button" data-bs-toggle="modal" data-bs-target="#editModal" data-id="${row.id}"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-link delete-button" data-id="${row.id}"><i class="fas fa-trash"></i></button>
+                                <button class="btn print-button" data-id="${data.id}" style="color: #4B49AC"><i class="fas fa-print"></i></button>
+                                <button class="btn btn-link delete-button" data-id="${row.id}" style="color: #4B49AC"><i class="fas fa-trash"></i></button>
                             `;
                         }
                     }
@@ -387,6 +427,78 @@
                     $('.dataTables_paginate > .pagination').addClass('pagination-rounded');
                 }
             });
+
+            // Handle click on print button
+            $('.yajra-datatable').on('click', '.print-button', function () {
+                var id = $(this).data('id');
+                $.ajax({
+                    url: `{{ url('orderhistory/details') }}/${id}`,
+                    success: function (data) {
+                        const now = new Date();
+                        const formattedDate = new Date(data.created_at).toLocaleString('en-EN', { 
+                            year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+                        });
+                            const formattedTotalPrice = new Intl.NumberFormat('id-ID', {
+                            style: 'currency',
+                            currency: 'IDR'
+                        }).format(data.total_price || 0);
+
+                        // Pemetaan weight
+                        const weightMap = {
+                            'less_than_8': '<8g',
+                            'between_8_and_14': '8-14g',
+                            'between_14_and_18': '14-18g',
+                            'greater_equal_18': '>18g'
+                        };
+                        const mappedWeight = weightMap[data.weight] || data.weight;
+
+                        // isi print
+                        $('#printContent').html(`
+                            <div class="text-center mb-4">
+                                <h3>Payment Receipt</h3>
+                                <p>Order ID: ${data.id}</p>
+                                <p>${formattedDate}</p>
+                            </div>
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr><th>Fullname</th><td>${data.fullname}</td></tr>
+                                    <tr><th>Phone Number</th><td>${data.phone_number}</td></tr>
+                                    <tr><th>Email</th><td>${data.email || '-'}</td></tr>
+                                    <tr><th>Item Name</th><td>${data.item_name}</td></tr>
+                                    <tr><th>Agency Name</th><td>${data.agency_name || '-'}</td></tr>
+                                    <tr><th>Operator Name</th><td>${data.operator_name || '-'}</td></tr>
+                                    <tr><th>Weight</th><td>${mappedWeight}</td></tr>
+                                    <tr><th>Male Quantity</th><td>${data.male_quantity || 0}</td></tr>
+                                    <tr><th>Female Quantity</th><td>${data.female_quantity || 0}</td></tr>
+                                    <tr><th>Total Price</th><td>${formattedTotalPrice}</td></tr>
+                                    <tr><th>Payment Status</th><td>${data.is_paid ? 'Paid' : 'Unpaid'}</td></tr>
+                                </tbody>
+                            </table>
+                            <div class="text-center mt-4">
+                                <p>Thank you for your order!</p>
+                                <p>Biofarma STAS-RG</p>
+                            </div>
+                        `);
+                        $('#printModal').modal('show');
+                    },
+                    error: function (xhr) {
+                        alert('Error: ' + xhr.responseText);
+                    }
+                });
+            });
+
+            
+            $('#printButton').on('click', function () {
+                var content = document.getElementById('printContent').innerHTML;
+                var originalContent = document.body.innerHTML;
+
+                document.body.innerHTML = content;
+                window.print();
+                document.body.innerHTML = originalContent;
+                location.reload();
+            });
+            });
+
 
             // Handle click on details button
             $('.yajra-datatable').on('click', '.details-button', function () {
@@ -413,67 +525,105 @@
                 modalBody.append(table);
             });       
                  // Handle click on edit button
-            $('.yajra-datatable').on('click', '.edit-button', function () {
-                var id = $(this).data('id');
-                $.ajax({
-                    url: `{{ url('orderhistory/edit') }}/${id}`,
-                    type: 'GET',
-                    success: function(data) {
-                        var form = $('#editForm');
-                        form.find('#edit_fullname').val(data.fullname);
-                        form.find('#edit_phone_number').val(data.phone_number);
-                        form.find('#edit_email').val(data.email);
-                        form.find('#edit_item_name').val(data.item_name);
-                        form.find('#edit_agency_name').val(data.agency_name);
-                        // form.find('#edit_weight').val(data.weight);
-                        // form.find('#edit_male_quantity').val(data.male_quantity);
-                        // form.find('#edit_female_quantity').val(data.female_quantity);
-                        $('#updateOrderButton').data('id', id); // Set id to update button
-                    }
-                });
-            });
+            // $('.yajra-datatable').on('click', '.edit-button', function () {
+            //     var id = $(this).data('id');
+            //     $.ajax({
+            //         url: `{{ url('orderhistory/edit') }}/${id}`,
+            //         type: 'GET',
+            //         success: function(data) {
+            //             var form = $('#editForm');
+            //             form.find('#edit_fullname').val(data.fullname);
+            //             form.find('#edit_phone_number').val(data.phone_number);
+            //             form.find('#edit_email').val(data.email);
+            //             form.find('#edit_item_name').val(data.item_name);
+            //             form.find('#edit_agency_name').val(data.agency_name);
+            //             // form.find('#edit_weight').val(data.weight);
+            //             // form.find('#edit_male_quantity').val(data.male_quantity);
+            //             // form.find('#edit_female_quantity').val(data.female_quantity);
+            //             $('#updateOrderButton').data('id', id); // Set id to update button
+            //         }
+            //     });
+            // });
 
-            // update button click
-            $('#updateOrderButton').on('click', function() {
-                var id = $(this).data('id');
-                var formData = $('#editForm').serialize();
-                $.ajax({
-                    url: `{{ url('orderhistory/update') }}/${id}`,
-                    type: 'PUT',
-                    data: formData,
-                    success: function(response) {
-                        $('#editModal').modal('hide');
-                        table.ajax.reload();
-                    }
-                });
-            });
+            // // update button click
+            // $('#updateOrderButton').on('click', function() {
+            //     var id = $(this).data('id');
+            //     var formData = $('#editForm').serialize();
+            //     $.ajax({
+            //         url: `{{ url('orderhistory/update') }}/${id}`,
+            //         type: 'PUT',
+            //         data: formData,
+            //         success: function(response) {
+            //             $('#editModal').modal('hide');
+            //             table.ajax.reload();
+            //         }
+            //     });
+            // });
 
             // delete button click
             $('.yajra-datatable').on('click', '.delete-button', function () {
                 var id = $(this).data('id');
-                if (confirm('Are you sure you want to delete this order?')) {
-                    $.ajax({
-                        url: `{{ url('orderhistory/delete') }}/${id}`,
-                        type: 'DELETE',
-                        data: {
-                            _token: "{{ csrf_token() }}" // Kirim CSRF token untuk permintaan penghapusan
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                alert('Order deleted successfully');
-                                // Reload DataTable untuk memperbarui data
-                                $('.yajra-datatable').DataTable().ajax.reload();
-                            } else {
-                                alert('Failed to delete order');
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#4B49AC",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, delete it!",
+                    customClass: {
+                        popup: 'custom-swal-popup',
+                        icon: 'custom-swal-icon'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: `{{ url('orderhistory/delete') }}/${id}`,
+                            type: 'DELETE',
+                            data: {
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        title: "Deleted!",
+                                        text: response.message,
+                                        icon: "success",
+                                        customClass: {
+                                            popup: 'custom-swal-popup',
+                                            icon: 'custom-swal-icon'
+                                        }
+                                    });
+                                    $('.yajra-datatable').DataTable().ajax.reload();
+                                } else {
+                                    Swal.fire({
+                                        title: "Failed!",
+                                        text: response.message,
+                                        icon: "error",
+                                        customClass: {
+                                            popup: 'custom-swal-popup',
+                                            icon: 'custom-swal-icon'
+                                        }
+                                    });
+                                }
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    title: "Error!",
+                                    text: xhr.responseJSON.message || 'An error occurred.',
+                                    icon: "error",
+                                    customClass: {
+                                        popup: 'custom-swal-popup',
+                                        icon: 'custom-swal-icon'
+                                    }
+                                });
                             }
-                        },
-                        error: function(xhr) {
-                            alert('Error: ' + xhr.responseText);
-                        }
-                    });
-                }
-            });        
-        });
+                        });
+                    }
+                });
+            });
+
+
     </script>
 </body>
 

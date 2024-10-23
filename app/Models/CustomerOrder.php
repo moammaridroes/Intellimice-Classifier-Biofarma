@@ -15,6 +15,7 @@ class CustomerOrder extends Model
      * @var array
      */
     protected $fillable = [
+        'customer_id',
         'fullname',
         'phone_number',
         'email',
@@ -25,11 +26,9 @@ class CustomerOrder extends Model
         'male_quantity',
         'female_quantity',
         'total_price',
-        'is_paid',
         'notes',
         'status',
-        'approved_by',
-        'customer_id' // Tambahkan customer_id di sini
+        'is_paid',
     ];
 
     /**

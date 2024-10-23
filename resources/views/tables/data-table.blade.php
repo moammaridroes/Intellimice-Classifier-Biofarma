@@ -33,6 +33,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <style>
+        .custom-swal-icon {
+            margin-top: 30px; /* Adjust this to move the icon down */
+        }
+        .custom-swal-popup {
+            padding-top: 40px; /* Adjust to increase spacing between title and icon */
+        }
         .summary-item {
             display: grid;
             grid-template-columns: 200px auto;
@@ -237,6 +243,8 @@
         <!-- DataTables Scripts -->
         <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
         <!-- Initialize DataTables -->
         <script type="text/javascript">
@@ -263,8 +271,22 @@
                     ]
                 });
 
-                $('#deleteAll').click(function () {
-                    if (confirm("Are you sure you want to delete all records?")) {
+                // Delete all records with SweetAlert confirmation
+            $('#deleteAll').click(function () {
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#4B49AC",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, delete all!",
+                    customClass: {
+                        popup: 'custom-swal-popup', // Apply this class to the entire popup for layout adjustments
+                        icon: 'custom-swal-icon' // Adjust the icon specifically
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
                         $.ajax({
                             url: '/detailmencit/deleteAll',
                             type: 'DELETE',
@@ -274,19 +296,50 @@
                             success: function (response) {
                                 table.ajax.reload();
                                 updateStockCounts();
-                                alert('All records deleted successfully!');
+                                Swal.fire({
+                                    title: "Deleted!",
+                                    text: "All records have been deleted.",
+                                    icon: "success",
+                                    customClass: {
+                                        popup: 'custom-swal-popup', // Apply this class to the entire popup for layout adjustments
+                                        icon: 'custom-swal-icon' // Adjust the icon specifically
+                                    }
+                                });
                             },
                             error: function (response) {
-                                alert('Failed to delete all records.');
+                                Swal.fire({
+                                    title: "Error!",
+                                    text: "Failed to delete all records.",
+                                    icon: "error",
+                                    customClass: {
+                                        popup: 'custom-swal-popup', // Apply this class to the entire popup for layout adjustments
+                                        icon: 'custom-swal-icon' // Adjust the icon specifically
+                                    }
+                                });
                             }
                         });
                     }
                 });
+            });
 
-                // Delete individual record
-                $('body').on('click', '.delete', function () {
-                    var id = $(this).data('id');
-                    if (confirm("Are you sure you want to delete this record?")) {
+            // Delete individual record with SweetAlert confirmation
+            $('body').on('click', '.delete', function () {
+                var id = $(this).data('id');
+                
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#4B49AC",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, delete it!",
+                    customClass: {
+                        popup: 'custom-swal-popup', // Apply this class to the entire popup for layout adjustments
+                        icon: 'custom-swal-icon' // Adjust the icon specifically
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
                         $.ajax({
                             url: `/detailmencit/delete/${id}`,
                             type: 'DELETE',
@@ -296,14 +349,32 @@
                             success: function (response) {
                                 table.ajax.reload();
                                 updateStockCounts();
-                                alert('Record deleted successfully!');
+                                Swal.fire({
+                                    title: "Deleted!",
+                                    text: "The record has been deleted.",
+                                    icon: "success",
+                                    customClass: {
+                                        popup: 'custom-swal-popup', // Apply this class to the entire popup for layout adjustments
+                                        icon: 'custom-swal-icon' // Adjust the icon specifically
+                                    }
+                                });
                             },
                             error: function (response) {
-                                alert('Failed to delete the record.');
+                                Swal.fire({
+                                    title: "Error!",
+                                    text: "Failed to delete the record.",
+                                    icon: "error",
+                                    customClass: {
+                                        popup: 'custom-swal-popup', // Apply this class to the entire popup for layout adjustments
+                                        icon: 'custom-swal-icon' // Adjust the icon specifically
+                                    }
+                                });
                             }
                         });
                     }
                 });
+            });
+
 
                 // Function to update stock counts
                 function updateStockCounts() {

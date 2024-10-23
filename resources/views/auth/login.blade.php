@@ -13,9 +13,25 @@
         .form-check-input {
             margin-right: 10px;
         }
-        .form-check {
+        /* .form-check {
             display: flex;
             align-items: center;
+        } */
+        .remember-me-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        margin-left: 20px;
+
+        }
+
+        .remember-checkbox {
+        margin-right: 8px;
+        }
+
+        .remember-label {
+        font-size: 14px;
+        cursor: pointer;
         }
     </style>
 </head>
@@ -67,10 +83,12 @@
                     @enderror
                 </div>
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="form-check">
+                    {{-- <div class="form-check"> --}}
+                        <div class="remember-me-container">
                         <input id="remember_me" name="remember" type="checkbox" class="form-check-input" {{ old('remember') ? 'checked' : '' }}>
                         <label for="remember_me" class="form-check-label">Remember me</label>
-                    </div>
+                        </div>
+                    {{-- </div> --}}
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Sign in</button>
             </form>
