@@ -43,7 +43,8 @@ class DetailMencitController extends Controller
     public function getData(Request $request)
     {
         if ($request->ajax()) {
-            $data = DetailMencit::select(['id', 'created_at', 'berat', 'gender', 'health_status']);
+            $data = DetailMencit::select(['id', 'created_at', 'berat', 'gender', 'health_status'])
+                ->orderByDesc('created_at'); // Mengurutkan data dari data terbaru
             
             return DataTables::of($data)
                 ->addIndexColumn() // Auto indexing

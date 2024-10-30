@@ -1,6 +1,34 @@
 <?php
 
 return [
+    //sidebar_customer
+    'home' => 'Home',
+    'notification' => 'Notification',
+    'order' => 'Order',
+    'order_forms' => 'Order Forms',
+    'order_history' => 'Order History',
+
+    //customer_home.blade.php
+    'pending_orders' => 'Pending Orders',
+    'pending' => 'Pending',
+    'approved_orders' => 'Approved Orders',
+    'approved' => 'Approved',
+    'rejected_orders' => 'Rejected Orders',
+    'rejected' => 'Rejected',
+    'description' => 'Description',
+    'booking_procedure' => 'Booking Procedure',
+    'order_carefully' => 'Order Carefully',
+    'order_carefully_description' => 'Please place orders according to your needs',
+    'check_status' => 'Check Status',
+    'check_status_description' => 'Wait for admin approval/rejection. Check regularly',
+    'download_receipt' => 'Download Order Receipt',
+    'download_receipt_description' => 'Download PDF receipt on order history and bring it to the pickup location as proof of order',
+    'pickup_time' => 'Pick Up On Time',
+    'pickup_time_description' => 'Please collect your order on the scheduled date. Late pickups will be canceled',
+    'pay_onsite' => 'Pay On Site',
+    'pay_onsite_description' => 'Payment is made directly at the pickup location',
+
+
     //customer_notification.blade.php
     'languages' => 'Languages',
     'notifications' => 'Notifications',
@@ -56,4 +84,6 @@ return [
     'footer_message' => 'Thank you for your order!',
     'company_name' => 'Biofarma STAS-RG',
     'search_records' => 'Search records',
+    'payment_status' => 'Payment Status',
+    'order_id' => 'Order ID',
 ];

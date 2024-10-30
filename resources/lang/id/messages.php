@@ -1,6 +1,33 @@
 <?php
 
 return [
+    //sidebar customer
+    'home' => 'Beranda',
+    'notification' => 'Notifikasi',
+    'order' => 'Pesanan',
+    'order_forms' => 'Formulir Pesanan',
+    'order_history' => 'Riwayat Pesanan',
+
+    //customer_home.blade.php
+    'pending_orders' => 'Pesanan Tertunda',
+    'pending' => 'Tertunda',
+    'approved_orders' => 'Pesanan Disetujui',
+    'approved'=> 'Disetujui',
+    'rejected_orders' => 'Pesanan Ditolak',
+    'rejected'=> 'Ditolak',
+    'description' => 'Deskripsi',
+    'booking_procedure' => 'Prosedur Pemesanan',
+    'order_carefully' => 'Pesan dengan Teliti',
+    'order_carefully_description' => 'Silakan pesan sesuai dengan kebutuhan Anda.',
+    'check_status' => 'Periksa Status',
+    'check_status_description' => 'Tunggu persetujuan/penolakan dari admin. Periksa secara berkala.',
+    'download_receipt' => 'Unduh Bukti Pesanan',
+    'download_receipt_description' => 'Unduh PDF bukti pesanan di halaman riwayat pesanan dan bawa ke lokasi pengambilan sebagai bukti pemesanan',
+    'pickup_time' => 'Ambil Tepat Waktu',
+    'pickup_time_description' => 'Silakan ambil pesanan Anda pada tanggal yang dijadwalkan. Pengambilan yang terlambat akan dibatalkan',
+    'pay_onsite' => 'Bayar di Tempat',
+    'pay_onsite_description' => 'Pembayaran dilakukan langsung di lokasi pengambilan.',
+
     //customer_notification.blade.php
     'languages' => 'Bahasa',
     'notifications' => 'Notifikasi',
@@ -56,4 +83,6 @@ return [
     'footer_message' => 'Terima kasih atas pesanan Anda!',
     'company_name' => 'Biofarma STAS-RG',
     'search_records' => 'Cari catatan',
+    'payment_status' => 'Status Pembayaran',
+    'order_id' => 'ID Pesanan',
 ];

@@ -234,8 +234,8 @@
                   <table class="table table-striped yajra-datatable">
                     <thead>
                       <tr>
+                        <th>Order ID</th>
                         <th>Fullname</th>
-                        <th>Item Name</th>
                         <th>Pick Up Date</th>
                         <th>Total Price</th>
                         <th>Payment Status</th>
@@ -304,9 +304,83 @@
   <script src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
-  <script type="text/javascript">
+  <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+  <script>
+      // Inisialisasi Pusher
+      const pusher = new Pusher('{{ env("PUSHER_APP_KEY") }}', {
+          cluster: '{{ env("PUSHER_APP_CLUSTER") }}',
+          encrypted: true,
+      });
+  
+      // Subscribe ke channel
+      const channel = pusher.subscribe('orders');
+  
+      // CSS untuk notifikasi
+      const style = document.createElement('style');
+      style.textContent = `
+          .notification-container {
+              position: fixed;
+              top: 20px;
+              right: 20px;
+              background-color: #28a745;
+              color: white;
+              padding: 15px 25px;
+              border-radius: 5px;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+              z-index: 9000;
+              opacity: 0;
+              transform: translateY(-20px);
+              transition: all 0.3s ease-in-out;
+              max-width: 350px;
+              word-wrap: break-word;
+          }
+  
+          .notification-container.show {
+              opacity: 1;
+              transform: translateY(0);
+          }
+  
+          .notification-container.hide {
+              opacity: 0;
+              transform: translateY(-20px);
+          }
+      `;
+      document.head.appendChild(style);
+  
+      // Dengarkan event 'order.created'
+      channel.bind('order.created', function(data) {
+          // Buat container notifikasi
+          const notificationContainer = document.createElement('div');
+          notificationContainer.classList.add('notification-container');
+          notificationContainer.textContent = `Pesanan baru dari ${data.order.fullname} untuk ${data.order.item_name}`;
+          document.body.appendChild(notificationContainer);
+  
+          // Animasi munculnya notifikasi
+          setTimeout(() => {
+              notificationContainer.classList.add('show');
+          }, 100);
+  
+          // Hilangkan notifikasi setelah 5 detik
+          setTimeout(() => {
+              notificationContainer.classList.add('hide');
+              setTimeout(() => {
+                  notificationContainer.remove();
+              }, 300);
+          }, 5000);
+  
+          // Update badge notifikasi
+          let badge = document.querySelector('.nav-link .badge');
+          if (badge) {
+              let currentCount = parseInt(badge.textContent);
+              badge.textContent = currentCount + 1;
+          } else {
+              badge = document.createElement('span');
+              badge.classList.add('badge', 'badge-danger');
+              badge.textContent = 1;
+              document.querySelector('.nav-link').appendChild(badge);
+          }
+      });
+      
     $(function () {
      var table = $('.yajra-datatable').DataTable({
          processing: true,
@@ -314,8 +388,10 @@
          ajax: "{{ route('onlinehistory.getData') }}",
          order: [[0, 'desc']],
          columns: [
+             {data: 'id', name: 'id', render: function (data, type, row) {
+                 return 'ONL-' + data;
+             }},
              {data: 'fullname', name: 'fullname'},
-             {data: 'item_name', name: 'item_name'},
              {data: 'pick_up_date', name: 'pick_up_date'},
              {data: 'total_price', name: 'total_price', render: $.fn.dataTable.render.number(',', '.', 2, 'Rp ')},
              {
@@ -386,7 +462,7 @@
                 $('#printContent').html(`
                     <div class="text-center mb-4">
                         <h3>Payment Receipt</h3>
-                        <p>Order ID: ${data.id}</p>
+                        <p>Order ID: ONL-${data.id}</p>
                         <p>${formattedDate}</p>
                     </div>
                     <table class="table table-bordered">
@@ -439,7 +515,8 @@
          // Kosongkan modal sebelum menambahkan data baru
          modalBody.empty();
          modalFooter.find('.mark-paid-button, .mark-unpaid-button').remove(); // Hapus tombol lama jika ada
- 
+
+         modalBody.append('<p><strong>Order ID:</strong> ' + 'ONL-' + data.id + '</p>');
          modalBody.append('<p><strong>Fullname:</strong> ' + data.fullname + '</p>');
          modalBody.append('<p><strong>Phone Number:</strong> ' + data.phone_number + '</p>');
          modalBody.append('<p><strong>Email:</strong> ' + data.email + '</p>');

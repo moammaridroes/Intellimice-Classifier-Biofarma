@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Log;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\ServiceAccount;
 use App\Notifications\OrderCreatedNotification;
-// use App\Events\OrderCreated;
 
 
 class CustomerOrderController extends Controller
@@ -50,6 +49,7 @@ class CustomerOrderController extends Controller
         // Simpan data ke dalam model CustomerOrder
         $order = CustomerOrder::create([
             'customer_id' => auth()->id(),
+            
             'fullname' => $validated['fullname'],
             'phone_number' => $validated['phone_number'],
             'email' => $validated['email'],
@@ -64,61 +64,11 @@ class CustomerOrderController extends Controller
             'status' => 'pending',
             'is_paid' => false,
         ]);
-
-
-        
-        // Memicu event broadcasting
-        // Memicu event broadcasting
-        // // Log::info('Order Created Event Triggered: ', ['order' => $order]);
-        // event(new OrderCreated($order));
-        //  // Kirim notifikasi ke user (atau admin)
-        // $user = auth()->user(); // atau bisa juga admin atau pihak tertentu
-        // $user->notify(new OrderCreatedNotification($order));
-
-        //     $firebase = (new Factory)
-        //     ->withServiceAccount(storage_path('\laragon\www\Intellimice-Classifier-Biofarma\storage\app\intelimice-classifier-firebase.json')) // Path ke file JSON service account
-        //     ->withDatabaseUri('https://intelmice-classifier-default-rtdb.asia-southeast1.firebasedatabase.app/') // Ganti dengan URI Firebase yang benar
-        //     ->create();
-
-        // $database = $firebase->getDatabase();
-
-        // $newOrderData = [
-        //     'customer_name' => $validated['fullname'],
-        //     'phone_number' => $validated['phone_number'],
-        //     'email' => $validated['email'],
-        //     'item_name' => $validated['item_name'],
-        //     'status' => 'pending',
-        //     'created_at' => now(),
-        // ];
-
-        // // Simpan data order ke Firebase
-        // $database->getReference('orders')->push($newOrderData);
-
-         // Inisialisasi Firebase
-    // // Inisialisasi Firebase
-    // $factory = (new Factory)
-    //     ->withServiceAccount(config('firebase.credentials_file')) // Ambil path dari konfigurasi
-    //     ->withDatabaseUri(config('firebase.database.url')); // Ambil URL dari konfigurasi
-
-    // $database = $factory->createDatabase(); // Menggunakan createDatabase() untuk mendapatkan instance database
-
-    // // Siapkan data notifikasi
-    // $notificationData = [
-    //     'customer_name' => $validated['fullname'],
-    //     'item_name' => $validated['item_name'],
-    //     'agency_name' => $validated['agency_name'],
-    //     'pick_up_date' => $validated['pick_up_date'],
-    //     'total_price' => $totalPrice,
-    //     'status' => 'pending',
-    //     'created_at' => now(),
-    // ];
-
-    // // Simpan data order ke Firebase
-    // $database->getReference('orders')->push($notificationData);
+        event(new OrderCreated($order));
 
     // Redirect back with success message
-    return redirect()->back()->with('success', 'Order has been placed and saved to Firebase!');
-}
+    return redirect()->back()->with('success', 'Order has been placed and saved successfully!');
+    }
     
 
 
@@ -132,15 +82,16 @@ class CustomerOrderController extends Controller
 
     // Method untuk notifikasi admin
     public function notificationAdmin()
-    {
-        // Ambil semua pesanan yang statusnya masih pending
-        $orders = CustomerOrder::where('status', 'pending')->get();
-        
-        // Hitung jumlah pesanan pending
-        $unreadNotificationsCount = $orders->count();
+{
+    // Ambil semua pesanan yang statusnya masih pending
+    $orders = CustomerOrder::where('status', 'pending')->get();
+    
+    // Hitung jumlah pesanan pending
+    $unreadNotificationsCount = $orders->count();
 
-        return view('notification', compact('orders', 'unreadNotificationsCount'));
-    }
+    return view('notification', compact('orders', 'unreadNotificationsCount'));
+}
+
 
     // Method untuk menyetujui pesanan
     public function approve($id)
@@ -197,7 +148,7 @@ class CustomerOrderController extends Controller
                 'created_at',
                 'updated_at'
             ])
-            ->orderBy('created_at', 'desc');
+            ->orderBy('updated_at', 'desc');
 
         return DataTables::of($orders)
             ->addIndexColumn()
@@ -218,9 +169,7 @@ class CustomerOrderController extends Controller
     {
         $orders = CustomerOrder::where('customer_id', auth()->id())->get();
         return view('customer.customer_notification', compact('orders'));
-    }
-
-    
+    } 
 
     // Method untuk menampilkan history customer
     public function showCustomerHistory()
@@ -351,8 +300,6 @@ class CustomerOrderController extends Controller
         return $query->count();
     }
 
-
-
     private function reduceStock($maleQuantity, $femaleQuantity, $weightCategory)
     {
         // Pemetaan kategori berat dari format tampilan ke value blade asli
@@ -461,10 +408,10 @@ class CustomerOrderController extends Controller
 //             return; // Jika kategori berat tidak valid, hentikan eksekusi
 //     }
 
-//     // Kembalikan stok mencit pria
+//     // Kembalikan stok mencit jantan
 //     $this->addStock('Male', $maleQuantity, $weightConditions);
 
-//     // Kembalikan stok mencit wanita
+//     // Kembalikan stok mencit betina
 //     $this->addStock('Female', $femaleQuantity, $weightConditions);
 // }
 

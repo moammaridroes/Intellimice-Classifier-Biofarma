@@ -263,87 +263,122 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pusher/7.2.0/pusher.min.js"></script>
+    {{-- <script src="https://js.pusher.com/7.2/pusher.min.js"></script> --}}
+    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pusher/7.2.0/pusher.min.js"></script> --}}
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.11.1/dist/echo.iife.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js"></script>
-
-
-    {{-- <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging.js"></script> --}}
+    {{-- <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.11.1/dist/echo.iife.js"></script> --}}
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDPlx_sWOnTJSPzezDPYEUGOeLvgMw4Beg",
-            authDomain: "intelmice-classifier.firebaseapp.com",
-            databaseURL: "https://intelmice-classifier-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "intelmice-classifier",
-            storageBucket: "intelmice-classifier.appspot.com",
-            messagingSenderId: "787318778123",
-            appId: "1:787318778123:web:0cb47c592906ba51fada0e",
-            measurementId: "G-QZV1QYHFRP"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-
-    // Reference to orders in the database
-    const ordersRef = firebase.database().ref('orders');
-
-    // Listen for new orders
-    ordersRef.on('child_added', function(data) {
-        const order = data.val();
-        alert(`New order from ${order.customer_name}: ${order.item_name}`);
-        // You can customize this to update your table or show notifications in a nicer way
-    });
-    // <script type="module">
-
-// import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-//             import { getMessaging, onMessage } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging.js";
-
-//             // Firebase configuration
-//             const firebaseConfig = {
-//                 apiKey: "AIzaSyDPlx_sWOnTJSPzezDPYEUGOeLvgMw4Beg",
-//                 authDomain: "intelmice-classifier.firebaseapp.com",
-//                 databaseURL: "https://intelmice-classifier-default-rtdb.asia-southeast1.firebasedatabase.app",
-//                 projectId: "intelmice-classifier",
-//                 storageBucket: "intelmice-classifier.appspot.com",
-//                 messagingSenderId: "787318778123",
-//                 appId: "1:787318778123:web:ce2b870ce9a77614fada0e",
-//                 measurementId: "G-SDV61SQNCR"
-//             };
-
-//             // Initialize Firebase
-//             const app = initializeApp(firebaseConfig);
-//             const messaging = getMessaging(app);
-
-//             // Handle incoming messages
-//             onMessage(messaging, (payload) => {
-//                 console.log('Message received. ', payload);
-//                 alert(`Notification: ${payload.notification.body}`);
-//             });
-
-// // Enable pusher logging - don't include this in production
-    // Pusher.logToConsole = true;
-
-    // var pusher = new Pusher('{{ env('PUSHER_APP_KEY') }}', {
-    //     cluster: '{{ env('PUSHER_APP_CLUSTER') }}',
-    //     forceTLS: true
-    // });
-
-    // // Subscribe ke channel "orders"
-    // var channel = pusher.subscribe('orders');
-
-    // // Listen untuk event "OrderCreated"
-    // channel.bind('App\\Events\\OrderCreated', function(data) {
-    //     console.log('Order Created:', data);
-    //     if (data.order) {
-    //         alert(`Order baru dari ${data.order.fullname}`);
-    //     }
-    // });
+    // Kode inisialisasi Pusher yang ada
+    const pusher = new Pusher('{{ env("PUSHER_APP_KEY") }}', {
+    cluster: '{{ env("PUSHER_APP_CLUSTER") }}',
+    encrypted: true,
     
+    // forceTLS: true, // Memaksa penggunaan 
+    // wsHost: 'ws-ap1.pusher.com', // Host WebSocket yang benar untuk cluster ap1
+    // // wsPort: 6001, // Port default WebSocket untuk Laravel Echo Server
+    // wssPort: 443, // Port aman WebSocket
+    // enabledTransports: ['ws', 'wss'], // Membatasi transport ke WebSocket   
+    // disableStats: true // Mengurangi masalah CORS dengan menonaktifkan statistik
+});
+
+
+    // Subscribe ke channel
+    const channel = pusher.subscribe('orders');
+
+    const style = document.createElement('style');
+    style.textContent = `
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #28a745;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 9000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease-in-out;
+            max-width: 350px;
+            word-wrap: break-word;
+        }
+
+        .notification-container.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .notification-container.hide {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Dengarkan event 'order.created'
+    channel.bind('order.created', function(data) {
+        // Buat container notifikasi
+        const notificationContainer = document.createElement('div');
+        notificationContainer.classList.add('notification-container');
+        notificationContainer.textContent = `Pesanan baru dari ${data.order.fullname} untuk ${data.order.item_name}`;
+        document.body.appendChild(notificationContainer);
+
+        // Animasi munculnya notifikasi
+        setTimeout(() => {
+            notificationContainer.classList.add('show');
+        }, 100);
+
+        // Hilangkan notifikasi setelah 5 detik
+        setTimeout(() => {
+            notificationContainer.classList.add('hide');
+            setTimeout(() => {
+                notificationContainer.remove();
+            }, 300);
+        }, 5000);
+        
+        // Secara opsional, perbarui DOM untuk mencerminkan pesanan baru tanpa memuat ulang halaman
+        let tbody = document.querySelector("table.table tbody");
+        let newRow = `
+            <tr>
+                <td>${data.order.fullname}</td>
+                <td>${data.order.item_name}</td>
+                <td>${data.order.agency_name}</td>
+                <td>${new Date(data.order.pick_up_date).toLocaleDateString('id-ID', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-')}</td>
+                <td>Rp ${parseInt(data.order.total_price).toLocaleString('id-ID')}</td>
+                <td><span class="badge badge-warning">Pending</span></td>
+                <td>
+                    <button class="btn btn-info btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#orderDetailsModal"
+                            data-order='${JSON.stringify(data.order)}'>Details</button>
+                    <form action="{{ route('admin.customer-orders.approve', '') }}/${data.order.id}" method="POST" style="display: inline;">
+                        @csrf
+                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                    </form>
+                    <form action="{{ route('admin.customer-orders.reject', '') }}/${data.order.id}" method="POST" style="display: inline;">
+                        @csrf
+                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                    </form>
+                </td>
+            </tr>
+        `;
+        tbody.insertAdjacentHTML("afterbegin", newRow);
+
+        // Perbarui jumlah notifikasi yang belum dibaca
+        let badge = document.querySelector('.nav-link .badge');
+        if (badge) {
+            let currentCount = parseInt(badge.textContent);
+            badge.textContent = currentCount + 1; // Tambah jumlah notifikasi
+        } else {
+            // Jika badge tidak ada, buat badge baru
+            badge = document.createElement('span');
+            badge.classList.add('badge', 'badge-danger');
+            badge.textContent = 1;
+            document.querySelector('.nav-link').appendChild(badge);
+        }
+    });
+   
         // Menampilkan detail order di modal
         const orderDetailsModal = document.getElementById('orderDetailsModal');
         orderDetailsModal.addEventListener('show.bs.modal', function (event) {
