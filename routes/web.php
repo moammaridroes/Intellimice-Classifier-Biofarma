@@ -7,7 +7,6 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderHistoryController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\CustomerDashboardController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
@@ -22,11 +21,6 @@ use Illuminate\Support\Facades\App;
 Route::get('/', function () {
     return redirect('/login');
 });
-// Route::get('/test-event', function () {
-//     $order = CustomerOrder::first(); // Ambil order contoh
-//     OrderCreated::dispatch($order); // Picu event
-//     return 'Event dispatched!';
-// });
 
 Route::middleware(['auth'])->group(function () {
     // Semua route yang membutuhkan autentikasi dapat ditaruh di sini tp ni ga kepake si.
@@ -34,6 +28,11 @@ Route::middleware(['auth'])->group(function () {
 
 Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->group(function () {
     
+// Route::post('/save-token', [TokenController::class, 'saveToken'])->middleware('auth'); 
+    Route::post('/save-fcm-token', [CustomerOrderController::class, 'saveFcmToken'])->name('save-fcm-token'); 
+    Route::get('/admin/get-latest-orders', [CustomerOrderController::class, 'getLatestOrders']);
+    Route::get('/admin/get-unread-notifications-count', [CustomerOrderController::class, 'getUnreadNotificationsCount']);
+
     // Route khusus admin
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

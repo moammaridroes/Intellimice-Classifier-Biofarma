@@ -267,9 +267,10 @@
     {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pusher/7.2.0/pusher.min.js"></script> --}}
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     {{-- <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.11.1/dist/echo.iife.js"></script> --}}
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging-compat.js"></script>
 
-    <script>
-    // Kode inisialisasi Pusher yang ada
+<script>
     const pusher = new Pusher('{{ env("PUSHER_APP_KEY") }}', {
     cluster: '{{ env("PUSHER_APP_CLUSTER") }}',
     encrypted: true,
@@ -281,8 +282,6 @@
     // enabledTransports: ['ws', 'wss'], // Membatasi transport ke WebSocket   
     // disableStats: true // Mengurangi masalah CORS dengan menonaktifkan statistik
 });
-
-
     // Subscribe ke channel
     const channel = pusher.subscribe('orders');
 
@@ -378,33 +377,33 @@
             document.querySelector('.nav-link').appendChild(badge);
         }
     });
-   
-        // Menampilkan detail order di modal
-        const orderDetailsModal = document.getElementById('orderDetailsModal');
-        orderDetailsModal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
-            const order = JSON.parse(button.getAttribute('data-order')); // Data order dari button
-    
-            // Memastikan bahwa data order tersedia dan valid
-            if (order) {
-                const modalBody = orderDetailsModal.querySelector('.modal-body');
-                modalBody.innerHTML = `
-                    <p><strong>Customer Name:</strong> ${order.fullname}</p>
-                    <p><strong>Phone Number:</strong> ${order.phone_number}</p>
-                    <p><strong>Email:</strong> ${order.email}</p>
-                    <p><strong>Item Name:</strong> ${order.item_name}</p>
-                    <p><strong>Agency Name:</strong> ${order.agency_name}</p>
-                    <p><strong>Pick Up Date:</strong> ${new Date(order.pick_up_date).toLocaleDateString('id-ID')}</p>
-                    <p><strong>Weight:</strong> ${order.weight}</p>
-                    <p><strong>Male Quantity:</strong> ${order.male_quantity}</p>
-                    <p><strong>Female Quantity:</strong> ${order.female_quantity}</p>
-                    <p><strong>Total Price:</strong> Rp ${new Intl.NumberFormat('id-ID').format(order.total_price)}</p>
-                    <p><strong>Status:</strong> ${order.status}</p>
-                    <p><strong>Notes:</strong> ${order.notes || '-'}</p>`;
-            } else {
-                console.error('Tidak ada data order yang ditemukan.');
-            }
-        });
-    </script>
-    </body>
+
+    // Menampilkan detail order di modal
+    const orderDetailsModal = document.getElementById('orderDetailsModal');
+    orderDetailsModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const order = JSON.parse(button.getAttribute('data-order')); // Data order dari button
+
+        // Memastikan bahwa data order tersedia dan valid
+        if (order) {
+            const modalBody = orderDetailsModal.querySelector('.modal-body');
+            modalBody.innerHTML = `
+                <p><strong>Customer Name:</strong> ${order.fullname}</p>
+                <p><strong>Phone Number:</strong> ${order.phone_number}</p>
+                <p><strong>Email:</strong> ${order.email}</p>
+                <p><strong>Item Name:</strong> ${order.item_name}</p>
+                <p><strong>Agency Name:</strong> ${order.agency_name}</p>
+                <p><strong>Pick Up Date:</strong> ${new Date(order.pick_up_date).toLocaleDateString('id-ID')}</p>
+                <p><strong>Weight:</strong> ${order.weight}</p>
+                <p><strong>Male Quantity:</strong> ${order.male_quantity}</p>
+                <p><strong>Female Quantity:</strong> ${order.female_quantity}</p>
+                <p><strong>Total Price:</strong> Rp ${new Intl.NumberFormat('id-ID').format(order.total_price)}</p>
+                <p><strong>Status:</strong> ${order.status}</p>
+                <p><strong>Notes:</strong> ${order.notes || '-'}</p>`;
+        } else {
+            console.error('Tidak ada data order yang ditemukan.');
+        }
+    });
+</script>
+</body>
 </html>

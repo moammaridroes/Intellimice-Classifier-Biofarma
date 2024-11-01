@@ -7,70 +7,68 @@ use Illuminate\Http\Request;
 use App\Models\CustomerOrder;
 use App\Models\DetailMencit;
 use Carbon\Carbon;
+use App\Models\User;
 use Kreait\Firebase\Database;
 use App\Events\OrderCreated;
 use Illuminate\Support\Facades\Log;
 use Kreait\Firebase\Factory;
+use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\ServiceAccount;
 use App\Notifications\OrderCreatedNotification;
+use Google\Client as GoogleClient;
 
 
 class CustomerOrderController extends Controller
 {
     // Method untuk menyimpan pesanan dari customer
     public function store(Request $request)
-    {
-        // Validasi data
-        $validated = $request->validate([
-            'fullname' => 'required|string|max:255',
-            'phone_number' => 'required|string|max:20',
-            'email' => 'required|email|max:255',
-            'agency_name' => 'required|string|max:255',
-            'item_name' => 'required|string|max:255',
-            'pick_up_date' => 'required|date',
-            'weight' => 'required|string|max:255',
-            'male_quantity' => 'nullable|numeric|min:0',
-            'female_quantity' => 'nullable|numeric|min:0',
-            'notes' => 'nullable|string|max:500',
-        ]);
-        
+{
+    // Validasi data
+    $validated = $request->validate([
+        'fullname' => 'required|string|max:255',
+        'phone_number' => 'required|string|max:20',
+        'email' => 'required|email|max:255',
+        'agency_name' => 'required|string|max:255',
+        'item_name' => 'required|string|max:255',
+        'pick_up_date' => 'required|date',
+        'weight' => 'required|string|max:255',
+        'male_quantity' => 'nullable|numeric|min:0',
+        'female_quantity' => 'nullable|numeric|min:0',
+        'notes' => 'nullable|string|max:500',
+    ]);
 
-        // Pemetaan value weight ke format yang diinginkan
-        $weightMap = [
-            'less_than_8' => '<8g',
-            'between_8_and_14' => '8-14g',
-            'between_14_and_18' => '14-18g',
-            'greater_equal_18' => '>18g'
-        ];
+    // Pemetaan dan hitung total harga
+    $weightMap = [
+        'less_than_8' => '<8g',
+        'between_8_and_14' => '8-14g',
+        'between_14_and_18' => '14-18g',
+        'greater_equal_18' => '>18g'
+    ];
+    $totalPrice = ($request->male_quantity * 4000) + ($request->female_quantity * 5000);
 
-        // Hitung total harga
-        $totalPrice = ($request->male_quantity * 4000) + ($request->female_quantity * 5000);
+    // Simpan order ke database
+    $order = CustomerOrder::create([
+        'customer_id' => auth()->id(),
+        'fullname' => $validated['fullname'],
+        'phone_number' => $validated['phone_number'],
+        'email' => $validated['email'],
+        'item_name' => $validated['item_name'],
+        'agency_name' => $validated['agency_name'],
+        'pick_up_date' => $validated['pick_up_date'],
+        'weight' => $weightMap[$validated['weight']],
+        'male_quantity' => $validated['male_quantity'] ?? 0,
+        'female_quantity' => $validated['female_quantity'] ?? 0,
+        'total_price' => $totalPrice,
+        'notes' => $validated['notes'] ?? '',
+        'status' => 'pending',
+        'is_paid' => false,
+    ]);
 
-        // Simpan data ke dalam model CustomerOrder
-        $order = CustomerOrder::create([
-            'customer_id' => auth()->id(),
-            
-            'fullname' => $validated['fullname'],
-            'phone_number' => $validated['phone_number'],
-            'email' => $validated['email'],
-            'item_name' => $validated['item_name'],
-            'agency_name' => $validated['agency_name'],
-            'pick_up_date' => $validated['pick_up_date'],
-            'weight' => $weightMap[$validated['weight']],
-            'male_quantity' => $validated['male_quantity'] ?? 0,
-            'female_quantity' => $validated['female_quantity'] ?? 0,
-            'total_price' => $totalPrice,
-            'notes' => $validated['notes'] ?? '',
-            'status' => 'pending',
-            'is_paid' => false,
-        ]);
-        event(new OrderCreated($order));
+    event(new OrderCreated($order));
 
     // Redirect back with success message
     return redirect()->back()->with('success', 'Order has been placed and saved successfully!');
     }
-    
-
 
     // Method untuk menampilkan pesanan ke admin
     public function index()
