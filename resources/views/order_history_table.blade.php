@@ -176,12 +176,10 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('admin.notification') }}">
-                            <i class="ti-bell menu-icon"></i>
+                        <a class="nav-link" href="{{ route('admin.notification') }}" >
+                            <i class="ti-bell menu-icon position-relative"></i>
                             <span class="menu-title">Notification</span>
-                            @if($unreadNotificationsCount > 0)
-                                <span class="badge badge-danger">{{ $unreadNotificationsCount }}</span>
-                            @endif
+                            <span id="notificationBadge" class="badge badge-danger notification-badge">{{ $unreadNotificationsCount > 0 ? $unreadNotificationsCount : '' }}</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -425,7 +423,7 @@
             // Buat container notifikasi
             const notificationContainer = document.createElement('div');
             notificationContainer.classList.add('notification-container');
-            notificationContainer.textContent = `Pesanan baru dari ${data.order.fullname} untuk ${data.order.item_name}`;
+            notificationContainer.textContent = `New orders have been received`;
             document.body.appendChild(notificationContainer);
 
             // Animasi munculnya notifikasi
@@ -442,17 +440,15 @@
             }, 5000);
 
             // Update badge notifikasi
-            let badge = document.querySelector('.nav-link .badge');
+            const badge = document.getElementById('notificationBadge');
             if (badge) {
-                let currentCount = parseInt(badge.textContent);
+                // Ambil nilai badge saat ini dan ubah ke angka (0 jika kosong)
+                let currentCount = parseInt(badge.textContent) || 0;
+                    
+                // Tambahkan 1 ke nilai saat ini
                 badge.textContent = currentCount + 1;
-            } else {
-                badge = document.createElement('span');
-                badge.classList.add('badge', 'badge-danger');
-                badge.textContent = 1;
-                document.querySelector('.nav-link').appendChild(badge);
             }
-        });
+            });
         $(function () {
             var table = $('.yajra-datatable').DataTable({
                 processing: true,
@@ -697,9 +693,6 @@
                     }
                 });
             });
-
-
     </script>
 </body>
-
 </html>

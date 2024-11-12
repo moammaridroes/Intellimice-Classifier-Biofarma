@@ -62,6 +62,7 @@ return [
     'notes' => 'Catatan',
     'submit' => 'Kirim',
     'reset' => 'Atur Ulang',
+    'enter_dash_if_none' => 'Input "-" jika tidak memiliki agensi',
 
     //customer_history_table.blade.php
     'order_history' => 'Riwayat Pesanan',

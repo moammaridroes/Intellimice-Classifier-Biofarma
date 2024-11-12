@@ -21,26 +21,59 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 </head>
+<style>
+.sidebar-offcanvas {
+    height: 100vh;
+    overflow-y: auto;
+}
 
-{{-- <style>
-    .rules-list li {
-        margin-bottom: 20px; /* Adjusts the space between items */
+/* Tombol menu untuk mode mobile */
+.mobile-menu-btn {
+    display: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+/* Tombol untuk menutup sidebar di tampilan mobile */
+.close-sidebar-btn {
+    display: none;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #333;
+}
+
+@media (max-width: 767px) {
+    .mobile-menu-btn {
+        display: inline;
     }
 
-    .icon-md {
-        width: 50px;
-        height: 50px;
-        border-radius: 10px;
+    .sidebar-offcanvas {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 200px;
+        height: 100vh;
+        background-color: #ffffff;
+        z-index: 1050;
+        padding-top: 60px;
+        border-right: 1px solid #ddd;
     }
 
-    .rules-list h6 {
-        margin-bottom: 5px;
+    .sidebar-offcanvas.active {
+        display: block;
     }
 
-    .rules-list span {
-        color: #6c757d;
+    .sidebar-offcanvas.active .close-sidebar-btn {
+        display: inline;
     }
-</style> --}}
+}
+
+</style> 
 
 
 <body>
@@ -58,6 +91,11 @@
 
             
             <div class="navbar-menu-wrapper d-flex align-items-center justify-content-between">
+                <!-- Tombol untuk tampilan mobile -->
+                <span class="mobile-menu-btn" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </span>
+
                 <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
                     <span class="icon-menu"></span>
                 </button>
@@ -125,6 +163,9 @@
       <!-- partial -->
       <!-- partial:../../partials/_sidebar.html -->
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
+        <span class="close-sidebar-btn" onclick="toggleSidebar()">
+            <i class="fas fa-times"></i>
+        </span>
         <ul class="nav">
           <li class="nav-item">
             <a class="nav-link" href="{{ url('customer/home') }}">
@@ -169,75 +210,75 @@
         </ul>
       </nav>
       <!-- partial -->
-<div class="main-panel">
-    <div class="content-wrapper">
-        <div class="row">
-            <div class="col-xl-3 col-sm-6 mb-4">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">@lang('messages.pending_orders')</p>
-                                    <h5 class="font-weight-bolder mb-0">
-                                        {{ $pendingCount }}
-                                        <span class="text-warning text-sm font-weight-bolder">@lang('messages.pending')</span>
-                                    </h5>
+    <div class="main-panel">
+        <div class="content-wrapper">
+            <div class="row">
+                <div class="col-xl-3 col-sm-6 mb-4">
+                    <div class="card">
+                        <div class="card-body p-3">
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="numbers">
+                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">@lang('messages.pending_orders')</p>
+                                        <h5 class="font-weight-bolder mb-0">
+                                            {{ $pendingCount }}
+                                            <span class="text-warning text-sm font-weight-bolder">@lang('messages.pending')</span>
+                                        </h5>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-warning shadow text-center border-radius-md">
-                                    <<i class="ti-alert text-lg opacity-10" aria-hidden="true"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-sm-6 mb-4">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">@lang('messages.approved_orders')</p>
-                                    <h5 class="font-weight-bolder mb-0">
-                                        {{ $approvedCount }}
-                                        <span class="text-success text-sm font-weight-bolder">@lang('messages.approved')</span>
-                                    </h5>
-                                </div>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-success shadow text-center border-radius-md">
-                                    <i class="ti-check-box text-lg opacity-10" aria-hidden="true"></i>
+                                <div class="col-4 text-end">
+                                    <div class="icon icon-shape bg-gradient-warning shadow text-center border-radius-md">
+                                        <<i class="ti-alert text-lg opacity-10" aria-hidden="true"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-xl-3 col-sm-6 mb-4">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="numbers">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">@lang('messages.rejected_orders')</p>
-                                    <h5 class="font-weight-bolder mb-0">
-                                        {{ $rejectedCount }}
-                                        <span class="text-danger text-sm font-weight-bolder">@lang('messages.rejected')</span>
-                                    </h5>
+                <div class="col-xl-3 col-sm-6 mb-4">
+                    <div class="card">
+                        <div class="card-body p-3">
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="numbers">
+                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">@lang('messages.approved_orders')</p>
+                                        <h5 class="font-weight-bolder mb-0">
+                                            {{ $approvedCount }}
+                                            <span class="text-success text-sm font-weight-bolder">@lang('messages.approved')</span>
+                                        </h5>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-4 text-end">
-                                <div class="icon icon-shape bg-gradient-danger shadow text-center border-radius-md">
-                                    <i class="ti-close text-lg opacity-10" aria-hidden="true"></i>
+                                <div class="col-4 text-end">
+                                    <div class="icon icon-shape bg-gradient-success shadow text-center border-radius-md">
+                                        <i class="ti-check-box text-lg opacity-10" aria-hidden="true"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+                <div class="col-xl-3 col-sm-6 mb-4">
+                    <div class="card">
+                        <div class="card-body p-3">
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="numbers">
+                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">@lang('messages.rejected_orders')</p>
+                                        <h5 class="font-weight-bolder mb-0">
+                                            {{ $rejectedCount }}
+                                            <span class="text-danger text-sm font-weight-bolder">@lang('messages.rejected')</span>
+                                        </h5>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <div class="icon icon-shape bg-gradient-danger shadow text-center border-radius-md">
+                                        <i class="ti-close text-lg opacity-10" aria-hidden="true"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             
         <div class="row mt-4">
             <div class="col-lg-7 mb-lg-0 mb-4">
@@ -347,90 +388,12 @@
   <!-- endinject -->
   <!-- Custom js for this page-->
   <!-- End custom js for this page-->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    var ctx = document.getElementById("chart-line").getContext("2d");
+    function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("active");
+    }
 
-    var gradientStroke1 = ctx.createLinearGradient(0, 230, 0, 50);
-    gradientStroke1.addColorStop(1, 'rgba(94, 114, 228, 0.2)');
-    gradientStroke1.addColorStop(0.2, 'rgba(94, 114, 228, 0.0)');
-    gradientStroke1.addColorStop(0, 'rgba(94, 114, 228, 0)');
-
-    new Chart(ctx, {
-        type: "line",
-        data: {
-            labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-            datasets: [{
-                label: "Mobile apps",
-                tension: 0.4,
-                borderWidth: 0,
-                pointRadius: 0,
-                borderColor: "#5e72e4",
-                backgroundColor: gradientStroke1,
-                borderWidth: 3,
-                fill: true,
-                data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
-                maxBarThickness: 6
-            }],
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false,
-                }
-            },
-            interaction: {
-                intersect: false,
-                mode: 'index',
-            },
-            scales: {
-                y: {
-                    grid: {
-                        drawBorder: false,
-                        display: true,
-                        drawOnChartArea: true,
-                        drawTicks: false,
-                        borderDash: [5, 5]
-                    },
-                    ticks: {
-                        display: true,
-                        padding: 10,
-                        color: '#fbfbfb',
-                        font: {
-                            size: 11,
-                            family: "Open Sans",
-                            style: 'normal',
-                            lineHeight: 2
-                        },
-                    }
-                },
-                x: {
-                    grid: {
-                        drawBorder: false,
-                        display: false,
-                        drawOnChartArea: false,
-                        drawTicks: false,
-                        borderDash: [5, 5]
-                    },
-                    ticks: {
-                        display: true,
-                        color: '#ccc',
-                        padding: 20,
-                        font: {
-                            size: 11,
-                            family: "Open Sans",
-                            style: 'normal',
-                            lineHeight: 2
-                        },
-                    }
-                },
-            },
-        },
-    });
-</script>
-
+    </script>
 </body>
 
 </html>

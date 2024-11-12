@@ -80,15 +80,15 @@ class CustomerOrderController extends Controller
 
     // Method untuk notifikasi admin
     public function notificationAdmin()
-{
-    // Ambil semua pesanan yang statusnya masih pending
-    $orders = CustomerOrder::where('status', 'pending')->get();
-    
-    // Hitung jumlah pesanan pending
-    $unreadNotificationsCount = $orders->count();
+    {
+        // Ambil semua pesanan yang statusnya masih pending
+        $orders = CustomerOrder::where('status', 'pending')->get();
+        
+        // Hitung jumlah pesanan pending
+        $unreadNotificationsCount = $orders->count();
 
-    return view('notification', compact('orders', 'unreadNotificationsCount'));
-}
+        return view('notification', compact('orders', 'unreadNotificationsCount'));
+    }
 
 
     // Method untuk menyetujui pesanan
@@ -340,6 +340,8 @@ class CustomerOrderController extends Controller
     }
 
 
+    // Method untuk mengurangi stok mencit berdasarkan gender dan kondisi berat yang dipesan
+    // Stok mencit yang dihapus berdasarkan kategori berat yang dipilih
     private function updateStock($gender, $quantity, $weightConditions)
     {
         // Ambil mencit sehat berdasarkan gender dan kondisi berat

@@ -63,6 +63,7 @@ return [
     'notes' => 'Notes',
     'submit' => 'Submit',
     'reset' => 'Reset',
+    'enter_dash_if_none' => 'Input "-" if you dont have agency',
 
     //customer_history_table.blade.php
     'order_history' => 'Order History',

@@ -49,7 +49,6 @@ class Order extends Model
     // Accessor untuk mengembalikan value asli dari database ke dalam form (optional)
     public function getWeightAttribute($value)
     {
-        // Jika Anda perlu mengubah kembali dari database ke format dropdown (tidak wajib)
         switch ($value) {
             case '<8g':
                 return 'less_than_8';
@@ -60,7 +59,7 @@ class Order extends Model
             case '>18g':
                 return 'greater_equal_18';
             default:
-                return $value; // Untuk kasus yang tidak dikenal
+                return $value;
         }
     }
 

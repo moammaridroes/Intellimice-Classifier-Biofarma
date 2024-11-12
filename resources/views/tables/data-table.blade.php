@@ -60,14 +60,6 @@
             color: #333;
         }
 
-        .text-info {
-            color: #007bff;
-        }
-
-        .text-success {
-            color: #28a745;
-        }
-
         .summary-container {
             padding: 20px;
             background-color: #f9f9f9;
@@ -133,12 +125,10 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.notification') }}">
-                                <i class="ti-bell menu-icon"></i>
+                            <a class="nav-link" href="{{ route('admin.notification') }}" >
+                                <i class="ti-bell menu-icon position-relative"></i>
                                 <span class="menu-title">Notification</span>
-                                @if($unreadNotificationsCount > 0)
-                                    <span class="badge badge-danger">{{ $unreadNotificationsCount }}</span>
-                                @endif
+                                <span id="notificationBadge" class="badge badge-danger notification-badge">{{ $unreadNotificationsCount > 0 ? $unreadNotificationsCount : '' }}</span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -180,14 +170,14 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-lg-6 mb-3">
-                                        <h5 class="summary-item"><strong>Male Sick:</strong> <span class="text-info male-sick-count">{{ $maleSickCount }}</span></h5>
+                                        <h5 class="summary-item"><strong>Mice Sick:</strong> <span class="text-danger mice-sick-count">{{ $miceSickCount }}</span></h5>
                                         <h5 class="summary-item"><strong>Male Healthy (&lt;8g):</strong> <span class="text-success male-healthy-less-than-8">{{ $maleHealthyCounts['less_than_8'] }}</span></h5>
                                         <h5 class="summary-item"><strong>Male Healthy (8-14g):</strong> <span class="text-success male-healthy-between-8-and-14">{{ $maleHealthyCounts['between_8_and_14'] }}</span></h5>
                                         <h5 class="summary-item"><strong>Male Healthy (14-18g):</strong> <span class="text-success male-healthy-between-14-and-18">{{ $maleHealthyCounts['between_14_and_18'] }}</span></h5>
                                         <h5 class="summary-item"><strong>Male Healthy (&gt;18g):</strong> <span class="text-success male-healthy-greater-18">{{ $maleHealthyCounts['greater_equal_18'] }}</span></h5>
                                     </div>
                                     <div class="col-lg-6 mb-3">
-                                        <h5 class="summary-item"><strong>Female Sick:</strong> <span class="text-info female-sick-count">{{ $femaleSickCount }}</span></h5>
+                                        {{-- <h5 class="summary-item"><strong>Female Sick:</strong> <span class="text-danger female-sick-count">{{ $femaleSickCount }}</span></h5> --}}
                                         <h5 class="summary-item"><strong>Female Healthy (&lt;8g):</strong> <span class="text-success female-healthy-less-than-8">{{ $femaleHealthyCounts['less_than_8'] }}</span></h5>
                                         <h5 class="summary-item"><strong>Female Healthy (8-14g):</strong> <span class="text-success female-healthy-between-8-and-14">{{ $femaleHealthyCounts['between_8_and_14'] }}</span></h5>
                                         <h5 class="summary-item"><strong>Female Healthy (14-18g):</strong> <span class="text-success female-healthy-between-14-and-18">{{ $femaleHealthyCounts['between_14_and_18'] }}</span></h5>
@@ -203,6 +193,7 @@
                                 <div class="container mt-4">
                                     <div class="container-fluid">
                                         <button id="deleteAll" class="btn btn-danger mb-4">Delete All</button>
+                                        <button id="syncData" class="btn btn-primary mb-4">Sync Data</button>
                                     </div>
                                     <div class="table-responsive">
                                         <table class="table table-striped yajra-datatable">
@@ -218,6 +209,23 @@
                                             </thead>
                                             <tbody>
                                                 <!-- Data will be populated by DataTables -->
+                                                {{-- @foreach($dataMencit as $key => $mencit)
+                                                    <tr>
+                                                        <td>{{ $key + 1 }}</td>
+                                                        <td>{{ \Carbon\Carbon::parse($mencit->created_at)->format('d/m/Y') }}</td>
+                                                        <td>{{ $mencit->berat ?? 'N/A' }}</td>
+                                                        <td>{{ $mencit->gender ?? 'N/A' }}</td>
+                                                        <td>
+                                                            @if($mencit->health_status == 'Healthy')
+                                                                <label class="badge badge-success">Healthy</label>
+                                                            @elseif($mencit->health_status == 'Sick')
+                                                                <label class="badge badge-danger">Sick</label>
+                                                            @else
+                                                                <label class="badge badge-warning">N/A</label>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                @endforeach --}}
                                             </tbody>
                                         </table>
                                     </div>
@@ -294,7 +302,7 @@
                 // Buat container notifikasi
                 const notificationContainer = document.createElement('div');
                 notificationContainer.classList.add('notification-container');
-                notificationContainer.textContent = `Pesanan baru dari ${data.order.fullname} untuk ${data.order.item_name}`;
+                notificationContainer.textContent = `New orders have been received`;
                 document.body.appendChild(notificationContainer);
 
                 // Animasi munculnya notifikasi
@@ -311,17 +319,17 @@
                 }, 5000);
 
                 // Update badge notifikasi
-                let badge = document.querySelector('.nav-link .badge');
+                const badge = document.getElementById('notificationBadge');
                 if (badge) {
-                    let currentCount = parseInt(badge.textContent);
+                    // Ambil nilai badge saat ini dan ubah ke angka (0 jika kosong)
+                    let currentCount = parseInt(badge.textContent) || 0;
+                        
+                    // Tambahkan 1 ke nilai saat ini
                     badge.textContent = currentCount + 1;
-                } else {
-                    badge = document.createElement('span');
-                    badge.classList.add('badge', 'badge-danger');
-                    badge.textContent = 1;
-                    document.querySelector('.nav-link').appendChild(badge);
                 }
             });
+            
+            
             $(document).ready(function () {
                 var table = $('.yajra-datatable').DataTable({
                     processing: true,
@@ -345,111 +353,158 @@
                     ]
                 });
 
+                $('#syncData').click(function () {
+                Swal.fire({
+                    title: "Sync Data?",
+                    text: "Apakah Anda yakin ingin menyinkronkan data?",
+                    icon: "info",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, sync it!",
+                    customClass: {
+                            popup: 'custom-swal-popup', 
+                            icon: 'custom-swal-icon' 
+                        }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/sync-detail-mencit', // Sesuaikan route untuk syncData
+                            type: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function (response) {
+                                Swal.fire({
+                                    title: 'Synced!',
+                                    text: 'Data berhasil disinkronkan.',
+                                    icon: 'success',
+                                    customClass: {
+                                        popup: 'custom-swal-popup', 
+                                        icon: 'custom-swal-icon'
+                                    }
+                            });
+                                table.ajax.reload(); // Reload tabel setelah sinkronisasi
+                            },
+                            error: function (response) {
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: 'Gagal menyinkronkan data.',
+                                    icon: 'error',
+                                    customClass: {
+                                        popup: 'custom-swal-popup', 
+                                        icon: 'custom-swal-icon'
+                                    }
+                            });
+                            }
+                        });
+                    }
+                });
+            });
+
                 // Delete all records with SweetAlert confirmation
-            $('#deleteAll').click(function () {
-                Swal.fire({
-                    title: "Are you sure?",
-                    text: "You won't be able to revert this!",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#4B49AC",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Yes, delete all!",
-                    customClass: {
-                        popup: 'custom-swal-popup', // Apply this class to the entire popup for layout adjustments
-                        icon: 'custom-swal-icon' // Adjust the icon specifically
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: '/detailmencit/deleteAll',
-                            type: 'DELETE',
-                            data: {
-                                _token: '{{ csrf_token() }}'
-                            },
-                            success: function (response) {
-                                table.ajax.reload();
-                                updateStockCounts();
-                                Swal.fire({
-                                    title: "Deleted!",
-                                    text: "All records have been deleted.",
-                                    icon: "success",
-                                    customClass: {
-                                        popup: 'custom-swal-popup', // Apply this class to the entire popup for layout adjustments
-                                        icon: 'custom-swal-icon' // Adjust the icon specifically
-                                    }
-                                });
-                            },
-                            error: function (response) {
-                                Swal.fire({
-                                    title: "Error!",
-                                    text: "Failed to delete all records.",
-                                    icon: "error",
-                                    customClass: {
-                                        popup: 'custom-swal-popup', // Apply this class to the entire popup for layout adjustments
-                                        icon: 'custom-swal-icon' // Adjust the icon specifically
-                                    }
-                                });
-                            }
-                        });
-                    }
+                $('#deleteAll').click(function () {
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "You won't be able to revert this!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#4B49AC",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, delete all!",
+                        customClass: {
+                            popup: 'custom-swal-popup', 
+                            icon: 'custom-swal-icon'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: '/detailmencit/deleteAll',
+                                type: 'DELETE',
+                                data: {
+                                    _token: '{{ csrf_token() }}'
+                                },
+                                success: function (response) {
+                                    table.ajax.reload();
+                                    updateStockCounts();
+                                    Swal.fire({
+                                        title: "Deleted!",
+                                        text: "All records have been deleted.",
+                                        icon: "success",
+                                        customClass: {
+                                            popup: 'custom-swal-popup', 
+                                            icon: 'custom-swal-icon'
+                                        }
+                                    });
+                                },
+                                error: function (response) {
+                                    Swal.fire({
+                                        title: "Error!",
+                                        text: "Failed to delete all records.",
+                                        icon: "error",
+                                        customClass: {
+                                            popup: 'custom-swal-popup', 
+                                            icon: 'custom-swal-icon' 
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
                 });
-            });
 
-            // Delete individual record with SweetAlert confirmation
-            $('body').on('click', '.delete', function () {
-                var id = $(this).data('id');
-                
-                Swal.fire({
-                    title: "Are you sure?",
-                    text: "You won't be able to revert this!",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#4B49AC",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Yes, delete it!",
-                    customClass: {
-                        popup: 'custom-swal-popup', // Apply this class to the entire popup for layout adjustments
-                        icon: 'custom-swal-icon' // Adjust the icon specifically
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: `/detailmencit/delete/${id}`,
-                            type: 'DELETE',
-                            data: {
-                                _token: '{{ csrf_token() }}'
-                            },
-                            success: function (response) {
-                                table.ajax.reload();
-                                updateStockCounts();
-                                Swal.fire({
-                                    title: "Deleted!",
-                                    text: "The record has been deleted.",
-                                    icon: "success",
-                                    customClass: {
-                                        popup: 'custom-swal-popup', // Apply this class to the entire popup for layout adjustments
-                                        icon: 'custom-swal-icon' // Adjust the icon specifically
-                                    }
-                                });
-                            },
-                            error: function (response) {
-                                Swal.fire({
-                                    title: "Error!",
-                                    text: "Failed to delete the record.",
-                                    icon: "error",
-                                    customClass: {
-                                        popup: 'custom-swal-popup', // Apply this class to the entire popup for layout adjustments
-                                        icon: 'custom-swal-icon' // Adjust the icon specifically
-                                    }
-                                });
-                            }
-                        });
-                    }
+                // Delete individual record with SweetAlert confirmation
+                $('body').on('click', '.delete', function () {
+                    var id = $(this).data('id');
+                    
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "You won't be able to revert this!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#4B49AC",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, delete it!",
+                        customClass: {
+                            popup: 'custom-swal-popup', 
+                            icon: 'custom-swal-icon' 
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: `/detailmencit/delete/${id}`,
+                                type: 'DELETE',
+                                data: {
+                                    _token: '{{ csrf_token() }}'
+                                },
+                                success: function (response) {
+                                    table.ajax.reload();
+                                    updateStockCounts();
+                                    Swal.fire({
+                                        title: "Deleted!",
+                                        text: "The record has been deleted.",
+                                        icon: "success",
+                                        customClass: {
+                                            popup: 'custom-swal-popup', 
+                                            icon: 'custom-swal-icon' 
+                                        }
+                                    });
+                                },
+                                error: function (response) {
+                                    Swal.fire({
+                                        title: "Error!",
+                                        text: "Failed to delete the record.",
+                                        icon: "error",
+                                        customClass: {
+                                            popup: 'custom-swal-popup', 
+                                            icon: 'custom-swal-icon' 
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
                 });
-            });
-
-
                 // Function to update stock counts
                 function updateStockCounts() {
                     $.ajax({
@@ -457,14 +512,14 @@
                         type: 'GET',
                         success: function (data) {
                             // Update Male Stock Counts
-                            $('.male-sick-count').text(data.maleSickCount);
+                            $('.mice-sick-count').text(data.miceSickCount);
                             $('.male-healthy-less-than-8').text(data.maleHealthyCounts.less_than_8);
                             $('.male-healthy-between-8-and-14').text(data.maleHealthyCounts.between_8_and_14);
                             $('.male-healthy-between-14-and-18').text(data.maleHealthyCounts.between_14_and_18);
                             $('.male-healthy-greater-18').text(data.maleHealthyCounts.greater_equal_18);
 
                             // Update Female Stock Counts
-                            $('.female-sick-count').text(data.femaleSickCount);
+                            // $('.female-sick-count').text(data.femaleSickCount);
                             $('.female-healthy-less-than-8').text(data.femaleHealthyCounts.less_than_8);
                             $('.female-healthy-between-8-and-14').text(data.femaleHealthyCounts.between_8_and_14);
                             $('.female-healthy-between-14-and-18').text(data.femaleHealthyCounts.between_14_and_18);

@@ -103,15 +103,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('admin.notification') }}">
-                            <i class="ti-bell menu-icon"></i>
+                        <a class="nav-link" href="{{ route('admin.notification') }}" >
+                            <i class="ti-bell menu-icon position-relative"></i>
                             <span class="menu-title">Notification</span>
-                            @if($unreadNotificationsCount > 0)
-                                <span class="badge badge-danger">{{ $unreadNotificationsCount }}</span>
-                            @endif
+                            <span id="notificationBadge" class="badge badge-danger notification-badge">{{ $unreadNotificationsCount > 0 ? $unreadNotificationsCount : '' }}</span>
                         </a>
-                    </li>
-                    
+                    </li>                    
                     <li class="nav-item">
                         <a class="nav-link" data-toggle="collapse" href="#form-elements" aria-expanded="false"
                             aria-controls="form-elements">
@@ -179,7 +176,7 @@
                                                     <td>{{ ($order->pick_up_date)->format('d-m-Y') }}</td>
                                                     <td>Rp. {{ number_format($order->total_price, 0, ',', '.') }}</td>
                                                     <td>
-                                                        <span class="badge rounded-pill bg-{{ $order->status == 'approved' ? 'success' : ($order->status == 'rejected' ? 'danger' : 'warning') }}">
+                                                        <span class="badge badge-pill bg-{{ $order->status == 'approved' ? 'success' : ($order->status == 'rejected' ? 'danger' : 'warning') }}">
                                                             {{ ucfirst($order->status) }}
                                                         </span>
                                                     </td>
@@ -268,77 +265,82 @@
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     {{-- <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.11.1/dist/echo.iife.js"></script> --}}
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging-compat.js"></script>
 
-<script>
-    const pusher = new Pusher('{{ env("PUSHER_APP_KEY") }}', {
-    cluster: '{{ env("PUSHER_APP_CLUSTER") }}',
-    encrypted: true,
-    
-    // forceTLS: true, // Memaksa penggunaan 
-    // wsHost: 'ws-ap1.pusher.com', // Host WebSocket yang benar untuk cluster ap1
-    // // wsPort: 6001, // Port default WebSocket untuk Laravel Echo Server
-    // wssPort: 443, // Port aman WebSocket
-    // enabledTransports: ['ws', 'wss'], // Membatasi transport ke WebSocket   
-    // disableStats: true // Mengurangi masalah CORS dengan menonaktifkan statistik
-});
-    // Subscribe ke channel
-    const channel = pusher.subscribe('orders');
+    <script>
+        const pusher = new Pusher('{{ env("PUSHER_APP_KEY") }}', {
+            cluster: '{{ env("PUSHER_APP_CLUSTER") }}',
+            encrypted: true,  
+            // forceTLS: true, // Memaksa penggunaan 
+            // wsHost: 'ws-ap1.pusher.com', // Host WebSocket yang benar untuk cluster ap1
+            // // wsPort: 6001, // Port default WebSocket untuk Laravel Echo Server
+            // wssPort: 443, // Port aman WebSocket
+            // enabledTransports: ['ws', 'wss'], // Membatasi transport ke WebSocket   
+            // disableStats: true // Mengurangi masalah CORS dengan menonaktifkan statistik
+        });
+        // Subscribe ke channel
+        const channel = pusher.subscribe('orders');
 
-    const style = document.createElement('style');
-    style.textContent = `
-        .notification-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: #28a745;
-            color: white;
-            padding: 15px 25px;
-            border-radius: 5px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            z-index: 9000;
-            opacity: 0;
-            transform: translateY(-20px);
-            transition: all 0.3s ease-in-out;
-            max-width: 350px;
-            word-wrap: break-word;
-        }
+        const style = document.createElement('style');
+        style.textContent = `
+            .notification-container {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background-color: #28a745;
+                color: white;
+                padding: 15px 25px;
+                border-radius: 5px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                z-index: 9000;
+                opacity: 0;
+                transform: translateY(-20px);
+                transition: all 0.3s ease-in-out;
+                max-width: 350px;
+                word-wrap: break-word;
+            }
 
-        .notification-container.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
+            .notification-container.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
 
-        .notification-container.hide {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-    `;
-    document.head.appendChild(style);
+            .notification-container.hide {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        `;
+        document.head.appendChild(style);
 
-    // Dengarkan event 'order.created'
-    channel.bind('order.created', function(data) {
-        // Buat container notifikasi
-        const notificationContainer = document.createElement('div');
-        notificationContainer.classList.add('notification-container');
-        notificationContainer.textContent = `Pesanan baru dari ${data.order.fullname} untuk ${data.order.item_name}`;
-        document.body.appendChild(notificationContainer);
+        // Dengarkan event 'order.created'
+        channel.bind('order.created', function(data) {
+    if (!data.order) {
+        console.log('Tidak ada data order yang diterima.');
+        return; // Hentikan jika tidak ada data order
+    }
 
-        // Animasi munculnya notifikasi
+    // Buat container notifikasi
+    const notificationContainer = document.createElement('div');
+    notificationContainer.classList.add('notification-container');
+    notificationContainer.textContent = `New orders have been received`;
+    document.body.appendChild(notificationContainer);
+
+    // Animasi munculnya notifikasi
+    setTimeout(() => {
+        notificationContainer.classList.add('show');
+    }, 100);
+
+    // Hilangkan notifikasi setelah 5 detik
+    setTimeout(() => {
+        notificationContainer.classList.add('hide');
         setTimeout(() => {
-            notificationContainer.classList.add('show');
-        }, 100);
+            notificationContainer.remove();
+        }, 300);
+    }, 5000);
 
-        // Hilangkan notifikasi setelah 5 detik
-        setTimeout(() => {
-            notificationContainer.classList.add('hide');
-            setTimeout(() => {
-                notificationContainer.remove();
-            }, 300);
-        }, 5000);
-        
-        // Secara opsional, perbarui DOM untuk mencerminkan pesanan baru tanpa memuat ulang halaman
-        let tbody = document.querySelector("table.table tbody");
+    // Tambahkan baris baru di tabel jika data order tersedia
+    let tbody = document.querySelector("table.table tbody");
+    if (tbody) {
         let newRow = `
             <tr>
                 <td>${data.order.fullname}</td>
@@ -348,62 +350,63 @@
                 <td>Rp ${parseInt(data.order.total_price).toLocaleString('id-ID')}</td>
                 <td><span class="badge badge-warning">Pending</span></td>
                 <td>
-                    <button class="btn btn-info btn-sm" data-bs-toggle="modal"
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                         <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal"
                             data-bs-target="#orderDetailsModal"
                             data-order='${JSON.stringify(data.order)}'>Details</button>
-                    <form action="{{ route('admin.customer-orders.approve', '') }}/${data.order.id}" method="POST" style="display: inline;">
-                        @csrf
-                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
-                    </form>
-                    <form action="{{ route('admin.customer-orders.reject', '') }}/${data.order.id}" method="POST" style="display: inline;">
-                        @csrf
-                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
-                    </form>
+                        <form action="/admin/customer-orders/${data.order.id}/approve" method="POST" style="display: inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                        </form>
+                        <form action="/admin/customer-orders/${data.order.id}/reject" method="POST" style="display: inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                        
+                        </form>
+                    </div>
                 </td>
             </tr>
         `;
         tbody.insertAdjacentHTML("afterbegin", newRow);
+    }
 
         // Perbarui jumlah notifikasi yang belum dibaca
-        let badge = document.querySelector('.nav-link .badge');
+        const badge = document.getElementById('notificationBadge');
         if (badge) {
-            let currentCount = parseInt(badge.textContent);
-            badge.textContent = currentCount + 1; // Tambah jumlah notifikasi
-        } else {
-            // Jika badge tidak ada, buat badge baru
-            badge = document.createElement('span');
-            badge.classList.add('badge', 'badge-danger');
-            badge.textContent = 1;
-            document.querySelector('.nav-link').appendChild(badge);
+            // Ambil nilai badge saat ini dan ubah ke angka (0 jika kosong)
+            let currentCount = parseInt(badge.textContent) || 0;
+                
+            // Tambahkan 1 ke nilai saat ini
+            badge.textContent = currentCount + 1;
         }
-    });
+     });
 
-    // Menampilkan detail order di modal
-    const orderDetailsModal = document.getElementById('orderDetailsModal');
-    orderDetailsModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const order = JSON.parse(button.getAttribute('data-order')); // Data order dari button
+        // Menampilkan detail order di modal
+        const orderDetailsModal = document.getElementById('orderDetailsModal');
+        orderDetailsModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const order = JSON.parse(button.getAttribute('data-order')); // Data order dari button
 
-        // Memastikan bahwa data order tersedia dan valid
-        if (order) {
-            const modalBody = orderDetailsModal.querySelector('.modal-body');
-            modalBody.innerHTML = `
-                <p><strong>Customer Name:</strong> ${order.fullname}</p>
-                <p><strong>Phone Number:</strong> ${order.phone_number}</p>
-                <p><strong>Email:</strong> ${order.email}</p>
-                <p><strong>Item Name:</strong> ${order.item_name}</p>
-                <p><strong>Agency Name:</strong> ${order.agency_name}</p>
-                <p><strong>Pick Up Date:</strong> ${new Date(order.pick_up_date).toLocaleDateString('id-ID')}</p>
-                <p><strong>Weight:</strong> ${order.weight}</p>
-                <p><strong>Male Quantity:</strong> ${order.male_quantity}</p>
-                <p><strong>Female Quantity:</strong> ${order.female_quantity}</p>
-                <p><strong>Total Price:</strong> Rp ${new Intl.NumberFormat('id-ID').format(order.total_price)}</p>
-                <p><strong>Status:</strong> ${order.status}</p>
-                <p><strong>Notes:</strong> ${order.notes || '-'}</p>`;
-        } else {
-            console.error('Tidak ada data order yang ditemukan.');
-        }
-    });
-</script>
+            // Memastikan bahwa data order tersedia dan valid
+            if (order) {
+                const modalBody = orderDetailsModal.querySelector('.modal-body');
+                modalBody.innerHTML = `
+                    <p><strong>Customer Name:</strong> ${order.fullname}</p>
+                    <p><strong>Phone Number:</strong> ${order.phone_number}</p>
+                    <p><strong>Email:</strong> ${order.email}</p>
+                    <p><strong>Item Name:</strong> ${order.item_name}</p>
+                    <p><strong>Agency Name:</strong> ${order.agency_name}</p>
+                    <p><strong>Pick Up Date:</strong> ${new Date(order.pick_up_date).toLocaleDateString('id-ID')}</p>
+                    <p><strong>Weight:</strong> ${order.weight}</p>
+                    <p><strong>Male Quantity:</strong> ${order.male_quantity}</p>
+                    <p><strong>Female Quantity:</strong> ${order.female_quantity}</p>
+                    <p><strong>Total Price:</strong> Rp ${new Intl.NumberFormat('id-ID').format(order.total_price)}</p>
+                    <p><strong>Status:</strong> ${order.status}</p>
+                    <p><strong>Notes:</strong> ${order.notes || '-'}</p>`;
+            } else {
+                console.error('Tidak ada data order yang ditemukan.');
+            }
+        });
+    </script>
 </body>
 </html>

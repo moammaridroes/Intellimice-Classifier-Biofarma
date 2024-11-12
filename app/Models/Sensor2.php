@@ -18,7 +18,7 @@ class Sensor2 extends Model
         'jeniskelamin_status',
         'timestamp'
     ];
-    // public $timestamps = true;  // Make sure this is true if you want Laravel to auto-manage `created_at` and `updated_at`
+    public $timestamps = true;  // Make sure this is true if you want Laravel to auto-manage `created_at` and `updated_at`
 }
 
 

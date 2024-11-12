@@ -5,22 +5,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Online History</title>
-
   <!-- plugins:css -->
   <link rel="stylesheet" href="{{ asset('vendors/feather/feather.css') }}">
   <link rel="stylesheet" href="{{ asset('vendors/ti-icons/css/themify-icons.css') }}">
   <link rel="stylesheet" href="{{ asset('vendors/css/vendor.bundle.base.css') }}">
   <!-- endinject -->
-
   <!-- Plugin css for this page -->
   <link rel="stylesheet" href="{{ asset('vendors/select2/select2.min.css') }}">
   <link rel="stylesheet" href="{{ asset('vendors/select2-bootstrap-theme/select2-bootstrap.min.css') }}">
   <!-- End plugin css for this page -->
-
   <!-- inject:css -->
   <link rel="stylesheet" href="{{ asset('css/vertical-layout-light/style.css') }}">
   <!-- endinject -->
-
   <link rel="shortcut icon" href="{{ asset('images/logobiofarmakecil.png') }}" />
 
   <!-- DataTables CSS -->
@@ -180,16 +176,18 @@
               <span class="menu-title">Home</span>
             </a>
           </li>
+          {{-- ni beda kode karena ada sedikit permasalahan style badge notification dan jsnya juga ada perbedaan--}}
           <li class="nav-item">
-            <a class="nav-link" href="{{ route('admin.notification') }}">
-              <i class="ti-bell menu-icon"></i>
-              <span class="menu-title">Notification</span>
-              @if($unreadNotificationsCount > 0)
-                <span class="badge badge-danger">{{ $unreadNotificationsCount }}</span>
-              @endif
+            <a class="nav-link" href="{{ route('admin.notification') }}" >
+                <i class="ti-bell menu-icon position-relative"></i>
+                <span class="menu-title">Notification</span>
+                <span id="notificationBadge" 
+                    class="badge badge-danger notification-badge" 
+                    style="display: {{ $unreadNotificationsCount > 0 ? 'inline-block' : 'none' }}; background-color: red; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 75%; line-height: 1; vertical-align: baseline; white-space: nowrap;">
+                    {{ $unreadNotificationsCount > 0 ? $unreadNotificationsCount : '' }}
+                </span>
             </a>
           </li>
-
           <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
               <i class="icon-columns menu-icon"></i>
@@ -293,17 +291,31 @@
     </div>
   </div>
 
+  <!-- plugins:js -->
   <script src="{{ asset('vendors/js/vendor.bundle.base.js') }}"></script>
+  <!-- endinject -->
+  <!-- inject:js -->
   <script src="{{ asset('js/off-canvas.js') }}"></script>
   <script src="{{ asset('js/hoverable-collapse.js') }}"></script>
   <script src="{{ asset('js/template.js') }}"></script>
   <script src="{{ asset('js/settings.js') }}"></script>
   <script src="{{ asset('js/todolist.js') }}"></script>
+  <!-- endinject -->
+
+  <!-- jQuery dan DataTables scripts -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
-  <script src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js"></script>
+
+  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- DataTables Bootstrap 5 integration -->
+  <script src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js"></script>
+
+  <!-- Moment.js untuk format tanggal -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
   <script>
       // Inisialisasi Pusher
@@ -352,7 +364,7 @@
           // Buat container notifikasi
           const notificationContainer = document.createElement('div');
           notificationContainer.classList.add('notification-container');
-          notificationContainer.textContent = `Pesanan baru dari ${data.order.fullname} untuk ${data.order.item_name}`;
+          notificationContainer.textContent = `New orders have been received`;
           document.body.appendChild(notificationContainer);
   
           // Animasi munculnya notifikasi
@@ -369,18 +381,19 @@
           }, 5000);
   
           // Update badge notifikasi
-          let badge = document.querySelector('.nav-link .badge');
+          const badge = document.getElementById('notificationBadge');
           if (badge) {
-              let currentCount = parseInt(badge.textContent);
-              badge.textContent = currentCount + 1;
-          } else {
-              badge = document.createElement('span');
-              badge.classList.add('badge', 'badge-danger');
-              badge.textContent = 1;
-              document.querySelector('.nav-link').appendChild(badge);
+              // Ambil nilai badge saat ini dan ubah ke angka (0 jika kosong)
+              let currentCount = parseInt(badge.textContent) || 0;
+
+              // Tambahkan 1 ke nilai saat ini
+              currentCount += 1;
+              badge.textContent = currentCount;
+
+              // Tampilkan badge jika sebelumnya tidak terlihat
+              badge.style.display = 'inline-block';
           }
-      });
-      
+        });
     $(function () {
      var table = $('.yajra-datatable').DataTable({
          processing: true,

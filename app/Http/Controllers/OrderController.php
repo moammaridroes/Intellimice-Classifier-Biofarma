@@ -42,7 +42,7 @@ class OrderController extends Controller
         $order->male_quantity = $request->male_quantity;
         $order->female_quantity = $request->female_quantity;
         $order->total_price = $totalPrice;
-        $order->is_paid = true; // Default value
+        $order->is_paid = true; 
         $order->save();
         $order->created_at = Carbon::now('Asia/Jakarta');
         $order->updated_at = Carbon::now('Asia/Jakarta');

@@ -9,16 +9,13 @@ class Sensor1 extends Model
 {
     use HasFactory;
 
-    // Define the table if it's different from the pluralized name of the model
     protected $table = 'data_kesehatan';
-    protected $primarykey = 'id';
+    protected $primaryKey = 'id';
 
-    // Fillable fields to allow mass assignment
     protected $fillable = [
         'kesehatan_status',
         'timestamp'
     ];
-    // public $timestamps = true;  // Make sure this is true if you want Laravel to auto-manage `created_at` and `updated_at`
+
+    public $timestamps = false; // Ubah menjadi true jika ingin Laravel mengelola `created_at` dan `updated_at`
 }
-
-

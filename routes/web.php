@@ -12,24 +12,27 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CustomerOrderController;
 use App\Http\Controllers\LanguageController ;
+use App\Http\Controllers\DataCollectingController ;
 use App\Models\Order;
 use App\Models\CustomerOrder;
 use App\Events\OrderCreated;
 use Illuminate\Support\Facades\App;
 // use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return redirect('/login');
-});
+    Route::get('/', function () {
+        return view('landing');  // Mengarahkan root URL ke halaman landing
+    })->name('landing');
 
-Route::middleware(['auth'])->group(function () {
-    // Semua route yang membutuhkan autentikasi dapat ditaruh di sini tp ni ga kepake si.
-});
+    // Route untuk login tetap disediakan agar pengguna bisa login dari halaman lain
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+    Route::middleware(['auth'])->group(function () {
+        // Semua route yang membutuhkan autentikasi dapat ditaruh di sini tp ni ga kepake si.
+    });
 
 Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->group(function () {
     
-// Route::post('/save-token', [TokenController::class, 'saveToken'])->middleware('auth'); 
-    Route::post('/save-fcm-token', [CustomerOrderController::class, 'saveFcmToken'])->name('save-fcm-token'); 
     Route::get('/admin/get-latest-orders', [CustomerOrderController::class, 'getLatestOrders']);
     Route::get('/admin/get-unread-notifications-count', [CustomerOrderController::class, 'getUnreadNotificationsCount']);
 
@@ -64,6 +67,9 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->g
 
     Route::get('stok', [DetailMencitController::class, 'showData'])->name('data.table');
     Route::get('detailmencit/data', [DetailMencitController::class, 'getData'])->name('detailmencit.data');
+    Route::post('/sync-detail-mencit', [DetailMencitController::class, 'syncData'])->name('sync.detail-mencit');
+    // Route::post('/sync-data', [DetailMencitController::class, 'syncData'])->name('sync.data');
+
     Route::delete('/detailmencit/delete/{id}', [DetailMencitController::class, 'delete'])->name('detailmencit.delete');
     Route::delete('/detailmencit/deleteAll', [DetailMencitController::class, 'deleteAll']);
     Route::get('detailmencit/updateStockCountss', [DetailMencitController::class, 'updateStockCounts'])->name('detailmencit.updateStockCounts');
@@ -82,6 +88,13 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->g
     Route::post('/customer-orders/{id}/mark-as-paid', [CustomerOrderController::class, 'markAsPaid'])->name('customer-orders.markAsPaid');
     Route::post('/customer-orders/{id}/mark-as-unpaid', [CustomerOrderController::class, 'markAsUnpaid'])->name('customer-orders.markAsUnpaid');
     Route::get('/orderonline/details/{id}', [CustomerOrderController::class, 'details']);
+
+    //testing db
+    // Route::get('/data-collecting', [DataCollectingController::class, 'index'])->name('data.collecting');
+    // Route::get('/detail-mencit', [DataCollectingController::class, 'index']);
+
+    Route::post('/sync-detail-mencit', [DetailMencitController::class, 'syncData'])->name('sync.detail-mencit');
+
 
 
     Route::get('/datatable', function () {

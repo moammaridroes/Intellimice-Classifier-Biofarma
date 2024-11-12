@@ -78,15 +78,13 @@
               <span class="menu-title">Home</span>
             </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ route('admin.notification') }}">
-                <i class="ti-bell menu-icon"></i>
-                <span class="menu-title">Notification</span>
-                @if($unreadNotificationsCount > 0)
-                    <span class="badge badge-danger">{{ $unreadNotificationsCount }}</span>
-                @endif
-            </a>
-        </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ route('admin.notification') }}" >
+                  <i class="ti-bell menu-icon position-relative"></i>
+                  <span class="menu-title">Notification</span>
+                  <span id="notificationBadge" class="badge badge-danger notification-badge">{{ $unreadNotificationsCount > 0 ? $unreadNotificationsCount : '' }}</span>
+              </a>
+          </li>
           <li class="nav-item">
             <a class="nav-link" data-bs-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
               <i class="icon-columns menu-icon"></i>
@@ -130,7 +128,7 @@
                     @csrf
                     <div class="form-group">
                       <label for="fullname">Fullname</label>
-                      <input type="text" class="form-control" name="fullname" id="fullname" placeholder="Fullname" required>
+                      <input type="text" class="form-control" name="fullname" id="fullname" placeholder="Fullname" maxlength="40" required>
                     </div>
                     <div class="form-group">
                       <label for="phone_number">Phone Number</label>
@@ -268,6 +266,8 @@
               position: fixed;
               top: 20px;
               right: 20px;
+              background-color: rgba(255, 215, 0, 0.6);
+              color: black;
               background-color: #28a745;
               color: white;
               padding: 15px 25px;
@@ -298,7 +298,7 @@
           // Buat container notifikasi
           const notificationContainer = document.createElement('div');
           notificationContainer.classList.add('notification-container');
-          notificationContainer.textContent = `Pesanan baru dari ${data.order.fullname} untuk ${data.order.item_name}`;
+          notificationContainer.textContent = `New orders have been received`;
           document.body.appendChild(notificationContainer);
   
           // Animasi munculnya notifikasi
@@ -315,16 +315,15 @@
           }, 5000);
   
           // Update badge notifikasi
-          let badge = document.querySelector('.nav-link .badge');
-          if (badge) {
-              let currentCount = parseInt(badge.textContent);
-              badge.textContent = currentCount + 1;
-          } else {
-              badge = document.createElement('span');
-              badge.classList.add('badge', 'badge-danger');
-              badge.textContent = 1;
-              document.querySelector('.nav-link').appendChild(badge);
-          }
+          // Perbarui jumlah notifikasi yang belum dibaca
+        const badge = document.getElementById('notificationBadge');
+        if (badge) {
+            // Ambil nilai badge saat ini dan ubah ke angka (0 jika kosong)
+            let currentCount = parseInt(badge.textContent) || 0;
+                
+            // Tambahkan 1 ke nilai saat ini
+            badge.textContent = currentCount + 1;
+        }
       });
       
     function fetchStockCount() {
