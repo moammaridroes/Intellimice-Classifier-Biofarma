@@ -16,31 +16,32 @@ class Sensor2Controller extends Controller
     }
 
     public function store(Request $request)
-    {
-        date_default_timezone_set('Asia/Jakarta');
-        $now = Carbon::now()->toDateTimeString();
+{
+    date_default_timezone_set('Asia/Jakarta');
+    $now = Carbon::now()->toDateTimeString();
 
-        // Siapkan data untuk disimpan
-        $params = [
-            'jenis_kelamin' => $request->jenis_kelamin,
-            'timestamp' => $now
-        ];
+    // Mengambil data dari body JSON
+    $params = [
+        'jenis_kelamin' => $request->input('jenis_kelamin'), // Sesuaikan dengan key JSON
+        'timestamp' => $now,
+    ];
 
-        try {
-            DB::table('data_jenis_kelamin')->insert($params);
-            return response()->json([
-                'code' => 200,
-                'message' => "success",
-                'data' => $params
-            ]);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'code' => 400,
-                'message' => "failed",
-                "data" => $th->errorInfo
-            ], 400);
-        }
+    try {
+        DB::table('data_jenis_kelamin')->insert($params);
+        return response()->json([
+            'code' => 200,
+            'message' => "success",
+            'data' => $params,
+        ]);
+    } catch (\Throwable $th) {
+        return response()->json([
+            'code' => 400,
+            'message' => "failed",
+            "data" => $th->errorInfo,
+        ], 400);
     }
+}
+
 
     public function show($id)
     {

@@ -57,16 +57,16 @@ class OrderController extends Controller
     
             // Tentukan rentang berat
             switch ($request->weight) {
-                case 'less_than_8':
+                case 'category1':
                     $query->where('berat', '<', 8);
                     break;
-                case 'between_8_and_14':
+                case 'category2':
                     $query->whereBetween('berat', [8, 14]);
                     break;
-                case 'between_14_and_18':
+                case 'category3':
                     $query->whereBetween('berat', [14.01, 18]);
                     break;
-                case 'greater_equal_18':
+                case 'category4':
                     $query->where('berat', '>', 18);
                     break;
             }
@@ -86,16 +86,16 @@ class OrderController extends Controller
     
             // Tentukan rentang berat
             switch ($request->weight) {
-                case 'less_than_8':
+                case 'category1':
                     $query->where('berat', '<', 8);
                     break;
-                case 'between_8_and_14':
+                case 'category2':
                     $query->whereBetween('berat', [8, 14]);
                     break;
-                case 'between_14_and_18':
+                case 'category3':
                     $query->whereBetween('berat', [14.01, 18]);
                     break;
-                case 'greater_equal_18':
+                case 'category4':
                     $query->where('berat', '>', 18);
                     break;
             }
@@ -123,32 +123,32 @@ class OrderController extends Controller
 
         $maleStock = DetailMencit::where('gender', 'Male')
             ->where('health_status', 'Healthy')
-            ->when($weight === 'less_than_8', function ($query) {
+            ->when($weight === 'category1', function ($query) {
                 return $query->where('berat', '<', 8);
             })
-            ->when($weight === 'between_8_and_14', function ($query) {
+            ->when($weight === 'category2', function ($query) {
                 return $query->whereBetween('berat', [8, 14]);
             })
-            ->when($weight === 'between_14_and_18', function ($query) {
+            ->when($weight === 'category3', function ($query) {
                 return $query->whereBetween('berat', [14.01, 18]);
             })
-            ->when($weight === 'greater_equal_18', function ($query) {
+            ->when($weight === 'category4', function ($query) {
                 return $query->where('berat', '>', 18);
             })
             ->count();
 
         $femaleStock = DetailMencit::where('gender', 'Female')
             ->where('health_status', 'Healthy')
-            ->when($weight === 'less_than_8', function ($query) {
+            ->when($weight === 'category1', function ($query) {
                 return $query->where('berat', '<', 8);
             })
-            ->when($weight === 'between_8_and_14', function ($query) {
+            ->when($weight === 'category2', function ($query) {
                 return $query->whereBetween('berat', [8, 14]);
             })
-            ->when($weight === 'between_14_and_18', function ($query) {
+            ->when($weight === 'category3', function ($query) {
                 return $query->whereBetween('berat', [14.01, 18]);
             })
-            ->when($weight === 'greater_equal_18', function ($query) {
+            ->when($weight === 'category4', function ($query) {
                 return $query->where('berat', '>', 18);
             })
             ->count();

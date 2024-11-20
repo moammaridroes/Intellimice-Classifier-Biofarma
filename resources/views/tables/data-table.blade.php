@@ -171,17 +171,17 @@
                                 <div class="row">
                                     <div class="col-lg-6 mb-3">
                                         <h5 class="summary-item"><strong>Mice Sick:</strong> <span class="text-danger mice-sick-count">{{ $miceSickCount }}</span></h5>
-                                        <h5 class="summary-item"><strong>Male Healthy (&lt;8g):</strong> <span class="text-success male-healthy-less-than-8">{{ $maleHealthyCounts['less_than_8'] }}</span></h5>
-                                        <h5 class="summary-item"><strong>Male Healthy (8-14g):</strong> <span class="text-success male-healthy-between-8-and-14">{{ $maleHealthyCounts['between_8_and_14'] }}</span></h5>
-                                        <h5 class="summary-item"><strong>Male Healthy (14-18g):</strong> <span class="text-success male-healthy-between-14-and-18">{{ $maleHealthyCounts['between_14_and_18'] }}</span></h5>
-                                        <h5 class="summary-item"><strong>Male Healthy (&gt;18g):</strong> <span class="text-success male-healthy-greater-18">{{ $maleHealthyCounts['greater_equal_18'] }}</span></h5>
+                                        <h5 class="summary-item"><strong>Male Healthy (&lt;8g):</strong> <span class="text-success male-healthy-less-than-8">{{ $maleHealthyCounts['category1'] }}</span></h5>
+                                        <h5 class="summary-item"><strong>Male Healthy (8-14g):</strong> <span class="text-success male-healthy-between-8-and-14">{{ $maleHealthyCounts['category2'] }}</span></h5>
+                                        <h5 class="summary-item"><strong>Male Healthy (14-18g):</strong> <span class="text-success male-healthy-between-14-and-18">{{ $maleHealthyCounts['category3'] }}</span></h5>
+                                        <h5 class="summary-item"><strong>Male Healthy (&gt;18g):</strong> <span class="text-success male-healthy-greater-18">{{ $maleHealthyCounts['category4'] }}</span></h5>
                                     </div>
                                     <div class="col-lg-6 mb-3">
                                         {{-- <h5 class="summary-item"><strong>Female Sick:</strong> <span class="text-danger female-sick-count">{{ $femaleSickCount }}</span></h5> --}}
-                                        <h5 class="summary-item"><strong>Female Healthy (&lt;8g):</strong> <span class="text-success female-healthy-less-than-8">{{ $femaleHealthyCounts['less_than_8'] }}</span></h5>
-                                        <h5 class="summary-item"><strong>Female Healthy (8-14g):</strong> <span class="text-success female-healthy-between-8-and-14">{{ $femaleHealthyCounts['between_8_and_14'] }}</span></h5>
-                                        <h5 class="summary-item"><strong>Female Healthy (14-18g):</strong> <span class="text-success female-healthy-between-14-and-18">{{ $femaleHealthyCounts['between_14_and_18'] }}</span></h5>
-                                        <h5 class="summary-item"><strong>Female Healthy (&gt;18g):</strong> <span class="text-success female-healthy-greater-18">{{ $femaleHealthyCounts['greater_equal_18'] }}</span></h5>
+                                        <h5 class="summary-item"><strong>Female Healthy (&lt;8g):</strong> <span class="text-success female-healthy-less-than-8">{{ $femaleHealthyCounts['category1'] }}</span></h5>
+                                        <h5 class="summary-item"><strong>Female Healthy (8-14g):</strong> <span class="text-success female-healthy-between-8-and-14">{{ $femaleHealthyCounts['category2'] }}</span></h5>
+                                        <h5 class="summary-item"><strong>Female Healthy (14-18g):</strong> <span class="text-success female-healthy-between-14-and-18">{{ $femaleHealthyCounts['category3'] }}</span></h5>
+                                        <h5 class="summary-item"><strong>Female Healthy (&gt;18g):</strong> <span class="text-success female-healthy-greater-18">{{ $femaleHealthyCounts['category4'] }}</span></h5>
                                     </div>
                                 </div>
                             </div>
@@ -513,17 +513,17 @@
                         success: function (data) {
                             // Update Male Stock Counts
                             $('.mice-sick-count').text(data.miceSickCount);
-                            $('.male-healthy-less-than-8').text(data.maleHealthyCounts.less_than_8);
-                            $('.male-healthy-between-8-and-14').text(data.maleHealthyCounts.between_8_and_14);
-                            $('.male-healthy-between-14-and-18').text(data.maleHealthyCounts.between_14_and_18);
-                            $('.male-healthy-greater-18').text(data.maleHealthyCounts.greater_equal_18);
+                            $('.male-healthy-less-than-8').text(data.maleHealthyCounts.category1);
+                            $('.male-healthy-between-8-and-14').text(data.maleHealthyCounts.category2);
+                            $('.male-healthy-between-14-and-18').text(data.maleHealthyCounts.category3);
+                            $('.male-healthy-greater-18').text(data.maleHealthyCounts.category4);
 
                             // Update Female Stock Counts
                             // $('.female-sick-count').text(data.femaleSickCount);
-                            $('.female-healthy-less-than-8').text(data.femaleHealthyCounts.less_than_8);
-                            $('.female-healthy-between-8-and-14').text(data.femaleHealthyCounts.between_8_and_14);
-                            $('.female-healthy-between-14-and-18').text(data.femaleHealthyCounts.between_14_and_18);
-                            $('.female-healthy-greater-18').text(data.femaleHealthyCounts.greater_equal_18);
+                            $('.female-healthy-less-than-8').text(data.femaleHealthyCounts.category1);
+                            $('.female-healthy-between-8-and-14').text(data.femaleHealthyCounts.category2);
+                            $('.female-healthy-between-14-and-18').text(data.femaleHealthyCounts.category3);
+                            $('.female-healthy-greater-18').text(data.femaleHealthyCounts.category4);
 
                             table.ajax.reload();
                         },

@@ -31,16 +31,16 @@ class Order extends Model
     public function setWeightAttribute($value)
     {
         switch ($value) {
-            case 'less_than_8':
+            case 'category1':
                 $this->attributes['weight'] = '<8g'; // Menyimpan '<8g'
                 break;
-            case 'between_8_and_14':
+            case 'category2':
                 $this->attributes['weight'] = '8-14g'; // Menyimpan '8-14g'
                 break;
-            case 'between_14_and_18':
+            case 'category3':
                 $this->attributes['weight'] = '14-18g'; // Menyimpan '14-18g'
                 break;
-            case 'greater_equal_18':
+            case 'category4':
                 $this->attributes['weight'] = '>18g'; // Menyimpan '>18g'
                 break;
         }
@@ -51,13 +51,13 @@ class Order extends Model
     {
         switch ($value) {
             case '<8g':
-                return 'less_than_8';
+                return 'category1';
             case '8-14g':
-                return 'between_8_and_14';
+                return 'category2';
             case '14-18g':
-                return 'between_14_and_18';
+                return 'category3';
             case '>18g':
-                return 'greater_equal_18';
+                return 'category4';
             default:
                 return $value;
         }

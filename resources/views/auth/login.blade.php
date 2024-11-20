@@ -10,33 +10,69 @@
     <link rel="stylesheet" href="css/vertical-layout-light/style.css">
     <link rel="shortcut icon" href="images/logobiofarmakecil.png">
     <style>
-        .form-check-input {
-            margin-right: 10px;
-        }
-        /* .form-check {
-            display: flex;
-            align-items: center;
-        } */
-        .remember-me-container {
+        body {
+        margin: 0;
+        padding: 0;
+        height: 100vh; /* Pastikan body memenuhi layar penuh */
+        background: linear-gradient(to top, #adace9, #ffffff 50%, transparent 50%); /* Gradasi dari bawah ke atas, hanya sampai setengah */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .min-vh-100 {
+        background: white; /* Warna putih untuk card form */
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        padding: 20px;
+        max-width: 400px;
+        width: 100%;
+    }
+
+    html, body {
+        overflow: hidden; /* Menghindari scroll jika terjadi elemen tambahan */
+    }
+
+    button.btn-primary {
+        background: #4B49AC;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 20px;
+        transition: background 0.3s ease-in-out;
+    }
+
+    button.btn-primary:hover {
+        background: #362f80; /* Warna lebih gelap saat hover */
+    }
+
+    .form-check-input {
+        margin-right: 10px;
+    }
+
+    /* .form-check {
+        display: flex;
+        align-items: center;
+    } */
+    .remember-me-container {
         display: flex;
         align-items: center;
         margin-bottom: 10px;
         margin-left: 20px;
+    }
 
-        }
-
-        .remember-checkbox {
+    .remember-checkbox {
         margin-right: 8px;
-        }
+    }
 
-        .remember-label {
+    .remember-label {
         font-size: 14px;
         cursor: pointer;
-        }
+    }
     </style>
 </head>
 <body>
-    <div class="min-vh-100 d-flex align-items-center justify-content-center bg-light">
+    {{-- <div class="min-vh-100 d-flex align-items-center justify-content-center bg-light"> --}}
         <div class="bg-white p-4 rounded-lg shadow w-100" style="max-width: 400px;">
             <div class="text-center mb-4">
                 <img src="images/logobiofarmakecil.png" alt="Biofarma Logo" class="img-fluid" style="height: 50px;">

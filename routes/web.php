@@ -37,9 +37,9 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->g
     Route::get('/admin/get-unread-notifications-count', [CustomerOrderController::class, 'getUnreadNotificationsCount']);
 
     // Route khusus admin
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    // Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/dashboard', [DashboardController::class, 'showData'])->name('dashboard');
     Route::get('/dashboard', function () {

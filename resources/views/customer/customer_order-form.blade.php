@@ -258,10 +258,10 @@
                                         <label for="weight">@lang('messages.weight')</label>
                                         <select class="form-control" name="weight" id="weightSelect">
                                             <option value="" selected disabled>Select Weight</option>
-                                            <option value="less_than_8">&lt;8g</option>
-                                            <option value="between_8_and_14">8-14g</option>
-                                            <option value="between_14_and_18">14-18g</option>
-                                            <option value="greater_equal_18">&gt;18g</option>
+                                            <option value="category1">&lt;8g</option>
+                                            <option value="category2">8-14g</option>
+                                            <option value="category3">14-18g</option>
+                                            <option value="category4">&gt;18g</option>
                                           </select>
                                     </div>
                                     <h4 class="card-title">Set amount of order</h4>

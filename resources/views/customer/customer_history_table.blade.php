@@ -198,7 +198,52 @@
                 <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
                     <span class="icon-menu"></span>
                 </button>
-                <!-- Bagian navbar lain -->
+                <div class="d-flex align-items-center ml-auto">
+                    <div class="nav-item dropdown mr-4">
+                        <a class="nav-link p-0" href="#" data-toggle="dropdown" id="languageDropdown">
+                            <div class="d-flex align-items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 24 24"><path fill="black" d="m12 22l-1-3H4q-.825 0-1.412-.587T2 17V4q0-.825.588-1.412T4 2h6l.875 3H20q.875 0 1.438.563T22 7v13q0 .825-.562 1.413T20 22zm-4.85-7.4q1.725 0 2.838-1.112T11.1 10.6q0-.2-.012-.362t-.063-.338h-3.95v1.55H9.3q-.2.7-.763 1.088t-1.362.387q-.975 0-1.675-.7T4.8 10.5t.7-1.725t1.675-.7q.45 0 .85.163t.725.487L9.975 7.55Q9.45 7 8.712 6.7T7.15 6.4q-1.675 0-2.863 1.188T3.1 10.5t1.188 2.913T7.15 14.6m6.7.5l.55-.525q-.35-.425-.637-.825t-.563-.85zm1.25-1.275q.7-.825 1.063-1.575t.487-1.175h-3.975l.3 1.05h1q.2.375.475.813t.65.887M13 21h7q.45 0 .725-.288T21 20V7q0-.45-.275-.725T20 6h-8.825l1.175 4.05h1.975V9h1.025v1.05H19v1.025h-1.275q-.25.95-.75 1.85T15.8 14.6l2.725 2.675L17.8 18l-2.7-2.7l-.9.925L15 19z"/></svg>
+                                {{-- <span style="color: black;">@lang('messages.languages')</span> --}}
+                            </div>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="languageDropdown">
+                            <a class="dropdown-item" href="{{ url('locale/en') }}">English</a>
+                            <a class="dropdown-item" href="{{ url('locale/id') }}">Bahasa Indonesia</a>
+                        </div>
+                    </div>
+
+            <div class="nav-item dropdown">
+              <!-- Username Display -->
+                <span class="text-black font-weight-bold">
+                    {{ Auth::user()->name }}
+                </span>
+
+                <!-- Trigger Button with SVG Icon -->
+                <a class="nav-link p-0" href="#" data-toggle="dropdown" id="profileDropdown">
+                    <div class="ms-1 d-flex justify-content-center">
+                        <!-- Custom Black SVG Icon -->
+                        <svg class="fill-current text-black" width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </a>
+
+                <!-- Dropdown Menu -->
+                <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
+                    <!-- Profile Link -->
+                    {{-- <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                        {{ __('Profile') }}
+                    </a> --}}
+
+                    <!-- Logout Form -->
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <a class="dropdown-item" href="{{ route('logout') }}"
+                            onclick="event.preventDefault(); this.closest('form').submit();">
+                            {{ __('Log Out') }}
+                        </a>
+                    </form>
+                </div>
             </div>
         </nav>
 

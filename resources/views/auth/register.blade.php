@@ -19,9 +19,34 @@
 
     <link rel="shortcut icon" href="{{ asset('images/logobiofarmakecil.png') }}" />
 </head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        height: 100vh; /* Pastikan body memenuhi layar penuh */
+        background: linear-gradient(to top, #adace9, #ffffff 50%, transparent 50%); /* Gradasi dari bawah ke atas, hanya sampai setengah */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .min-vh-100 {
+        background: white; /* Warna putih untuk card form */
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        padding: 20px;
+        max-width: 400px;
+        width: 100%;
+    }
+
+    html, body {
+        overflow: hidden; /* Menghindari scroll jika terjadi elemen tambahan */
+    }
+
+</style>
 
 <body>
-    <div class="min-vh-100 d-flex align-items-center justify-content-center bg-light">
+    {{-- <div class="min-vh-100 d-flex align-items-center justify-content-center bg-light"> --}}
         <div class="bg-white p-4 rounded-lg shadow w-100" style="max-width: 400px;">
             <div class="text-center mb-4">
                 <img src="{{ asset('images/logobiofarmakecil.png') }}" alt="Biofarma Logo" class="img-fluid" style="height: 100px;">

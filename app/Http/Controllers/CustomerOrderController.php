@@ -39,10 +39,10 @@ class CustomerOrderController extends Controller
 
     // Pemetaan dan hitung total harga
     $weightMap = [
-        'less_than_8' => '<8g',
-        'between_8_and_14' => '8-14g',
-        'between_14_and_18' => '14-18g',
-        'greater_equal_18' => '>18g'
+        'category1' => '<8g',
+        'category2' => '8-14g',
+        'category3' => '14-18g',
+        'category4' => '>18g'
     ];
     $totalPrice = ($request->male_quantity * 4000) + ($request->female_quantity * 5000);
 
@@ -127,9 +127,17 @@ class CustomerOrderController extends Controller
     }
 
     // Method untuk mengambil data order online yang telah disetujui
+    // dan jika pickupdate melebihi 2 hari maka akan hilang dan tidak tampil
     public function getOnlineHistoryData(Request $request)
     {
         $orders = CustomerOrder::where('status', 'approved')
+        ->where(function ($query) {
+            $query->where('is_paid', true)
+                ->orWhere(function ($subQuery) {
+                    $subQuery->where('is_paid', false)
+                        ->where('pick_up_date', '>=', now()->subDays(2)->toDateString());
+                });
+        })
             ->select([
                 'id',
                 'fullname',
@@ -252,10 +260,10 @@ class CustomerOrderController extends Controller
     private function checkStockAvailability($maleQuantity, $femaleQuantity, $weightCategory)
     {
         $weightMap = [
-            '<8g' => 'less_than_8',
-            '8-14g' => 'between_8_and_14',
-            '14-18g' => 'between_14_and_18',
-            '>18g' => 'greater_equal_18',
+            '<8g' => 'category1',
+            '8-14g' => 'category2',
+            '14-18g' => 'category3',
+            '>18g' => 'category4',
         ];
 
         if (!isset($weightMap[$weightCategory])) {
@@ -264,16 +272,16 @@ class CustomerOrderController extends Controller
 
         $weightConditions = [];
         switch ($weightMap[$weightCategory]) {
-            case 'less_than_8':
+            case 'category1':
                 $weightConditions = ['<', 8];
                 break;
-            case 'between_8_and_14':
+            case 'category2':
                 $weightConditions = ['between', [8, 14]];
                 break;
-            case 'between_14_and_18':
+            case 'category3':
                 $weightConditions = ['between', [14.01, 18]];
                 break;
-            case 'greater_equal_18':
+            case 'category4':
                 $weightConditions = ['>', 18];
                 break;
         }
@@ -302,10 +310,10 @@ class CustomerOrderController extends Controller
     {
         // Pemetaan kategori berat dari format tampilan ke value blade asli
         $weightMap = [
-            '<8g' => 'less_than_8',
-            '8-14g' => 'between_8_and_14',
-            '14-18g' => 'between_14_and_18',
-            '>18g' => 'greater_equal_18',
+            '<8g' => 'category1',
+            '8-14g' => 'category2',
+            '14-18g' => 'category3',
+            '>18g' => 'category4',
         ];
 
         // Cek apakah kategori berat valid
@@ -316,16 +324,16 @@ class CustomerOrderController extends Controller
         // Tentukan kondisi berdasarkan kategori berat yang dipilih
         $weightConditions = [];
         switch ($weightMap[$weightCategory]) {
-            case 'less_than_8':
+            case 'category1':
                 $weightConditions = ['<', 8];
                 break;
-            case 'between_8_and_14':
+            case 'category2':
                 $weightConditions = ['between', [8, 14]];
                 break;
-            case 'between_14_and_18':
+            case 'category3':
                 $weightConditions = ['between', [14.01, 18]];
                 break;
-            case 'greater_equal_18':
+            case 'category4':
                 $weightConditions = ['>', 18];
                 break;
             default:
@@ -452,10 +460,10 @@ class CustomerOrderController extends Controller
         }
 
         $weightMap = [
-            'less_than_8' => '<8g',
-            'between_8_and_14' => '8-14g',
-            'between_14_and_18' => '14-18g',
-            'greater_equal_18' => '>18g',
+            'category1' => '<8g',
+            'category2' => '8-14g',
+            'category3' => '14-18g',
+            'category4' => '>18g',
         ];
 
         $order->weight = $weightMap[$order->weight] ?? $order->weight;

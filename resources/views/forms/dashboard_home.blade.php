@@ -435,7 +435,8 @@
                 document.getElementById('offlineOrdersToday').innerText = data.offlineOrdersToday;
                 document.getElementById('totalRevenueToday').innerText = `Rp ${data.totalRevenueToday.toLocaleString('id-ID')}`;
                 document.getElementById('totalMaleSoldToday').innerText = data.totalMaleSoldToday;
-                document.getElementById('totalFemaleSoldToday').innerText = data.totalFemaleSoldToday;            })
+                document.getElementById('totalFemaleSoldToday').innerText = data.totalFemaleSoldToday;            
+            })
             .catch(error => console.error('Error:', error));
 
         $(document).ready(function () {

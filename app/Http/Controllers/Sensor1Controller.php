@@ -20,10 +20,10 @@ class Sensor1Controller extends Controller
         date_default_timezone_set('Asia/Jakarta');
         $now = Carbon::now()->toDateTimeString();
 
-        // Validate the incoming request data
+        // Mengambil data dari body JSON
         $params = [
-            'kesehatan_status' => $request->kesehatan_status,
-            'timestamp' => $now
+            'kesehatan_status' => $request->input('status_kesehatan'), // Sesuaikan dengan key JSON
+            'timestamp' => $now,
         ];
 
         try {
@@ -31,16 +31,17 @@ class Sensor1Controller extends Controller
             return response()->json([
                 'code' => 200,
                 'message' => "success",
-                'data' => $params
+                'data' => $params,
             ]);
         } catch (\Throwable $th) {
             return response()->json([
                 'code' => 400,
                 'message' => "failed",
-                "data" => $th->errorInfo
+                "data" => $th->errorInfo,
             ], 400);
         }
     }
+
 
     public function show($id)
     {

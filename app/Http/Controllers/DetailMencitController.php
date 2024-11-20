@@ -25,36 +25,36 @@ class DetailMencitController extends Controller
             $healthStatus = $kesehatan->kesehatan_status ?? 'N/A';
 
             if ($healthStatus === 'Sick') {
-                // Jika status kesehatan adalah 'Sick', gender dan berat langsung diisi sebagai 'N/A'
+                // Jika status kesehatan adalah 'Sick', gender dan berat langsung diisi sebagai 'N/A' dan 0
                 $gender = 'N/A';
                 $weight = 0;
-
-                // Pastikan data default di tabel data_jenis_kelamin
-                DB::table('data_jenis_kelamin')->updateOrInsert(
-                    ['id' => $kesehatan->id],
-                    [
-                        'jenis_kelamin' => $gender,
-                        'timestamp' => $kesehatan->timestamp
-                    ]
-                );
-
-                // Pastikan data default di tabel data_load_cell
-                DB::table('data_load_cell')->updateOrInsert(
-                    ['id' => $kesehatan->id],
-                    [
-                        'berat' => $weight,
-                        'timestamp' => $kesehatan->timestamp
-                    ]
-                );
             } else {
                 // Jika status kesehatan bukan 'Sick', ambil data dari data_jenis_kelamin dan data_load_cell
                 $jenisKelamin = DB::table('data_jenis_kelamin')->where('id', $kesehatan->id)->first();
                 $berat = DB::table('data_load_cell')->where('id', $kesehatan->id)->first();
 
-                // Tentukan nilai gender dan berat
+                // Tentukan nilai gender dan berat dengan fallback ke nilai default
                 $gender = $jenisKelamin->jenis_kelamin ?? 'N/A';
                 $weight = $berat->berat ?? 0;
             }
+
+            // Pastikan data default di tabel data_jenis_kelamin jika tidak ada entry untuk id ini
+            DB::table('data_jenis_kelamin')->updateOrInsert(
+                ['id' => $kesehatan->id],
+                [
+                    'jenis_kelamin' => $gender,
+                    'timestamp' => $kesehatan->timestamp
+                ]
+            );
+
+            // Pastikan data default di tabel data_load_cell jika tidak ada entry untuk id ini
+            DB::table('data_load_cell')->updateOrInsert(
+                ['id' => $kesehatan->id],
+                [
+                    'berat' => $weight,
+                    'timestamp' => $kesehatan->timestamp
+                ]
+            );
 
             // Masukkan data ke dalam tabel detail_mencit
             DetailMencit::updateOrCreate(
@@ -74,8 +74,11 @@ class DetailMencitController extends Controller
                 ->update(['synced_at' => Carbon::now()]);
         }
 
-        return response()->json(['message' => 'Data berhasil disinkronkan ke tabel detail_mencit']);
+        return response()->json(['message' => 'Data berhasil disinkronkan ke tabel detail_mencit, data_jenis_kelamin, dan data_load_cell']);
     }
+
+
+
 
     public function showData()
     {
@@ -86,18 +89,18 @@ class DetailMencitController extends Controller
 
         // Male Healthy with weight conditions
         $maleHealthyCounts = [
-            'less_than_8' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->where('berat', '<', 8)->count(),
-            'between_8_and_14' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->whereBetween('berat', [8, 14])->count(),
-            'between_14_and_18' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->whereBetween('berat', [14.01, 18])->count(),
-            'greater_equal_18' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->where('berat', '>', 18)->count(),
+            'category1' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->where('berat', '<', 8)->count(),
+            'category2' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->whereBetween('berat', [8, 14])->count(),
+            'category3' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->whereBetween('berat', [14.01, 18])->count(),
+            'category4' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->where('berat', '>', 18)->count(),
         ];
 
         // Female Healthy with weight conditions
         $femaleHealthyCounts = [
-            'less_than_8' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->where('berat', '<', 8)->count(),
-            'between_8_and_14' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->whereBetween('berat', [8, 14])->count(),
-            'between_14_and_18' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->whereBetween('berat', [14.01, 18])->count(),
-            'greater_equal_18' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->where('berat', '>', 18)->count(),
+            'category1' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->where('berat', '<', 8)->count(),
+            'category2' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->whereBetween('berat', [8, 14])->count(),
+            'category3' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->whereBetween('berat', [14.01, 18])->count(),
+            'category4' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->where('berat', '>', 18)->count(),
         ];
 
         return view('tables.data-table', compact(
@@ -154,17 +157,17 @@ class DetailMencitController extends Controller
         $miceSickCount = DetailMencit::where('health_status', 'Sick')->count();
 
         $maleHealthyCounts = [
-            'less_than_8' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->where('berat', '<', 8)->count(),
-            'between_8_and_14' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->whereBetween('berat', [8, 14])->count(),
-            'between_14_and_18' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->whereBetween('berat', [14.01, 18])->count(),
-            'greater_equal_18' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->where('berat', '>', 18)->count(),
+            'category1' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->where('berat', '<', 8)->count(),
+            'category2' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->whereBetween('berat', [8, 14])->count(),
+            'category3' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->whereBetween('berat', [14.01, 18])->count(),
+            'category4' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->where('berat', '>', 18)->count(),
         ];
 
         $femaleHealthyCounts = [
-            'less_than_8' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->where('berat', '<', 8)->count(),
-            'between_8_and_14' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->whereBetween('berat', [8, 14])->count(),
-            'between_14_and_18' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->whereBetween('berat', [14.01, 18])->count(),
-            'greater_equal_18' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->where('berat', '>', 18)->count(),
+            'category1' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->where('berat', '<', 8)->count(),
+            'category2' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->whereBetween('berat', [8, 14])->count(),
+            'category3' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->whereBetween('berat', [14.01, 18])->count(),
+            'category4' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->where('berat', '>', 18)->count(),
         ];
 
         return response()->json([

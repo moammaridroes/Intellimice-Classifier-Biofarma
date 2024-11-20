@@ -164,10 +164,10 @@
                     <label>Weight Category</label>
                     <select class="form-control" name="weight" id="weightSelect" onchange="fetchStockCount()">
                       <option value="" selected disabled>Select Weight</option>
-                      <option value="less_than_8">&lt;8g</option>
-                      <option value="between_8_and_14">8-14g</option>
-                      <option value="between_14_and_18">14-18g</option>
-                      <option value="greater_equal_18">&gt;18g</option>
+                      <option value="category1">&lt;8g</option>
+                      <option value="category2">8-14g</option>
+                      <option value="category3">14-18g</option>
+                      <option value="category4">&gt;18g</option>
                     </select>
                     <div id="weightError" class="error-message">Please select a weight</div>
                   </div>
@@ -429,10 +429,10 @@
 
     function showInvoiceModal(order) {
       const weightMap = {
-        'less_than_8': '<8g',
-        'between_8_and_14': '8-14g',
-        'between_14_and_18': '14-18g',
-        'greater_equal_18': '>18g'
+        'category1': '<8g',
+        'category2': '8-14g',
+        'category3': '14-18g',
+        'category4': '>18g'
         };
         
         const invoiceContent = `
@@ -537,22 +537,22 @@ function updateStockCounts() {
 
             let maleHealthyLessThan8 = document.querySelector('.male-healthy-less-than-8');
             if (maleHealthyLessThan8) {
-                maleHealthyLessThan8.textContent = data.maleHealthyCounts.less_than_8;
+                maleHealthyLessThan8.textContent = data.maleHealthyCounts.category1;
             }
 
             let maleHealthyBetween8And14 = document.querySelector('.male-healthy-between-8-and-14');
             if (maleHealthyBetween8And14) {
-                maleHealthyBetween8And14.textContent = data.maleHealthyCounts.between_8_and_14;
+                maleHealthyBetween8And14.textContent = data.maleHealthyCounts.category2;
             }
 
             let maleHealthyBetween14And18 = document.querySelector('.male-healthy-between-14-and-18');
             if (maleHealthyBetween14And18) {
-                maleHealthyBetween14And18.textContent = data.maleHealthyCounts.between_14_and_18;
+                maleHealthyBetween14And18.textContent = data.maleHealthyCounts.category3;
             }
 
             let maleHealthyGreater18 = document.querySelector('.male-healthy-greater-18');
             if (maleHealthyGreater18) {
-                maleHealthyGreater18.textContent = data.maleHealthyCounts.greater_equal_18;
+                maleHealthyGreater18.textContent = data.maleHealthyCounts.category4;
             }
 
             // Update Female Stock Counts
@@ -563,22 +563,22 @@ function updateStockCounts() {
 
             let femaleHealthyLessThan8 = document.querySelector('.female-healthy-less-than-8');
             if (femaleHealthyLessThan8) {
-                femaleHealthyLessThan8.textContent = data.femaleHealthyCounts.less_than_8;
+                femaleHealthyLessThan8.textContent = data.femaleHealthyCounts.category1;
             }
 
             let femaleHealthyBetween8And14 = document.querySelector('.female-healthy-between-8-and-14');
             if (femaleHealthyBetween8And14) {
-                femaleHealthyBetween8And14.textContent = data.femaleHealthyCounts.between_8_and_14;
+                femaleHealthyBetween8And14.textContent = data.femaleHealthyCounts.category2;
             }
 
             let femaleHealthyBetween14And18 = document.querySelector('.female-healthy-between-14-and-18');
             if (femaleHealthyBetween14And18) {
-                femaleHealthyBetween14And18.textContent = data.femaleHealthyCounts.between_14_and_18;
+                femaleHealthyBetween14And18.textContent = data.femaleHealthyCounts.category3;
             }
 
             let femaleHealthyGreater18 = document.querySelector('.female-healthy-greater-18');
             if (femaleHealthyGreater18) {
-                femaleHealthyGreater18.textContent = data.femaleHealthyCounts.greater_equal_18;
+                femaleHealthyGreater18.textContent = data.femaleHealthyCounts.category4;
             }
 
             // Reload DataTable if available
