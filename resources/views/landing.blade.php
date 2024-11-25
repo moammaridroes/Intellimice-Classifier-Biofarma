@@ -11,13 +11,103 @@
     <link rel="shortcut icon" href="{{ asset('images/logobiofarmakecil.png') }}" />
     <link href="https://fonts.googleapis.com/css2?family=Lugrasimo&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Lugrasimo&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
     <style>
-        <style>
+        <style>  
             
         body {
+            margin: 0%;
+            padding: 0%;
             background-color: #f8f9fa;
             color: #4b49ac;
         }
+
+        .header {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 1200px;
+            background: #f6f6fb; /* Warna utama sesuai */
+            box-shadow: 0 4px 6px rgba(28, 27, 99, 0.3); /* Warna shadow sedikit sesuai dengan tema */
+            border-radius: 12px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+            color: #ffffff; /* Teks putih agar kontras dengan warna latar */
+        }
+
+        .header .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1c1b63;
+            text-decoration: none;
+        }
+
+        .header .nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header .nav a {
+            text-decoration: none;
+            color: #000000;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.3s ease-in-out;
+        }
+
+        .header .nav a:hover {
+            color: #1c1b63;
+        }
+
+        .header .actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header .actions a {
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .header .login {
+            color: #000000;
+            transition: color 0.3s ease-in-out;
+        }
+
+        .header .login:hover {
+            color: #3230b1;
+        }
+
+        .header .join-now {
+            background: #1c1b63;
+            color: #ffffff;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s ease-in-out;
+        }
+
+        .header .join-now:hover {
+            background: #3230b1;
+        }
+
+        .content {
+            margin-top: 100px;
+            padding: 20px;
+        }
+
         .hero-section {
             background-color: #1c1b63;
             color: white;
@@ -94,6 +184,62 @@
         .btn-secondary:hover {
             background-color: #3e3b8a;
         }
+        #details {
+            background-color: #f8f9fa; /* Background warna sesuai tema */
+            padding: 30px; /* Jarak antara konten dan tepi */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Pusatkan konten secara vertikal */
+            align-items: center; /* Pusatkan konten secara horizontal */
+        }
+
+        #lokasi {
+            background-color: #f8f9fa; /* Warna latar belakang untuk kontras */
+            padding: 60px 15px;
+        }
+
+        #lokasi h5 {
+            color: #9333EA;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        #lokasi h2 {
+            color: #1c1b63;
+            font-size: 2.5rem;
+        }
+
+        #lokasi p {
+            font-size: 1rem;
+            color: #6c757d;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        #lokasi .btn-primary {
+            background-color: #1c1b63;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        #lokasi .btn-primary:hover {
+            background-color: #9333EA;
+        }
+
+        #lokasi .img-fluid {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        #lokasi .row .col-md-3 img {
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+
         footer {
             background-color: #f8f9fa;
             padding: 20px 0;
@@ -127,59 +273,107 @@
             }
         }
     </style>
+
 </head>
 <body>
-    <div class="hero-section">
-        {{-- <nav class="navbar navbar-expand-lg navbar-dark w-100">
-            <div class="container-fluid d-flex justify-content-end">
-                <a class="btn btn-outline-light me-2" href="{{ route('login') }}">Sign in</a>
-                <a class="btn btn-primary" href="{{ route('register') }}" style="background-color: #FF6B6B; border: none; border-radius: 20px;">Sign up</a>
-            </div>
-        </nav> --}}
+     <!-- Header -->
+     <header class="header">
+        <a href="#" class="logo">Intellimice</a>
+        <nav class="nav">
+            <a href="#about">Tentang kami</a>
+            <a href="#details">Details</a>
+            <a href="#lokasi">Lokasi</a>
+            <a href="#resources">ap ya</a>
+            <!-- Dropdown untuk bahasa -->
+            {{-- <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Bahasa
+                </a>
+                <div class="dropdown-menu" aria-labelledby="languageDropdown">
+                    <a class="dropdown-item" href="{{ url('locale/en') }}">English</a>
+                    <a class="dropdown-item" href="{{ url('locale/id') }}">Bahasa Indonesia</a>
+                </div>
+            </div> --}}
+        </nav>
+        <div class="actions">
+            <a href="{{ route('login') }}" class="login">Log In</a>
+            <a href="{{ route('register') }}" class="join-now">Register</a>
+        </div>
+    </header>
 
-        <img src="{{ asset('images/logobiofarmakecil.png') }}" alt="" style="width: 250px; height: 250px;">
-        <p style="font-size: 4rem;"><span></span> <span style="font-family: 'Ubuntu'; font-size: 5rem; color: #fff; text-shadow: 0 0 8px #ffffff;">Intellimice Classifier</span></p>
-        <div style="margin-top: -2.5rem; font-family: 'Lugrasimo'; margin-bottom: 15px;">by Biofarma</div>
-        <p style="font-size: 1.4rem;">Intellimice Classifier adalah platform yang dirancang untuk memfasilitasi pembelian mencit dengan kualitas terbaik.
-        Melalui platform ini, anda dapat dengan mudah menemukan dan membeli mencit yang telah melalui proses klasifikasi ketat
-        berdasarkan berbagai kriteria penting, seperti status kesehatan, jenis kelamin, dan kategori berat badan.
-        Silahkan klik tombol berikut untuk melakukan pemesanan.</p>
-        <div class="d-flex justify-content-center flex-wrap">
-            <a href="{{ route('register') }}" class="btn btn-light me-3" style="font-family: 'ubuntu'; font-size: 1.2rem; padding: 8px 40px; margin: 5px; border-radius: 20px; font-weight: bold;">Get Started</a>
+    {{-- About Us --}}
+    <div class="hero-section" id="about">
+        <div style="margin-top: 50px; text-align: center;">
+            <img src="{{ asset('images/logobiofarmakecil.png') }}" alt="" style="width: 250px; height: 250px; margin-bottom: 10px;">
+            <p style="font-size: 4rem; margin-top: 20px;">
+                <span style="font-family: 'Ubuntu'; font-size: 5rem; color: #fff; text-shadow: 0 0 8px #ffffff;">Intellimice Classifier</span>
+            </p>
+            <div style="margin-top: -1.8rem; font-family: 'Lugrasimo'; margin-bottom: 35px;">by Biofarma</div>
+            <p style="font-size: 1.4rem; margin-top: 20px;">
+                Intellimice Classifier adalah platform yang dirancang untuk memfasilitasi pembelian mencit dengan kualitas terbaik.
+                Melalui platform ini, anda dapat dengan mudah menemukan dan membeli mencit yang telah melalui proses klasifikasi ketat
+                berdasarkan berbagai kriteria penting, seperti status kesehatan, jenis kelamin, dan kategori berat badan.
+                Silahkan klik tombol berikut untuk melakukan pemesanan.
+            </p>
+            <div class="d-flex justify-content-center flex-wrap" style="margin-top: 20px;">
+                <a href="{{ route('register') }}" class="btn btn-light me-3" style="font-family: 'ubuntu'; font-size: 1.2rem; padding: 8px 40px; margin: 5px; border-radius: 20px; font-weight: bold;">Get Started</a>
+            </div>
         </div>
     </div>
 
-    <div class="container mt-5">
-        <h2 class="text-center">Detail Produk Kami</h2>
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card product-card mb-4" style="border: 1px solid #4B49AC;  border-radius: 4px; overflow: hidden;">
-                    <img src="images/mencit.jpg" class="card-img-top" alt="Tikus Mencit 2" style="max-width: 100%; height: auto; object-fit: cover; border-radius: 4px 4px 0 0;">
-                    <div class="card-body">
-                        <h5 class="card-title">Jenis Kelamin sudah terklasifikasi</h5>
-                        <p class="card-text">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-                        <button class="btn btn-secondary" data-toggle="modal" data-target="#detailModal" onclick="loadDetail('Jenis Kelamin sudah terklasifikasi')">Lihat Detail</button>
+    <!-- Detail Section -->
+    <div class="container-fluid py-5" id="details" style="background-color: #f8f9fa;">
+        <div class="row align-items-center justify-content-center" style="margin-left: 5%; margin-right: 2%;">
+            <div class="row align-items-center">
+
+                <!-- Carousel Section -->
+                <div class="col-md-6">
+                    <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+                        <ol class="carousel-indicators">
+                            <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+                            <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+                            <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+                        </ol>
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img src="images/mencit.jpg" class="d-block w-100 rounded" alt="...">
+                                <div class="carousel-caption d-none d-md-block" style="color: black;">
+                                    <p>Jenis Kelamin sudah terklasifikasi</p>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="images/mencit.jpg" class="d-block w-100 rounded" alt="...">
+                                <div class="carousel-caption d-none d-md-block" style="color: #000000">
+                                    <p>Mencit dipastikan sehat</p>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="images/mencit.jpg" class="d-block w-100 rounded" alt="...">
+                                <div class="carousel-caption d-none d-md-block" style="color: #000000">
+                                    <p>Berat bervariasi</p>
+                                </div>
+                            </div>
+                        </div>
+                        <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card product-card mb-4" style="border: 1px solid #4B49AC;  border-radius: 4px; overflow: hidden;">
-                    <img src="images/mencit.jpg" class="card-img-top" alt="Tikus Mencit 2" style="max-width: 100%; height: auto; object-fit: cover; border-radius: 4px 4px 0 0;">
-                    <div class="card-body">
-                        <h5 class="card-title">Mencit dipastikan sehat</h5>
-                        <p class="card-text">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-                        <button class="btn btn-secondary" data-toggle="modal" data-target="#detailModal" onclick="loadDetail('Mencit dipastikan sehat')">Lihat Detail</button>
-                    </div>
-                </div>
-            </div>            
-            <div class="col-md-4">
-                <div class="card product-card mb-4" style="border: 1px solid #4B49AC;  border-radius: 4px; overflow: hidden;">
-                    <img src="images/mencit.jpg" class="card-img-top" alt="Tikus Mencit 2" style="max-width: 100%; height: auto; object-fit: cover; border-radius: 4px 4px 0 0;">
-                    <div class="card-body">
-                        <h5 class="card-title">Berat bervariasi</h5>
-                        <p class="card-text">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-                        <button class="btn btn-secondary" data-toggle="modal" data-target="#detailModal" onclick="loadDetail('Berat bervariasi')">Lihat Detail</button>
-                    </div>
+                <!-- Text Content -->
+                <div class="col-md-6 text-white">
+                    <h2 class="mb-4 font-weight-bold" style="color: #1c1b63;">Detail mencit kami</h2>
+                    <p class="text-muted">
+                        Laboratorium kami menyediakan lingkungan yang mendukung untuk penelitian mencit dengan standar tinggi.
+                        Kami memprioritaskan keakuratan klasifikasi dan kesehatan mencit untuk mendukung penelitian ilmiah dan eksperimen farmasi.
+                    </p>
+                    <a onclick="loadDetail('Details')" class="btn btn-primary" style="background-color: #1c1b63; border-radius: 8px;" data-toggle="modal" data-target="#detailModal">
+                        Lihat Detail
+                    </a>
                 </div>
             </div>
         </div>
@@ -205,6 +399,40 @@
         </div>
     </div>
 
+    {{-- lokasi --}}
+    <div class="container-fluid py-5" id="lokasi" style="background-color: #f8f9fa;">
+        <div class="row align-items-center justify-content-center" style="margin-left: 5%; margin-right: 2%;">
+            <div class="col-md-6" style="margin-top: -5rem;">
+                <h5 class="text-uppercase font-weight-bold text-primary">Lokasi</h5>
+                <h2 class="mb-4 font-weight-bold">Laboratorium mencit</h2>
+                <p class="text-muted">
+                    Laboratorium ini dirancang khusus untuk pengelolaan dan pemeliharaan mencit dengan standar internasional. Fasilitas kami memastikan lingkungan yang steril dan aman, serta memberikan perhatian khusus terhadap kebutuhan biologis mencit. Dengan perlengkapan modern dan pengawasan ketat, laboratorium ini memungkinkan penelitian yang akurat dan mendukung inovasi di berbagai bidang seperti bioteknologi, farmasi, dan medis.
+                </p>       
+                <a href="https://www.google.com/maps/search/?api=1&query=-6.230173,106.845101" class="btn btn-primary" style="background-color: #1c1b63; border-radius: 8px;" target="_blank">Lihat Lokasi</a>
+            </div>
+            <!-- Kolom Gambar -->
+            <div class="col-md-6">
+                <img src="images/tikus1.jpg" alt="Team Work" class="img-fluid rounded shadow">
+            </div>
+        </div>
+    
+        <!-- Subsection Gambar -->
+        <div class="row mt-5 d-flex justify-content-center align-items-center" style="background-color: #1c1b63; height: 320px;">
+            <div class="col-md-3 d-flex justify-content-center align-items-center">
+                <img src="images/tikus4.jpg" alt="lab1" class="img-fluid rounded">
+            </div>
+            <div class="col-md-3 d-flex justify-content-center align-items-center">
+                <img src="images/tikus3.jpg" alt="lab2" class="img-fluid rounded">
+            </div>
+            <div class="col-md-3 d-flex justify-content-center align-items-center">
+                <img src="images/tikus4.jpg" alt="lab3" class="img-fluid rounded">
+            </div>
+            <div class="col-md-3 d-flex justify-content-center align-items-center">
+                <img src="images/tikus3.jpg" alt="lab4" class="img-fluid rounded">
+            </div>
+        </div>
+    </div>
+
     <hr class="my-1">
     <footer class="text-center mt-5">
         <p>Copyright &copy; 2024, Biofarma. STAS-RG. All rights reserved.</p>
@@ -217,19 +445,33 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
     <script>
-        // Function to load detail content into the modal
         function loadDetail(title) {
             const details = {
-            "Jenis Kelamin sudah terklasifikasi": "<p>Jenis kelamin dari mencit yang dijual di platform ini telah diklasifikasikan secara teliti melalui proses yang akurat dan terpercaya. Setiap mencit telah melalui pemeriksaan khusus untuk memastikan jenis kelaminnya sesuai, baik jantan maupun betina, sehingga Anda dapat memilih sesuai kebutuhan penelitian atau keperluan khusus lainnya. Proses klasifikasi ini dilakukan oleh tenaga ahli yang sudah berpengalaman di bidangnya, sehingga dapat mengurangi kemungkinan kesalahan dalam identifikasi.</p><p>Selain itu, klasifikasi jenis kelamin ini sangat membantu bagi Anda yang memiliki kebutuhan spesifik, misalnya dalam penelitian medis atau pengembangan produk farmasi yang mungkin membutuhkan jenis kelamin tertentu. Dengan mengetahui jenis kelamin, Anda bisa lebih mudah merencanakan penelitian atau eksperimen yang membutuhkan kesesuaian gender pada mencit. Layanan ini adalah bagian dari komitmen kami untuk memastikan kualitas mencit sesuai dengan standar yang diinginkan.</p><p>Kami menjamin keakuratan informasi jenis kelamin mencit yang Anda beli, yang sangat penting dalam menjaga konsistensi dan hasil dari percobaan Anda. Setiap mencit dilabeli dengan informasi jenis kelamin secara akurat sebelum didistribusikan, sehingga Anda dapat membeli dengan percaya diri dan mengurangi risiko kesalahan pada hasil penelitian Anda.</p>",
+                "Details": "<p>Platform kami menyediakan mencit berkualitas tinggi yang telah melalui serangkaian proses klasifikasi ketat untuk memastikan jenis kelamin, kesehatan, dan berat yang sesuai kebutuhan Anda. Setiap mencit diperiksa oleh tenaga ahli untuk menjamin akurasi dan bebas dari penyakit yang dapat memengaruhi hasil penelitian atau eksperimen.</p><p>Klasifikasi jenis kelamin membantu Anda memenuhi kebutuhan spesifik seperti penelitian medis atau pengembangan produk farmasi. Selain itu, kesehatan mencit dipastikan optimal melalui pemeriksaan rutin sesuai standar biofarmasi, memberikan hasil penelitian yang konsisten dan valid.</p><p>Berat mencit tersedia dalam berbagai kategori, memungkinkan Anda memilih sesuai kebutuhan eksperimen, mulai dari mencit ringan hingga berat. Proses ini mendukung fleksibilitas penelitian dan memastikan hasil yang lebih akurat serta sesuai standar ilmiah. Dengan platform ini, Anda dapat melakukan pembelian mencit secara efisien dan terpercaya.</p>"              
+            };
 
-            "Mencit dipastikan sehat": "<p>Kesehatan setiap mencit yang tersedia di platform kami sudah melalui serangkaian pemeriksaan ketat dan berstandar tinggi. Mencit yang dipasarkan dipastikan dalam kondisi sehat, tanpa adanya penyakit atau masalah kesehatan yang dapat mempengaruhi kualitas atau hasil penelitian Anda. Pemeriksaan kesehatan ini dilakukan oleh tenaga ahli menggunakan alat yang dirancang khusus untuk memastikan bahwa mencit bebas dari penyakit menular atau genetik yang dapat membahayakan percobaan atau studi yang Anda lakukan.</p><p>Mencit sehat adalah kunci utama dalam berbagai penelitian medis dan bioteknologi karena kondisi kesehatan mencit yang optimal dapat menghasilkan data yang lebih konsisten dan valid. Prosedur kesehatan yang diterapkan di sini adalah sesuai standar biofarmasi, mulai dari observasi rutin hingga pengecekan kebersihan dan sanitasi untuk memastikan kondisi yang prima.</p><p>Dengan demikian, Anda dapat memiliki keyakinan bahwa mencit yang Anda beli tidak hanya memiliki kondisi kesehatan terbaik tetapi juga telah diperiksa secara menyeluruh untuk mendukung penelitian dan eksperimen dengan hasil yang lebih andal.</p>",
-
-            "Berat bervariasi": "<p>Berat mencit di platform kami disediakan dalam berbagai kategori, memungkinkan Anda memilih sesuai dengan kebutuhan penelitian atau pengembangan produk yang spesifik. Kami menyadari bahwa berat badan mencit memainkan peran penting dalam berbagai eksperimen, misalnya dalam pengujian obat, eksperimen nutrisi, atau percobaan lainnya yang membutuhkan variasi dalam berat untuk hasil yang lebih akurat. Rentang berat yang tersedia mencakup mencit ringan hingga berat, yang dikelompokkan secara sistematis berdasarkan standar biofarmasi.</p><p>Kategori berat bervariasi ini memungkinkan Anda mendapatkan mencit dalam kondisi yang optimal untuk jenis penelitian tertentu, misalnya mencit dengan berat lebih rendah mungkin lebih sesuai untuk percobaan tertentu yang membutuhkan hewan uji lebih muda atau lebih ringan. Setiap mencit ditimbang dengan alat presisi tinggi sebelum diklasifikasikan dan dipasarkan, memastikan Anda mendapatkan informasi berat yang akurat.</p><p>Dengan menawarkan mencit dalam berbagai kategori berat, kami memberikan kemudahan bagi Anda untuk menyesuaikan kebutuhan penelitian secara lebih fleksibel. Hal ini juga meminimalkan risiko ketidakcocokan dalam eksperimen, karena Anda dapat memilih mencit dengan spesifikasi berat yang diinginkan.</p>"
-        };
-            document.getElementById('detailModalLabel').textContent = title;
-            document.getElementById('modalBodyContent').innerHTML = details[title] || "Detail tidak tersedia.";
+            if (details[title]) {
+                document.getElementById('detailModalLabel').textContent = title;
+                document.getElementById('modalBodyContent').innerHTML = details[title];
+            } else {
+                document.getElementById('detailModalLabel').textContent = "Detail Tidak Tersedia";
+                document.getElementById('modalBodyContent').innerHTML = "<p>Detail tidak tersedia.</p>";
+            }
         }
+            document.querySelectorAll('.nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 50,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
     </script>
 </body>
 </html>

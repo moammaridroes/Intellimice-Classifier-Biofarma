@@ -68,7 +68,7 @@
                 @csrf
                 <div class="form-group">
                     <label for="name" class="text-muted">Name</label>
-                    <input id="name" name="name" type="text" value="{{ old('name') }}" required class="form-control" placeholder="Enter your name">
+                    <input id="name" name="name" type="text" value="{{ old('name') }}" required class="form-control" placeholder="Enter your name" maxlength="15">
                 </div>
                 <div class="form-group">
                     <label for="email" class="text-muted">Email address</label>

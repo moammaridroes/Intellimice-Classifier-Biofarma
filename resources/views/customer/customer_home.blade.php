@@ -113,40 +113,26 @@
                         </div>
                     </div>
 
-            <div class="nav-item dropdown">
-              <!-- Username Display -->
-                <span class="text-black font-weight-bold">
-                    {{ Auth::user()->name }}
-                </span>
-
-                <!-- Trigger Button with SVG Icon -->
-                <a class="nav-link p-0" href="#" data-toggle="dropdown" id="profileDropdown">
-                    <div class="ms-1 d-flex justify-content-center">
-                        <!-- Custom Black SVG Icon -->
-                        <svg class="fill-current text-black" width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                </a>
-
-                <!-- Dropdown Menu -->
-                <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
-                    <!-- Profile Link -->
-                    {{-- <a class="dropdown-item" href="{{ route('profile.edit') }}">
-                        {{ __('Profile') }}
-                    </a> --}}
-
-                    <!-- Logout Form -->
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <a class="dropdown-item" href="{{ route('logout') }}"
-                            onclick="event.preventDefault(); this.closest('form').submit();">
-                            {{ __('Log Out') }}
+                    <div class="nav-item dropdown" style="border: 0.5px solid #5c5252; border-radius: 5px; padding: 5px;">
+                        <a href="#" id="profileDropdown" data-toggle="dropdown" aria-expanded="false" style="cursor: pointer; color: transparent;">
+                            <img src="{{ asset('images/profile.png') }}" alt="Profile Icon" style="width: 25px; height: 25px; ">
+                            <span class="text-black font-weight">
+                                {{ Auth::user()->name }}
+                            </span>
                         </a>
-                    </form>
+                    
+                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Log Out
+                                </a>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
-    </nav>
+        </nav>
     
     <!-- partial -->
     <div class="container-fluid page-body-wrapper">
@@ -226,11 +212,6 @@
                                         </h5>
                                     </div>
                                 </div>
-                                <div class="col-4 text-end">
-                                    <div class="icon icon-shape bg-gradient-warning shadow text-center border-radius-md">
-                                        <<i class="ti-alert text-lg opacity-10" aria-hidden="true"></i>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -248,11 +229,6 @@
                                         </h5>
                                     </div>
                                 </div>
-                                <div class="col-4 text-end">
-                                    <div class="icon icon-shape bg-gradient-success shadow text-center border-radius-md">
-                                        <i class="ti-check-box text-lg opacity-10" aria-hidden="true"></i>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -268,11 +244,6 @@
                                             {{ $rejectedCount }}
                                             <span class="text-danger text-sm font-weight-bolder">@lang('messages.rejected')</span>
                                         </h5>
-                                    </div>
-                                </div>
-                                <div class="col-4 text-end">
-                                    <div class="icon icon-shape bg-gradient-danger shadow text-center border-radius-md">
-                                        <i class="ti-close text-lg opacity-10" aria-hidden="true"></i>
                                     </div>
                                 </div>
                             </div>
