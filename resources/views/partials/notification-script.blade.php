@@ -1,4 +1,4 @@
-<!-- resources/views/partials/notification-script.blade.php -->
+{{-- GA KEPAKE TP JGN DIHAPUS TP GTAU BUAT AP --}}
 <script>
     function fetchUnreadNotifications() {
         fetch('/admin/notification-count')

@@ -25,9 +25,21 @@ class Sensor1Controller extends Controller
             'kesehatan_status' => $request->input('status_kesehatan'), // Sesuaikan dengan key JSON
             'timestamp' => $now,
         ];
+        $paramsBerat = [
+            'berat' => $request->input('berat'), // Sesuaikan dengan key JSON
+            'timestamp' => $now,
+        ];
+        $paramsJeniskelamin = [
+            'jenis_kelamin' => $request->input('jenis_kelamin'), // Sesuaikan dengan key JSON
+            'timestamp' => $now,
+        ];
+        
 
         try {
             DB::table('data_kesehatan')->insert($params);
+            DB::table('data_load_cell')->insert($paramsBerat);
+            DB::table('data_jenis_kelamin')->insert($paramsJeniskelamin);
+
             return response()->json([
                 'code' => 200,
                 'message' => "success",

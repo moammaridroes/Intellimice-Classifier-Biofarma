@@ -33,87 +33,12 @@
 <body>
   <div class="container-scroller">
     <!-- Navbar -->
-    <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
-      <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
-        <a class="navbar-brand brand-logo mr-5" href="{{ url('/') }}">
-          <img src="{{ asset('images/Logo_Bio_Farma.png') }}" style="width: 65%; height: 65%;" class="mr-2" alt="logo" />
-        </a>
-        <a class="navbar-brand brand-logo-mini" href="{{ url('/') }}">
-          <img src="{{ asset('images/logobiofarmakecil.png') }}" alt="logo" />
-        </a>
-      </div>
-      <div class="navbar-menu-wrapper d-flex align-items-center justify-content-between">
-        <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-bs-toggle="minimize">
-          <span class="icon-menu"></span>
-        </button>
-        <div class="nav-item dropdown">
-          <span class="text-black font-weight-bold">{{ Auth::user()->name }}</span>
-          <a class="nav-link p-0" href="#" data-toggle="dropdown" id="profileDropdown">
-              <div class="ms-1 d-flex justify-content-center">
-                  <svg class="fill-current text-black" width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 111.414 1.414l-4 4a1 1 01-1.414 0l-4-4a1 1 010-1.414z" clip-rule="evenodd" />
-                  </svg>
-              </div>
-          </a>
-          <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
-              <form method="POST" action="{{ route('logout') }}">
-                  @csrf
-                  <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();">
-                      {{ __('Log Out') }}
-                  </a>
-              </form>
-          </div>
-        </div>
-      </div>
-    </nav>
+    @include('partials.navbarAdmin')
     <!-- Navbar ends -->
 
-    <div class="container-fluid page-body-wrapper">
-      <!-- Sidebar -->
-      <nav class="sidebar sidebar-offcanvas" id="sidebar">
-        <ul class="nav">
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url('dashboard') }}">
-              <i class="icon-grid menu-icon"></i>
-              <span class="menu-title">Home</span>
-            </a>
-          </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ route('admin.notification') }}" >
-                  <i class="ti-bell menu-icon position-relative"></i>
-                  <span class="menu-title">Notification</span>
-                  <span id="notificationBadge" class="badge badge-danger notification-badge">{{ $unreadNotificationsCount > 0 ? $unreadNotificationsCount : '' }}</span>
-              </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
-              <i class="icon-columns menu-icon"></i>
-              <span class="menu-title">Order</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="form-elements">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"><a class="nav-link" href="{{ url('orderform') }}">Order Forms</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url('orderhistory') }}">Offline History</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url('online-history') }}">Online History</a></li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
-              <i class="icon-grid-2 menu-icon"></i>
-              <span class="menu-title">Data Collecting</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="tables">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"><a class="nav-link" href="{{ url('stok') }}">Table Data</a></li>
-              </ul>
-            </div>
-          </li>
-        </ul>
-      </nav>
-      <!-- Sidebar ends -->
+    <!-- Sidebar -->
+    @include('partials.sidebarAdmin')
+    {{-- sidebar ends --}}
 
       <!-- Main Content -->
       <div class="main-panel">
@@ -164,10 +89,10 @@
                     <label>Weight Category</label>
                     <select class="form-control" name="weight" id="weightSelect" onchange="fetchStockCount()">
                       <option value="" selected disabled>Select Weight</option>
-                      <option value="category1">&lt;8g</option>
-                      <option value="category2">8-14g</option>
-                      <option value="category3">14-18g</option>
-                      <option value="category4">&gt;18g</option>
+                      <option value="category1">&lt;10g</option>
+                      <option value="category2">10-22g</option>
+                      <option value="category3">&gt;22g</option>
+                      {{-- <option value="category4">&gt;22g</option> --}}
                     </select>
                     <div id="weightError" class="error-message">Please select a weight</div>
                   </div>
@@ -203,14 +128,8 @@
             </div>
           </div>
         </div>
+        @include('partials.footer')
       </div>
-      </div>
-
-      <footer class="footer">
-        <div class="d-sm-flex justify-content-center justify-content-sm-between">
-          <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2024, Biofarma. STAS-RG. All rights reserved.</span>
-        </div>
-      </footer>
     </div>
   </div>
   <!-- page-body-wrapper ends -->
@@ -248,84 +167,9 @@
   <script src="{{ asset('js/todolist.js') }}"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+  
+  @include('partials.pusher')
   <script>
-      // Inisialisasi Pusher
-      const pusher = new Pusher('{{ env("PUSHER_APP_KEY") }}', {
-          cluster: '{{ env("PUSHER_APP_CLUSTER") }}',
-          encrypted: true,
-      });
-  
-      // Subscribe ke channel
-      const channel = pusher.subscribe('orders');
-  
-      // CSS untuk notifikasi
-      const style = document.createElement('style');
-      style.textContent = `
-          .notification-container {
-              position: fixed;
-              top: 20px;
-              right: 20px;
-              background-color: rgba(255, 215, 0, 0.6);
-              color: black;
-              background-color: #28a745;
-              color: white;
-              padding: 15px 25px;
-              border-radius: 5px;
-              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-              z-index: 9000;
-              opacity: 0;
-              transform: translateY(-20px);
-              transition: all 0.3s ease-in-out;
-              max-width: 350px;
-              word-wrap: break-word;
-          }
-  
-          .notification-container.show {
-              opacity: 1;
-              transform: translateY(0);
-          }
-  
-          .notification-container.hide {
-              opacity: 0;
-              transform: translateY(-20px);
-          }
-      `;
-      document.head.appendChild(style);
-  
-      // Dengarkan event 'order.created'
-      channel.bind('order.created', function(data) {
-          // Buat container notifikasi
-          const notificationContainer = document.createElement('div');
-          notificationContainer.classList.add('notification-container');
-          notificationContainer.textContent = `New orders have been received`;
-          document.body.appendChild(notificationContainer);
-  
-          // Animasi munculnya notifikasi
-          setTimeout(() => {
-              notificationContainer.classList.add('show');
-          }, 100);
-  
-          // Hilangkan notifikasi setelah 5 detik
-          setTimeout(() => {
-              notificationContainer.classList.add('hide');
-              setTimeout(() => {
-                  notificationContainer.remove();
-              }, 300);
-          }, 5000);
-  
-          // Update badge notifikasi
-          // Perbarui jumlah notifikasi yang belum dibaca
-        const badge = document.getElementById('notificationBadge');
-        if (badge) {
-            // Ambil nilai badge saat ini dan ubah ke angka (0 jika kosong)
-            let currentCount = parseInt(badge.textContent) || 0;
-                
-            // Tambahkan 1 ke nilai saat ini
-            badge.textContent = currentCount + 1;
-        }
-      });
-      
     function fetchStockCount() {
     var selectedWeight = document.getElementById('weightSelect').value;
 
@@ -429,10 +273,10 @@
 
     function showInvoiceModal(order) {
       const weightMap = {
-        'category1': '<8g',
-        'category2': '8-14g',
-        'category3': '14-18g',
-        'category4': '>18g'
+        'category1': '<10g',
+        'category2': '10-22g',
+        'category3': '>22g'
+        // 'category4': '>18g'
         };
         
         const invoiceContent = `
@@ -545,14 +389,14 @@ function updateStockCounts() {
                 maleHealthyBetween8And14.textContent = data.maleHealthyCounts.category2;
             }
 
-            let maleHealthyBetween14And18 = document.querySelector('.male-healthy-between-14-and-18');
-            if (maleHealthyBetween14And18) {
-                maleHealthyBetween14And18.textContent = data.maleHealthyCounts.category3;
-            }
+            // let maleHealthyBetween14And18 = document.querySelector('.male-healthy-between-14-and-18');
+            // if (maleHealthyBetween14And18) {
+            //     maleHealthyBetween14And18.textContent = data.maleHealthyCounts.category3;
+            // }
 
             let maleHealthyGreater18 = document.querySelector('.male-healthy-greater-18');
             if (maleHealthyGreater18) {
-                maleHealthyGreater18.textContent = data.maleHealthyCounts.category4;
+                maleHealthyGreater18.textContent = data.maleHealthyCounts.category3;
             }
 
             // Update Female Stock Counts
@@ -571,14 +415,14 @@ function updateStockCounts() {
                 femaleHealthyBetween8And14.textContent = data.femaleHealthyCounts.category2;
             }
 
-            let femaleHealthyBetween14And18 = document.querySelector('.female-healthy-between-14-and-18');
-            if (femaleHealthyBetween14And18) {
-                femaleHealthyBetween14And18.textContent = data.femaleHealthyCounts.category3;
-            }
+            // let femaleHealthyBetween14And18 = document.querySelector('.female-healthy-between-14-and-18');
+            // if (femaleHealthyBetween14And18) {
+            //     femaleHealthyBetween14And18.textContent = data.femaleHealthyCounts.category3;
+            // }
 
             let femaleHealthyGreater18 = document.querySelector('.female-healthy-greater-18');
             if (femaleHealthyGreater18) {
-                femaleHealthyGreater18.textContent = data.femaleHealthyCounts.category4;
+                femaleHealthyGreater18.textContent = data.femaleHealthyCounts.category3;
             }
 
             // Reload DataTable if available

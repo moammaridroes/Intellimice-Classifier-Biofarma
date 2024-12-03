@@ -14,5 +14,6 @@ Route::get('/user', function (Request $request) {
     Route::apiResource('sensor1', Sensor1Controller::class);  // Kesehatan
     Route::apiResource('sensor2', Sensor2Controller::class);  // Jenis Kelamin
     Route::apiResource('sensor3', Sensor3Controller::class);  // Berat
+    // Route::apiResource('classifier', ClassifierController::class);  // rawrr
 // });
 

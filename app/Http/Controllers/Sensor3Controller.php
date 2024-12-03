@@ -19,6 +19,12 @@ class Sensor3Controller extends Controller
     {
         date_default_timezone_set('Asia/Jakarta');
         $now = Carbon::now()->toDateTimeString();
+        $arrcept = [
+            'kesehatan_status' => $request->input('status_kesehatan'), // Sesuaikan dengan key JSON
+            'jenis_kelamin' => $request->input('jenis_kelamin'), // Sesuaikan dengan key JSON
+            'berat' => $request->input('berat'), // Sesuaikan dengan key JSON
+
+        ];        
 
         // Mengambil data dari body JSON
         $params = [
@@ -26,13 +32,20 @@ class Sensor3Controller extends Controller
             'timestamp' => $now,
         ];
 
-        // $paramsKesehatan = [
-        //     'kesehatan_status' => 'healthy',
-        // ];
+        $paramsKesehatan = [
+            'kesehatan_status' => $request->input('status_kesehatan'), // Sesuaikan dengan key JSON
+            'timestamp' => $now,
+        ];
+        $paramsJeniskelamin = [
+            'jenis_kelamin' => $request->input('jenis_kelamin'), // Sesuaikan dengan key JSON
+            'timestamp' => $now,
+        ];
 
         try {
             DB::table('data_load_cell')->insert($params);
-            // DB::table('data_kesehatan')->insert($paramsKesehatan);
+            DB::table('data_kesehatan')->insert($paramsKesehatan);
+            DB::table('data_jenis_kelamin')->insert($paramsJeniskelamin);
+
             return response()->json([
                 'code' => 200,
                 'message' => "success",

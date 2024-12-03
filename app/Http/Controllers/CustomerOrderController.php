@@ -39,10 +39,10 @@ class CustomerOrderController extends Controller
 
     // Pemetaan dan hitung total harga
     $weightMap = [
-        'category1' => '<8g',
-        'category2' => '8-14g',
-        'category3' => '14-18g',
-        'category4' => '>18g'
+        'category1' => '<10g',
+        'category2' => '10-22g',
+        'category3' => '>22g'
+        // 'category4' => '>18g'
     ];
     $totalPrice = ($request->male_quantity * 4000) + ($request->female_quantity * 5000);
 
@@ -260,10 +260,10 @@ class CustomerOrderController extends Controller
     private function checkStockAvailability($maleQuantity, $femaleQuantity, $weightCategory)
     {
         $weightMap = [
-            '<8g' => 'category1',
-            '8-14g' => 'category2',
-            '14-18g' => 'category3',
-            '>18g' => 'category4',
+            '<10g' => 'category1',
+            '10-22g' => 'category2',
+            '>22g' => 'category3',
+            // '>18g' => 'category4',
         ];
 
         if (!isset($weightMap[$weightCategory])) {
@@ -273,16 +273,16 @@ class CustomerOrderController extends Controller
         $weightConditions = [];
         switch ($weightMap[$weightCategory]) {
             case 'category1':
-                $weightConditions = ['<', 8];
+                $weightConditions = ['<', 10];
                 break;
             case 'category2':
-                $weightConditions = ['between', [8, 14]];
+                $weightConditions = ['between', [10, 22]];
                 break;
+            // case 'category3':
+            //     $weightConditions = ['between', [14.01, 18]];
+            //     break;
             case 'category3':
-                $weightConditions = ['between', [14.01, 18]];
-                break;
-            case 'category4':
-                $weightConditions = ['>', 18];
+                $weightConditions = ['>', 22];
                 break;
         }
 
@@ -310,10 +310,10 @@ class CustomerOrderController extends Controller
     {
         // Pemetaan kategori berat dari format tampilan ke value blade asli
         $weightMap = [
-            '<8g' => 'category1',
-            '8-14g' => 'category2',
-            '14-18g' => 'category3',
-            '>18g' => 'category4',
+            '<10g' => 'category1',
+            '19-22g' => 'category2',
+            '>22g' => 'category3',
+            // '>18g' => 'category4',
         ];
 
         // Cek apakah kategori berat valid
@@ -325,16 +325,16 @@ class CustomerOrderController extends Controller
         $weightConditions = [];
         switch ($weightMap[$weightCategory]) {
             case 'category1':
-                $weightConditions = ['<', 8];
+                $weightConditions = ['<', 10];
                 break;
             case 'category2':
-                $weightConditions = ['between', [8, 14]];
+                $weightConditions = ['between', [10, 22]];
                 break;
+            // case 'category3':
+            //     $weightConditions = ['between', [14.01, 18]];
+            //     break;
             case 'category3':
-                $weightConditions = ['between', [14.01, 18]];
-                break;
-            case 'category4':
-                $weightConditions = ['>', 18];
+                $weightConditions = ['>', 22];
                 break;
             default:
                 return; // Jika kategori berat tidak valid, hentikan eksekusi
@@ -460,10 +460,10 @@ class CustomerOrderController extends Controller
         }
 
         $weightMap = [
-            'category1' => '<8g',
-            'category2' => '8-14g',
-            'category3' => '14-18g',
-            'category4' => '>18g',
+            'category1' => '<10g',
+            'category2' => '10-22g',
+            'category3' => '>22g',
+            // 'category4' => '>18g',
         ];
 
         $order->weight = $weightMap[$order->weight] ?? $order->weight;

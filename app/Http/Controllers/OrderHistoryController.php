@@ -49,10 +49,10 @@ class OrderHistoryController extends Controller
         })
         ->editColumn('weight', function($order) {
             $weightMap = [
-                'category1' => '<8g',
-                'category2' => '8-14g',
-                'category3' => '14-18g',
-                'category4' => '>18g'
+                'category1' => '<10g',
+                'category2' => '10-22g',
+                'category3' => '>22g'
+                // 'category4' => '>18g'
             ];
             return $weightMap[$order->weight] ?? $order->weight;
         })
@@ -69,10 +69,10 @@ class OrderHistoryController extends Controller
 
         // Pemetaan nilai weight
         $weightMap = [
-            'category1' => '<8g',
-            'category2' => '8-14g',
-            'category3' => '14-18g',
-            'category4' => '>18g'
+            'category1' => '<10g',
+            'category2' => '10-22g',
+            'category3' => '>22g'
+            // 'category4' => '>18g'
         ];
 
         // Gunakan pemetaan jika tersedia

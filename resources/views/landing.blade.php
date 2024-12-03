@@ -241,9 +241,9 @@
 
 
         footer {
-            background-color: #f8f9fa;
+            background-color: #ffffff;
             padding: 20px 0;
-            color: #4B49AC;
+            color: #000000;
         }
         .product-card {
             border: 1px solid #4B49AC;
