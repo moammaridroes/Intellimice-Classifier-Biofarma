@@ -77,4 +77,19 @@
             badge.style.display = 'inline-block';
         }
     });
+
+    // Listener untuk DataTables
+// const mencitChannel = pusher.subscribe('mencit-data');
+// mencitChannel.bind('data.updated', function(data) {
+//     const table = $('.yajra-datatable').DataTable();
+//     table.row.add({
+//         DT_RowIndex: data.id,
+//         created_at: data.created_at,
+//         berat: data.berat,
+//         gender: data.gender,
+//         health_status: data.health_status === 'Healthy'
+//             ? `<span class="badge bg-success">Healthy</span>`
+//             : `<span class="badge bg-danger">Sick</span>`
+//     }).draw(false);
+// });
 </script>

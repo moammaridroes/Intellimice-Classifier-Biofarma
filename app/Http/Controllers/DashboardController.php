@@ -50,38 +50,47 @@ class DashboardController extends Controller
 
     // Mengambil data rekap bulanan dari kedua tabel
     public function getMonthlyRecapData(Request $request)
-    {
-        // Data bulanan dari tabel Order
-        $orderRecap = Order::selectRaw('MONTH(created_at) as month, COUNT(*) as total_orders, SUM(total_price) as total_revenue, SUM(male_quantity) as total_male_sold, SUM(female_quantity) as total_female_sold')
-            ->groupByRaw('MONTH(created_at)');
+{
+    $year = $request->input('year');
 
-        // Data bulanan dari tabel CustomerOrder yang sudah di-approve
-        $customerOrderRecap = CustomerOrder::selectRaw('MONTH(created_at) as month, COUNT(*) as total_orders, SUM(total_price) as total_revenue, SUM(male_quantity) as total_male_sold, SUM(female_quantity) as total_female_sold')
-            ->where('is_paid', 1)
-            ->groupByRaw('MONTH(created_at)');
+    // Data bulanan dari tabel Order
+    $orderRecap = Order::selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, COUNT(*) as total_orders, SUM(total_price) as total_revenue, SUM(male_quantity) as total_male_sold, SUM(female_quantity) as total_female_sold')
+        ->when($year, function ($query, $year) {
+            return $query->whereYear('created_at', $year);
+        })
+        ->groupByRaw('YEAR(created_at), MONTH(created_at)');
 
-        // Gabungkan data dari kedua tabel menggunakan unionAll
-        $mergedRecap = $orderRecap->unionAll($customerOrderRecap)->get();
+    // Data bulanan dari tabel CustomerOrder
+    $customerOrderRecap = CustomerOrder::selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, COUNT(*) as total_orders, SUM(total_price) as total_revenue, SUM(male_quantity) as total_male_sold, SUM(female_quantity) as total_female_sold')
+        ->where('is_paid', 1)
+        ->when($year, function ($query, $year) {
+            return $query->whereYear('created_at', $year);
+        })
+        ->groupByRaw('YEAR(created_at), MONTH(created_at)');
 
-        // Kelompokkan data berdasarkan bulan dan lakukan agregasi
-        $finalRecap = $mergedRecap->groupBy('month')->map(function ($group) {
-            return [
-                'month' => $group->first()->month,
-                'total_orders' => $group->sum('total_orders'),
-                'total_revenue' => $group->sum('total_revenue'),
-                'total_male_sold' => $group->sum('total_male_sold'),
-                'total_female_sold' => $group->sum('total_female_sold'),
-            ];
-        })->values();
+    // Gabungkan data dari kedua tabel menggunakan unionAll
+    $mergedRecap = $orderRecap->unionAll($customerOrderRecap)->get();
 
-        // Ubah data untuk ditampilkan di DataTables
-        return DataTables::of($finalRecap)
-            ->editColumn('total_revenue', function ($recap) {
-                return 'Rp ' . number_format($recap['total_revenue'], 0, ',', '.');
-            })
-            ->editColumn('month', function ($recap) {
-                return \Carbon\Carbon::create()->month($recap['month'])->format('F');
-            })
-            ->make(true);
-    }
+    // Kelompokkan data berdasarkan bulan dan lakukan agregasi
+    $finalRecap = $mergedRecap->groupBy('month')->map(function ($group) {
+        return [
+            'month' => $group->first()->month,
+            'total_orders' => $group->sum('total_orders'),
+            'total_revenue' => $group->sum('total_revenue'),
+            'total_male_sold' => $group->sum('total_male_sold'),
+            'total_female_sold' => $group->sum('total_female_sold'),
+        ];
+    })->values();
+
+    // Ubah data untuk ditampilkan di DataTables
+    return DataTables::of($finalRecap)
+        ->editColumn('total_revenue', function ($recap) {
+            return 'Rp ' . number_format($recap['total_revenue'], 0, ',', '.');
+        })
+        ->editColumn('month', function ($recap) {
+            return \Carbon\Carbon::create()->month($recap['month'])->format('F');
+        })
+        ->make(true);
+}
+
 }

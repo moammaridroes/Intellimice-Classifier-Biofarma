@@ -26,10 +26,14 @@ class OrderController extends Controller
             'female_quantity' => 'nullable|numeric|min:0',
         ]);
     
-        $malePrice = 4000;
-        $femalePrice = 5000;
-        $totalPrice = ($request->male_quantity * $malePrice) + ($request->female_quantity * $femalePrice);
+        $malePrices = config('mice.prices.male');
+        $femalePrices = config('mice.prices.female');
     
+        $malePrice = $malePrices[$request->weight] ?? 0;
+        $femalePrice = $femalePrices[$request->weight] ?? 0;
+    
+        $totalPrice = ($request->male_quantity * $malePrice) + ($request->female_quantity * $femalePrice);
+        
         // Buat order baru
         $order = new Order();
         $order->fullname = $request->fullname;
@@ -110,7 +114,12 @@ class OrderController extends Controller
     
         // Simpan ID mencit yang dihapus ke dalam kolom deleted_mice_ids pada order
         $order->deleted_mice_ids = json_encode($deletedMiceIds);
-        $order->save();
+        if ($order->save()) {
+            return response()->json(['success' => true, 'message' => 'Payment successful']);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Failed to process payment'], 500);
+        }
+        
     }
     
     // Fungsi untuk menghitung stok mencit berdasarkan parameter weight.

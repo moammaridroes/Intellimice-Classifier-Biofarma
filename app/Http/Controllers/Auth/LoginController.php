@@ -87,7 +87,22 @@ class LoginController extends Controller
     {
         $request->validate([
             'email' => 'required|email',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string|min:8',
         ]);
     }
+    protected function redirectTo()
+    {
+        $user = Auth::user();
+
+        if ($user->role === 'admin') {
+            return route('dashboard');
+        } elseif ($user->role === 'customer') {
+            return route('customer.home');
+        } elseif ($user->role === 'master_data') {
+            return route('masterdata.home');
+        }
+
+        abort(403, 'Unauthorized action.');
+    }
+
 }

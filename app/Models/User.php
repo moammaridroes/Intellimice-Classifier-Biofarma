@@ -27,7 +27,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'fcm_token',
+        'role',
     ];
 
     /**
@@ -62,5 +62,13 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    public function hasRole($roles)
+    {
+        // If $roles is a string, convert to array
+        $roles = is_array($roles) ? $roles : func_get_args();
+
+        // Check if user's role matches any of the given roles
+        return in_array($this->role, $roles);
     }
 }

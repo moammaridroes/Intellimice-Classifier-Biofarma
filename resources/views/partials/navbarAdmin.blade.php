@@ -1,10 +1,10 @@
 <!-- Navbar -->
 <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row shadow-sm">
     <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
-        <a class="navbar-brand brand-logo mr-5" href="{{ url('/') }}">
+        <a class="navbar-brand brand-logo mr-5">
             <img src="{{ asset('images/Logo_Bio_Farma.png') }}" style="width: 65%; height: 65%;" alt="logo" />
         </a>
-        <a class="navbar-brand brand-logo-mini" href="{{ url('/') }}">
+        <a class="navbar-brand brand-logo-mini">
             <img src="{{ asset('images/logobiofarmakecil.png') }}" alt="logo" />
         </a>
     </div>

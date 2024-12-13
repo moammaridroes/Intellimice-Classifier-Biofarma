@@ -345,14 +345,23 @@
         }
 
         function calculateTotal() {
-            var maleQuantity = parseInt(document.getElementById('maleQuantity').value) || 0;
-            var femaleQuantity = parseInt(document.getElementById('femaleQuantity').value) || 0;
-            var totalQuantity = maleQuantity + femaleQuantity;
-            var totalPrice = (maleQuantity * 4000) + (femaleQuantity * 5000);
+    const maleQuantity = parseInt(document.querySelector("input[name='male_quantity']").value) || 0;
+    const femaleQuantity = parseInt(document.querySelector("input[name='female_quantity']").value) || 0;
 
-            document.getElementById('totalQuantity').value = totalQuantity;
-            document.getElementById('totalPrice').value = totalPrice.toLocaleString('id-ID');
-        }
+    // Ambil harga dari konfigurasi PHP (dari backend)
+    const malePrices = @json(config('mice.prices.male'));
+    const femalePrices = @json(config('mice.prices.female'));
+    const selectedWeight = document.querySelector("select[name='weight']").value;
+
+    // Kalkulasi total harga berdasarkan kategori
+    const malePrice = malePrices[selectedWeight] || 0;
+    const femalePrice = femalePrices[selectedWeight] || 0;
+
+    const totalPrice = (maleQuantity * malePrice) + (femaleQuantity * femalePrice);
+    document.getElementById("totalPrice").value = totalPrice.toLocaleString('id-ID');
+    return totalPrice;
+}
+
     </script>
 
 </body>

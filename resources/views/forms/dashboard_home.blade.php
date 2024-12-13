@@ -24,6 +24,7 @@
     <script src="{{ asset('js/todolist.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 
@@ -233,6 +234,18 @@
                     <div class="col-12">
                         <div class="card shadow-lg border-radius-2xl p-3">
                             <h4 class="card-title text-center font-weight-bold mb-4">Monthly Recap</h4>
+
+                            <!-- Dropdown Tahun -->
+                        <div class="mb-3">
+                            <label for="yearFilter" class="form-label">Select Year</label>
+                            <select id="yearFilter" class="form-control">
+                                <option value="">All Years</option>
+                                @foreach (range(date('Y'), date('Y') - 10) as $year)
+                                    <option value="{{ $year }}">{{ $year }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
                             <div class="table-responsive">
                                 <table id="monthlyRecapTable" class="table table-hover table-striped">
                                     <thead>
@@ -275,20 +288,32 @@
             })
             .catch(error => console.error('Error:', error));
 
-        $(document).ready(function () {
-            $('#monthlyRecapTable').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: '{{ route('monthly.recap.data') }}',
+            $(document).ready(function () {
+            // Inisialisasi DataTables dengan filter tahun
+            const table = $('#monthlyRecapTable').DataTable({
+                processing: true, // Proses data di server
+                serverSide: true, // DataTables menggunakan server-side processing
+                ajax: {
+                    url: '{{ route('monthly.recap.data') }}', // Endpoint untuk DataTables
+                    data: function (d) {
+                        d.year = $('#yearFilter').val(); // Kirim tahun yang dipilih sebagai parameter tambahan
+                    }
+                },
                 columns: [
-                    { data: 'month', name: 'month' },
-                    { data: 'total_orders', name: 'total_orders' },
-                    { data: 'total_revenue', name: 'total_revenue' },
-                    { data: 'total_male_sold', name: 'total_male_sold' },
-                    { data: 'total_female_sold', name: 'total_female_sold' },
+                    { data: 'month', name: 'month' }, // Kolom bulan
+                    { data: 'total_orders', name: 'total_orders' }, // Kolom total order
+                    { data: 'total_revenue', name: 'total_revenue' }, // Kolom total pendapatan
+                    { data: 'total_male_sold', name: 'total_male_sold' }, // Kolom total mencit jantan
+                    { data: 'total_female_sold', name: 'total_female_sold' }, // Kolom total mencit betina
                 ]
             });
+
+            // Event Listener untuk Dropdown Tahun
+            $('#yearFilter').on('change', function () {
+                table.ajax.reload(); // Reload data tabel setiap kali tahun berubah
+            });
         });
+
     });
     
 </script>

@@ -119,9 +119,9 @@
                   </div>
 
                   <div class="form-group">
-                    <label>Total</label>
-                    <input type="number" class="form-control form-control-lg" id="totalQuantity" placeholder="Total" readonly>
-                  </div>
+                    <label>Total Price</label>
+                    <input type="text" class="form-control" id="totalPrice" name="total_price" readonly>
+                </div>                
                   <button type="submit" class="btn btn-primary mr-2" style="background-color: #4B49AC; border-color: #4B49AC;" id="submitOrderButton">Submit</button>
                 </div>
               </div>
@@ -200,38 +200,72 @@
         calculateTotal();
     }
 
+    document.getElementById('maleQuantity').addEventListener('input', function () {
+    validateQuantity('maleQuantity', window.maleStockAvailable || 0);
+    calculateTotal();
+    });
+
+    document.getElementById('femaleQuantity').addEventListener('input', function () {
+        validateQuantity('femaleQuantity', window.femaleStockAvailable || 0);
+        calculateTotal();
+    });
+
     function validateQuantity(inputId, maxStock) {
-        var input = document.getElementById(inputId);
-        var value = parseInt(input.value) || 0;
-        
-        if (value < 0 || value > maxStock) {
-            input.value = 0; // Kembalikan ke 0 jika lebih dari stok atau negatif
+        const input = document.getElementById(inputId);
+        const value = parseInt(input.value) || 0;
+
+        // Jika jumlah melebihi stok, reset nilai input ke nilai maksimal dan tampilkan SweetAlert
+        if (value > maxStock) {
+            input.value = maxStock; // Batasi ke jumlah maksimal
             Swal.fire({
                 icon: "error",
                 title: "Oops...",
-                text: `Jumlah tidak valid! Jumlah harus antara 0 dan ${maxStock}`,
+                text: `Jumlah tidak valid! Maksimal stok yang tersedia adalah ${maxStock}.`,
                 customClass: {
-                            popup: 'custom-swal-popup',
-                            icon: 'custom-swal-icon'
-                        }
+                    popup: 'custom-swal-popup',
+                    icon: 'custom-swal-icon'
+                }
+            });
+        }
+
+        // Jika nilai negatif, set ke 0
+        if (value < 0) {
+            input.value = 0;
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Jumlah tidak valid! Nilai tidak boleh negatif.",
+                customClass: {
+                    popup: 'custom-swal-popup',
+                    icon: 'custom-swal-icon'
+                }
             });
         }
     }
 
     function calculateTotal() {
-        var maleQuantity = parseInt(document.getElementById('maleQuantity').value) || 0;
-        var femaleQuantity = parseInt(document.getElementById('femaleQuantity').value) || 0;
-        
-        // Validasi input male berdasarkan stok
-        validateQuantity('maleQuantity', window.maleStockAvailable || 0);
-        
-        // Validasi input female berdasarkan stok
-        validateQuantity('femaleQuantity', window.femaleStockAvailable || 0);
-        
-        var totalQuantity = maleQuantity + femaleQuantity;
-        document.getElementById('totalQuantity').value = totalQuantity;
-    }
+        const maleQuantity = parseInt(document.querySelector("input[name='male_quantity']").value) || 0;
+        const femaleQuantity = parseInt(document.querySelector("input[name='female_quantity']").value) || 0;
 
+        // Ambil harga dari konfigurasi PHP (dari backend)
+        const malePrices = @json(config('mice.prices.male'));
+        const femalePrices = @json(config('mice.prices.female'));
+        const selectedWeight = document.querySelector("select[name='weight']").value;
+
+        // Kalkulasi total harga berdasarkan kategori
+        const malePrice = malePrices[selectedWeight] || 0;
+        const femalePrice = femalePrices[selectedWeight] || 0;
+
+        const totalPrice = (maleQuantity * malePrice) + (femaleQuantity * femalePrice);
+
+        // Cek apakah elemen `totalPrice` ada
+        const totalPriceElement = document.getElementById("totalPrice");
+        if (totalPriceElement) {
+            totalPriceElement.value = totalPrice.toLocaleString('id-ID');
+        }
+
+        return totalPrice;
+    }
     document.getElementById('maleQuantity').addEventListener('input', function () {
         calculateTotal();
     });
@@ -263,12 +297,22 @@
             showInvoiceModal(orderData);
         });
 
-    function calculateTotalPrice() {
+        function calculateTotalPrice() {
         const maleQuantity = parseInt(document.querySelector("input[name='male_quantity']").value) || 0;
         const femaleQuantity = parseInt(document.querySelector("input[name='female_quantity']").value) || 0;
-        const malePrice = 4000; 
-        const femalePrice = 5000; 
-        return (maleQuantity * malePrice) + (femaleQuantity * femalePrice);
+
+        // Ambil harga dari konfigurasi PHP (dari backend)
+        const malePrices = @json(config('mice.prices.male'));
+        const femalePrices = @json(config('mice.prices.female'));
+        const selectedWeight = document.querySelector("select[name='weight']").value;
+
+        // Kalkulasi total harga berdasarkan kategori
+        const malePrice = malePrices[selectedWeight] || 0;
+        const femalePrice = femalePrices[selectedWeight] || 0;
+
+        const totalPrice = (maleQuantity * malePrice) + (femaleQuantity * femalePrice);
+        document.getElementById("totalPrice").value = totalPrice.toLocaleString('id-ID');
+        return totalPrice;
     }
 
     function showInvoiceModal(order) {
@@ -277,6 +321,7 @@
         'category2': '10-22g',
         'category3': '>22g'
         // 'category4': '>18g'
+      //   // {weightMap[order.weight] || order.weight}
         };
         
         const invoiceContent = `
@@ -299,71 +344,118 @@
         invoiceModal.show(); // Show modal using Bootstrap 5
     }
 
-    document.getElementById("payButton").addEventListener("click", function () {
-    // Tambahkan konfirmasi sebelum pembayaran
-    const confirmation = confirm("Apakah kamu yakin ingin melakukan pembayaran?");
-    
-    if (confirmation) {
-      window.location.reload();
-        // Jika konfirmasi diterima, lanjutkan dengan proses pembayaran
-        const orderData = {
-            _token: '{{ csrf_token() }}',
-            fullname: document.querySelector("input[name='fullname']").value,
-            phone_number: document.querySelector("input[name='phone_number']").value,
-            email: document.querySelector("input[name='email']").value,
-            item_name: document.querySelector("input[name='item_name']").value,
-            agency_name: document.querySelector("input[name='agency_name']").value,
-            operator_name: document.querySelector("input[name='operator_name']").value,
-            weight: document.querySelector("select[name='weight']").value,
-            male_quantity: document.querySelector("input[name='male_quantity']").value || 0,
-            female_quantity: document.querySelector("input[name='female_quantity']").value || 0,
-            total_price: calculateTotalPrice()
-        };
 
-        fetch('{{ url('submit-order') }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': orderData._token
-            },
-            body: JSON.stringify(orderData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log("Order sukses", data);
-                alert("Order has been paid successfully!");
 
-                // Update stok secara otomatis di tampilan setelah pembayaran berhasil
-                updateStockCounts();
+document.getElementById("payButton").addEventListener("click", function () {
+    // Use SweetAlert for confirmation
+    Swal.fire({
+        title: 'Konfirmasi Pembayaran',
+        text: 'Apakah kamu yakin ingin melakukan pembayaran?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, Bayar Sekarang!',
+        cancelButtonText: 'Batal',
+        customClass: {
+                    popup: 'custom-swal-popup',
+                    icon: 'custom-swal-icon'
+                }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Collect order data
+            const orderData = {
+                _token: '{{ csrf_token() }}',
+                fullname: document.querySelector("input[name='fullname']").value,
+                phone_number: document.querySelector("input[name='phone_number']").value,
+                email: document.querySelector("input[name='email']").value,
+                item_name: document.querySelector("input[name='item_name']").value,
+                agency_name: document.querySelector("input[name='agency_name']").value,
+                operator_name: document.querySelector("input[name='operator_name']").value,
+                weight: document.querySelector("select[name='weight']").value,
+                male_quantity: document.querySelector("input[name='male_quantity']").value || 0,
+                female_quantity: document.querySelector("input[name='female_quantity']").value || 0,
+                total_price: calculateTotalPrice()
+            };
 
-                // Nonaktifkan tombol "Bayar"
-                document.getElementById("payButton").disabled = true;
-                document.getElementById("invoiceContent").innerHTML += "<p><strong>Status:</strong> Paid</p>";
+            // Send order data
+            fetch('{{ url('submit-order') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': orderData._token
+                },
+                body: JSON.stringify(orderData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Success Sweet Alert
+                    Swal.fire({
+                        title: 'Pembayaran Berhasil!',
+                        text: 'Order telah dibayar dengan sukses.',
+                        icon: 'success',
+                        timer: 2000,
+                        customClass: {
+                        popup: 'custom-swal-popup',
+                        icon: 'custom-swal-icon'
+                    }
+                    }).then(() => {
+                        window.location.reload();
+                        // Update stock
+                        updateStockCounts();
 
-                // Tutup modal setelah sukses
-                var invoiceModal = bootstrap.Modal.getInstance(document.getElementById('invoiceModal'));
-                invoiceModal.hide();
+                        // Disable pay button
+                        document.getElementById("payButton").disabled = true;
+                        document.getElementById("invoiceContent").innerHTML += "<p><strong>Status:</strong> Paid</p>";
 
-                // Reset form setelah pembayaran sukses
-                document.getElementById("orderForm").reset();
+                        // Close modal
+                        var invoiceModal = bootstrap.Modal.getInstance(document.getElementById('invoiceModal'));
+                        invoiceModal.hide();
 
-                // Reset tampilan stok setelah pembayaran
-                document.getElementById('maleStock').textContent = "Stock: -";
-                document.getElementById('femaleStock').textContent = "Stock: -";
-                document.getElementById('totalQuantity').value = 0;
+                        // Reset form
+                        document.getElementById("orderForm").reset();
 
-                // Refresh halaman setelah form di-reset
-                window.location.reload(); // Ini akan memuat ulang halaman
-            } else {
-                alert("Failed to process payment!");
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    } else {
-        // Jika konfirmasi ditolak, tidak melakukan apa-apa
-        console.log("Pembayaran dibatalkan oleh pengguna.");
-    }
+                        // Reset stock display
+                        document.getElementById('maleStock').textContent = "Stock: -";
+                        document.getElementById('femaleStock').textContent = "Stock: -";
+                        // document.getElementById('totalQuantity').value = 0;
+
+                        // Reload page
+                        
+                    });
+                } else {
+                    // Failure Sweet Alert
+                    Swal.fire({
+                        title: 'Pembayaran Gagal!',
+                        text: 'Gagal memproses pembayaran.',
+                        icon: 'error',
+                        customClass: {
+                        popup: 'custom-swal-popup',
+                        icon: 'custom-swal-icon'
+                    }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Kesalahan',
+                    text: 'Terjadi kesalahan dalam memproses pembayaran.',
+                    icon: 'error',
+                    customClass: {
+                    popup: 'custom-swal-popup',
+                    icon: 'custom-swal-icon'
+                }
+                });
+            });
+        }
+    });
 });
 
 
@@ -440,3 +532,4 @@ function updateStockCounts() {
 </html>
 
        
+

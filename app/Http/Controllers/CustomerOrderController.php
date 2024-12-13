@@ -44,7 +44,15 @@ class CustomerOrderController extends Controller
         'category3' => '>22g'
         // 'category4' => '>18g'
     ];
-    $totalPrice = ($request->male_quantity * 4000) + ($request->female_quantity * 5000);
+    
+    $malePrices = config('mice.prices.male');
+    $femalePrices = config('mice.prices.female');
+
+    $malePrice = $malePrices[$request->weight] ?? 0;
+    $femalePrice = $femalePrices[$request->weight] ?? 0;
+
+    $totalPrice = ($request->male_quantity * $malePrice) + ($request->female_quantity * $femalePrice);
+
 
     // Simpan order ke database
     $order = CustomerOrder::create([

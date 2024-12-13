@@ -283,7 +283,7 @@
             <a href="#about">Tentang kami</a>
             <a href="#details">Details</a>
             <a href="#lokasi">Lokasi</a>
-            <a href="#resources">ap ya</a>
+            {{-- <a href="#resources">ap ya</a> --}}
             <!-- Dropdown untuk bahasa -->
             {{-- <div class="dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

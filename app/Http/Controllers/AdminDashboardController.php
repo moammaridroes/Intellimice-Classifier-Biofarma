@@ -13,8 +13,8 @@ class AdminDashboardController extends Controller
         $this->middleware(CheckRole::class . ':admin');
     }
 
-    public function index()
-    {
-        return view('dashboard');
-    }
+    // public function index()
+    // {
+    //     return view('dashboard');
+    // }
 }

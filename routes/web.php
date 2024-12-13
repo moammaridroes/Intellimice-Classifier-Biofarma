@@ -8,23 +8,29 @@ use App\Http\Controllers\OrderHistoryController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CustomerDashboardController;
+use App\Http\Controllers\WeightCategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CustomerOrderController;
-use App\Http\Controllers\LanguageController ;
+use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\MasterDataController;
+use App\Http\Controllers\MasterAdminController;
+use App\Http\Controllers\MasterPenjualanController;
+use App\Http\Controllers\MasterManageController;
 use App\Http\Controllers\DataCollectingController ;
 use App\Models\Order;
 use App\Models\CustomerOrder;
 use App\Events\OrderCreated;
+use App\Http\Controllers\MasterDashboardController;
 use Illuminate\Support\Facades\App;
 // use Illuminate\Support\Facades\Route;
 
     Route::get('/', function () {
         return view('landing');  // Mengarahkan root URL ke halaman landing
     })->name('landing');
-
     // Route untuk login tetap disediakan agar pengguna bisa login dari halaman lain
-    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    // Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::get('/login', [HomeController::class, 'redirectIfAuthenticated'])->middleware('guest')->name('login');
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 
     Route::middleware(['auth'])->group(function () {
@@ -73,6 +79,8 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->g
     Route::delete('/detailmencit/delete/{id}', [DetailMencitController::class, 'delete'])->name('detailmencit.delete');
     Route::delete('/detailmencit/deleteAll', [DetailMencitController::class, 'deleteAll']);
     Route::get('detailmencit/updateStockCountss', [DetailMencitController::class, 'updateStockCounts'])->name('detailmencit.updateStockCounts');
+    // Route::get('/api/detailmencit/stream', [DetailMencitController::class, 'streamUpdates']);
+
 
     Route::get('orderhistory', [OrderHistoryController::class, 'index'])->name('orderhistory.index');
     Route::get('orderhistory/data', [OrderHistoryController::class, 'getData'])->name('orderhistory.getData');
@@ -94,9 +102,8 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->g
     // Route::get('/detail-mencit', [DataCollectingController::class, 'index']);
 
     Route::post('/sync-detail-mencit', [DetailMencitController::class, 'syncData'])->name('sync.detail-mencit');
-
-
-
+    // Route::get('/mencit-updates', [DetailMencitController::class, 'streamUpdates']);
+    
     Route::get('/datatable', function () {
         return view('tables.data-table');
     });
@@ -110,10 +117,10 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->g
     Route::post('/order/payment/{id}', [OrderController::class, 'payment'])->name('order.payment');
 
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-    Route::get('/test-log', function () {
-        \Log::info('This is a test log entry!');
-        return 'Log entry added';
-    });
+    // Route::get('/test-log', function () {
+    //     \Log::info('This is a test log entry!');
+    //     return 'Log entry added';
+    // });
     
 });
 
@@ -121,9 +128,6 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':customer'])
     // Route khusus customer
     Route::get('/customer/home', [CustomerDashboardController::class, 'index'])->name('customer.home');
     Route::get('/customer/home/most-ordered-items', [CustomerOrderController::class, 'mostOrderedItems'])->name('customer.mostOrderedItems');
-    // Route::get('/customer/home', function () {
-    //     return view('customer.customer_home');
-    // })->name('customer.home');
 
     Route::get('locale/{lang}',[LanguageController::class,'setLocale']);
     // Route::get('/customer/home', [CustomerHomeController::class, 'index'])->name('customer.home');
@@ -132,12 +136,47 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':customer'])
     Route::get('/customer/orderform', function () {
         return view('customer.customer_order-form');
     });
+
     Route::post('/customer/order/submit', [CustomerOrderController::class, 'store'])->name('customer.order.submit');
-
     Route::get('/customer/notification', [CustomerOrderController::class, 'showCustomerNotifications'])->name('customer.notification');
-
     Route::get('/customer/history', [CustomerOrderController::class, 'showCustomerHistory'])->name('customer.history');
     Route::get('/customer/history/data', [CustomerOrderController::class, 'getCustomerHistoryData'])->name('customer.history.getData');
+});
+
+Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':master_data'])->group(function () {
+    Route::get('/masterdata/home', [MasterDataController::class, 'index'])->name('masterdata.home');
+    Route::get('/masterdata/home/{year?}', [MasterDataController::class, 'index']);
+
+    Route::get('/masterdata/manage', [MasterManageController::class, 'showMencitStock'])->name('master.stok.mencit');
+    Route::post('/master/update-price', [MasterManageController::class, 'updatePrice'])->name('master.update.prices');
+    Route::resource('weight', WeightCategoryController::class)->except(['show']);
+
+
+    Route::get('/masterdata/admin', [MasterAdminController::class, 'index'])->name('admin.index');
+    Route::get('/admin/{id}/edit', [MasterAdminController::class, 'edit'])->name('admin.edit');
+    Route::patch('/admin/{id}', [MasterAdminController::class, 'update'])->name('admin.update');
+    Route::delete('/admin/delete/{id}', [MasterAdminController::class, 'destroy'])->name('admin.delete');
+    Route::post('/add-admin', [MasterAdminController::class, 'store'])->name('admin.store');
+
+    Route::get('/masterdata/penjualan', [MasterPenjualanController::class, 'index'])->name('masterdata.penjualan');
+    Route::get('/masterdata/penjualan/{year}', [MasterPenjualanController::class, 'fetchData']);
+
+    //PERCOBAANNN
+    Route::get('masterdata/categories', [WeightCategoryController::class, 'index'])->name('master.categories');
+    Route::post('masterdata/categories', [WeightCategoryController::class, 'store'])->name('master.categories.store');
+    Route::put('masterdata/categories/{id}', [WeightCategoryController::class, 'update'])->name('master.categories.update');
+    Route::delete('masterdata/categories/{id}', [WeightCategoryController::class, 'destroy'])->name('master.categories.destroy');
+
+
+    // Route::get('masterdata/stok', [DetailMencitController::class, 'showData'])->name('masterdata.data.table');
+    // Route::get('masterdata/detailmencit/data', [DetailMencitController::class, 'getData'])->name('masterdata.detailmencit.data');
+    // Route::post('masterdata/sync-detail-mencit', [DetailMencitController::class, 'syncData'])->name('masterdata.sync.detail-mencit');
+    // Route::post('masterdata/sync-data', [DetailMencitController::class, 'syncData'])->name('masterdata.sync.data');
+
+    // Route::delete('masterdata/detailmencit/delete/{id}', [DetailMencitController::class, 'delete'])->name('masterdata.detailmencit.delete');
+    // Route::delete('masterdata/detailmencit/deleteAll', [DetailMencitController::class, 'deleteAll']);
+    // Route::get('masterdata/detailmencit/updateStockCountss', [DetailMencitController::class, 'updateStockCounts'])->name('masterdata.detailmencit.updateStockCounts');
+
 });
 
 Route::get('/db-check', function () {
@@ -150,5 +189,4 @@ Route::get('/db-check', function () {
 });
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
-
 Auth::routes();

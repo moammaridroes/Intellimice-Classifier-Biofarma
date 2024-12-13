@@ -6,77 +6,77 @@ use App\Models\Sensor1; // data_kesehatan
 use App\Models\Sensor2; // data_jenis_kelamin
 use App\Models\Sensor3; // data_load_cell
 use App\Models\DetailMencit;
+use App\Events\MencitDataUpdated;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class DetailMencitController extends Controller
 {
-    public function syncData()
-{
-    // Ambil semua data dari data_kesehatan yang belum pernah disinkronkan
-    $dataKesehatan = DB::table('data_kesehatan')
-        ->whereNull('synced_at')
-        ->get();
-
-    foreach ($dataKesehatan as $kesehatan) {
-        // Tentukan nilai health_status
-        $healthStatus = $kesehatan->kesehatan_status ?? 'N/A';
-
-        // Default values for gender and weight
-        $gender = 'N/A';
-        $weight = 0;
-
-        // Jika health_status bukan 'sick', ambil data asli dari data_jenis_kelamin dan data_load_cell
-        if ($healthStatus !== 'sick') {
-            $jenisKelamin = DB::table('data_jenis_kelamin')->where('id', $kesehatan->id)->first();
-            $berat = DB::table('data_load_cell')->where('id', $kesehatan->id)->first();
-
-            // Tetapkan data asli jika tersedia
-            $gender = $jenisKelamin->jenis_kelamin ?? 'N/A';
-            $weight = $berat->berat ?? 0;
-        }
-
-        // Pastikan data default di tabel data_jenis_kelamin
-        DB::table('data_jenis_kelamin')->updateOrInsert(
-            ['id' => $kesehatan->id],
-            [
-                'jenis_kelamin' => $gender,
-                'timestamp' => $kesehatan->timestamp
-            ]
-        );
-
-        // Pastikan data default di tabel data_load_cell
-        DB::table('data_load_cell')->updateOrInsert(
-            ['id' => $kesehatan->id],
-            [
-                'berat' => $weight,
-                'timestamp' => $kesehatan->timestamp
-            ]
-        );
-
-        // Masukkan data ke dalam tabel detail_mencit
-        DetailMencit::updateOrCreate(
-            ['id' => $kesehatan->id],
-            [
-                'berat' => $weight,
-                'gender' => $gender,
-                'health_status' => $healthStatus,
-                'created_at' => $kesehatan->timestamp,
-                'updated_at' => now()
-            ]
-        );
-
-        // Tandai data pada data_kesehatan sebagai sudah disinkronkan
-        DB::table('data_kesehatan')
-            ->where('id', $kesehatan->id)
-            ->update(['synced_at' => Carbon::now()]);
+    public function index()
+    {
+        $dataMencit = DetailMencit::all();
+        return response()->json($dataMencit, 200);
     }
 
-    return response()->json(['message' => 'Data berhasil disinkronkan ke tabel detail_mencit, data_jenis_kelamin, dan data_load_cell']);
-}
+    public function store(Request $request)
+    {
+        Log::info('Request input:', $request->all());
 
+        date_default_timezone_set('Asia/Jakarta');
+        $now = Carbon::now()->toDateTimeString();
+
+        // Mengambil data dari body JSON
+        $params = [
+            'berat' => $request->input('berat'), // Sesuaikan dengan key JSON
+            'gender' => $request->input('jenis_kelamin'), // Sesuaikan dengan key JSON
+            'health_status' => $request->input('status_kesehatan'), // Sesuaikan dengan key JSON
+            'created_at' => $now,
+            'updated_at' => $now,
+        ];
+        Log::info('Data to insert:', $params);
+        // Simpan data ke database
+        // $detailMencit = DetailMencit::create($params);
+
+        // // Broadcast data baru ke Pusher
+        // broadcast(new MencitDataUpdated($detailMencit))->toOthers();
+
+        try {
+            // Menyimpan data ke tabel detail_mencit
+            DB::table('detail_mencit')->insert($params);
+
+            return response()->json([
+                'code' => 200,
+                'message' => "success",
+                'data' => $params,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error('Error in store function:', ['error' => $e->getMessage()]);
+            return response()->json([
+                'code' => 400,
+                'message' => "failed",
+                'data' => $th->errorInfo,
+            ], 400);
+        }
+    }
+
+    
+    // public function streamUpdates()
+    // {
+    //     header('Content-Type: text/event-stream');
+    //     header('Cache-Control: no-cache');
+    //     header('Connection: keep-alive');
+
+    //     while (true) {
+    //         $data = DetailMencit::orderBy('created_at', 'desc')->limit(10)->get();
+    //         echo "data: " . json_encode($data) . "\n\n";
+    //         ob_flush();
+    //         flush();
+    //         sleep(5); // Kirim data setiap 5 detik
+    //     }
+    // }
 
 
     public function showData()
@@ -114,22 +114,27 @@ class DetailMencitController extends Controller
     {
         if ($request->ajax()) {
             $data = DetailMencit::select(['id', 'created_at', 'berat', 'gender', 'health_status'])
-                ->orderByDesc('created_at'); // Mengurutkan data dari data terbaru
-            
+                ->orderByDesc('created_at');
+    
             return DataTables::of($data)
-                ->addIndexColumn() // Auto indexing
+                ->addIndexColumn() // Gunakan addIndexColumn()
+                ->addColumn('DT_RowIndex', function($row) {
+                    return $row->id; // Secara eksplisit tambahkan kolom DT_RowIndex
+                })
                 ->editColumn('created_at', function ($row) {
-                    return $row->created_at->format('d/m/Y'); // Format tanggal
+                    return $row->created_at->format('d/m/Y');
                 })
                 ->editColumn('health_status', function ($row) {
                     return $row->health_status == 'Healthy' 
                         ? '<span class="badge bg-success">Healthy</span>' 
                         : '<span class="badge bg-danger">Sick</span>';
                 })
-                ->rawColumns(['health_status']) // Agar HTML badge dapat dirender
+                ->rawColumns(['health_status']) // Agar badge dapat dirender sebagai HTML
                 ->make(true);
         }
     }
+
+
 
     public function deleteAll()
     {
