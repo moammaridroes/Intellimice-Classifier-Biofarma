@@ -14,4 +14,16 @@ class DetailMencit extends Model
     protected $table = 'detail_mencit'; // Nama tabel di database
 
     protected $fillable = ['berat', 'gender', 'health_status']; // Kolom yang bisa diisi
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'detail_mencit_id');
+    }
+    
+    public function customerOrders()
+    {
+        return $this->hasMany(CustomerOrder::class, 'detail_mencit_id');
+    }
+    
+
 }

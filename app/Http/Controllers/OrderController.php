@@ -9,13 +9,32 @@ use App\Http\Controllers\CustomerOrderController;
 use App\Models\DetailMencit;
 use Carbon\Carbon;
 
+
+
+            
+        // $order = new Order();
+        // $order->fullname = $request->fullname;
+        // $order->phone_number = $request->phone_number;
+        // $order->email = $request->email;
+        // $order->item_name = $request->item_name;
+        // $order->agency_name = $request->agency_name;
+        // $order->operator_name = $request->operator_name;
+        // $order->weight = $request->weight;
+        // $order->male_quantity = $request->male_quantity;
+        // $order->female_quantity = $request->female_quantity;
+        // $order->total_price = $totalPrice;
+        // $order->is_paid = true; 
+        // $order->save();
+        // $order->created_at = Carbon::now('Asia/Jakarta');
+        // $order->updated_at = Carbon::now('Asia/Jakarta');
+
 class OrderController extends Controller
 {
     // Menampilkan halaman form order
     public function store(Request $request)
-    {
-        $request->validate([
-            'fullname' => 'required|string',
+{
+    $request->validate([
+        'fullname' => 'required|string',
             'phone_number' => 'required|numeric',
             'email' => 'required|email',
             'item_name' => 'required|string',
@@ -24,149 +43,127 @@ class OrderController extends Controller
             'weight' => 'required|string',
             'male_quantity' => 'nullable|numeric|min:0',
             'female_quantity' => 'nullable|numeric|min:0',
-        ]);
-    
-        $malePrices = config('mice.prices.male');
-        $femalePrices = config('mice.prices.female');
-    
-        $malePrice = $malePrices[$request->weight] ?? 0;
-        $femalePrice = $femalePrices[$request->weight] ?? 0;
-    
-        $totalPrice = ($request->male_quantity * $malePrice) + ($request->female_quantity * $femalePrice);
-        
-        // Buat order baru
-        $order = new Order();
-        $order->fullname = $request->fullname;
-        $order->phone_number = $request->phone_number;
-        $order->email = $request->email;
-        $order->item_name = $request->item_name;
-        $order->agency_name = $request->agency_name;
-        $order->operator_name = $request->operator_name;
-        $order->weight = $request->weight;
-        $order->male_quantity = $request->male_quantity;
-        $order->female_quantity = $request->female_quantity;
-        $order->total_price = $totalPrice;
-        $order->is_paid = true; 
-        $order->save();
-        $order->created_at = Carbon::now('Asia/Jakarta');
-        $order->updated_at = Carbon::now('Asia/Jakarta');
-    
-        // Simpan ID mencit yang dihapus
-        $deletedMiceIds = [];
-    
-        // Kurangi stok mencit jantan
-        if ($request->male_quantity > 0) {
-            $query = DetailMencit::where('gender', 'Male')
-                ->where('health_status', 'Healthy');
-    
-            // Tentukan rentang berat
-            switch ($request->weight) {
-                case 'category1':
-                    $query->where('berat', '<', 10);
-                    break;
-                case 'category2':
-                    $query->whereBetween('berat', [10, 22]);
-                    break;
-                // case 'category3':
-                //     $query->whereBetween('berat', [14.01, 18]);
-                //     break;
-                case 'category3':
-                    $query->where('berat', '>', 22);
-                    break;
-            }
-    
-            // Dapatkan mencit yang akan dihapus
-            $deletedMice = $query->limit($request->male_quantity)->get();
-            foreach ($deletedMice as $mencit) {
-                $deletedMiceIds[] = $mencit->id; // Simpan ID mencit yang dihapus
-                $mencit->delete(); // Hapus mencit
-            }
+    ]);
+
+    // Ambil harga dari mice.php
+    $malePrices = config('mice.prices.male');
+    $femalePrices = config('mice.prices.female');
+
+    $malePrice = $malePrices[$request->weight] ?? 0;
+    $femalePrice = $femalePrices[$request->weight] ?? 0;
+
+    $totalPrice = ($request->male_quantity * $malePrice) + ($request->female_quantity * $femalePrice);
+
+    // Buat order baru
+    $order = new Order();
+    $order->fill($request->all());
+    $order->total_price = $totalPrice;
+    $order->is_paid = true;
+    $order->created_at = Carbon::now('Asia/Jakarta');
+    $order->updated_at = Carbon::now('Asia/Jakarta');
+    $order->save();
+
+    $deletedMiceIds = $this->reduceStock($request->weight, $request->male_quantity, $request->female_quantity);
+
+    // Simpan ID mencit yang dihapus ke dalam order
+    $order->deleted_mice_ids = json_encode($deletedMiceIds);
+    $order->save();
+
+    return response()->json(['success' => true, 'message' => 'Payment successful']);
+}
+
+private function reduceStock($weight, $maleQuantity, $femaleQuantity)
+{
+    $deletedMiceIds = [];
+    $categories = $this->getWeightCategories();
+    [$start, $end] = $this->parseRange($weight);
+
+    // Kurangi stok mencit jantan
+    if ($maleQuantity > 0) {
+        $query = DetailMencit::where('gender', 'Male')
+            ->where('health_status', 'Healthy')
+            ->when($start !== null, fn($query) => $query->where('berat', '>=', $start))
+            ->when($end !== null, fn($query) => $query->where('berat', '<=', $end));
+
+        $deletedMice = $query->limit($maleQuantity)->get();
+        foreach ($deletedMice as $mencit) {
+            $deletedMiceIds[] = $mencit->id;
+            $mencit->delete();
         }
-    
-        // Kurangi stok mencit betina
-        if ($request->female_quantity > 0) {
-            $query = DetailMencit::where('gender', 'Female')
-                ->where('health_status', 'Healthy');
-    
-            // Tentukan rentang berat
-            switch ($request->weight) {
-                case 'category1':
-                    $query->where('berat', '<', 10);
-                    break;
-                case 'category2':
-                    $query->whereBetween('berat', [10, 22]);
-                    break;
-                // case 'category3':
-                //     $query->whereBetween('berat', [14.01, 18]);
-                //     break;
-                case 'category3':
-                    $query->where('berat', '>', 22);
-                    break;
-            }
-    
-            // Dapatkan mencit yang akan dihapus
-            $deletedMice = $query->limit($request->female_quantity)->get();
-            foreach ($deletedMice as $mencit) {
-                $deletedMiceIds[] = $mencit->id; // Simpan ID mencit yang dihapus
-                $mencit->delete(); // Hapus mencit
-            }
-        }
-    
-        // Simpan ID mencit yang dihapus ke dalam kolom deleted_mice_ids pada order
-        $order->deleted_mice_ids = json_encode($deletedMiceIds);
-        if ($order->save()) {
-            return response()->json(['success' => true, 'message' => 'Payment successful']);
-        } else {
-            return response()->json(['success' => false, 'message' => 'Failed to process payment'], 500);
-        }
-        
     }
+
+    // Kurangi stok mencit betina
+    if ($femaleQuantity > 0) {
+        $query = DetailMencit::where('gender', 'Female')
+            ->where('health_status', 'Healthy')
+            ->when($start !== null, fn($query) => $query->where('berat', '>=', $start))
+            ->when($end !== null, fn($query) => $query->where('berat', '<=', $end));
+
+        $deletedMice = $query->limit($femaleQuantity)->get();
+        foreach ($deletedMice as $mencit) {
+            $deletedMiceIds[] = $mencit->id;
+            $mencit->delete();
+        }
+    }
+
+    return $deletedMiceIds;
+}
+
+private function parseRange(string $key): array
+{
+    if (str_starts_with($key, '<')) {
+        return [null, (int)substr($key, 1)];
+    } elseif (str_starts_with($key, '>')) {
+        return [(int)substr($key, 1), null];
+    } elseif (strpos($key, '-') !== false) {
+        [$start, $end] = explode('-', $key);
+        return [(int)$start, (int)$end];
+    }
+
+    return [null, null];
+}
+
+
+
+    private function getWeightCategories()
+    {
+        $configPath = config_path('mice.php');
+        if (!file_exists($configPath)) {
+            throw new \Exception("Configuration file not found.");
+        }
+        $config = include($configPath);
+
+        return $config['categories'] ?? [];
+    }
+
     
     // Fungsi untuk menghitung stok mencit berdasarkan parameter weight.
     // Fungsi ini digunakan untuk mengupdate stok mencit di halaman order.
     // Weight dapat berupa 'less_than_8', 'between_8_and_14', 'between_14_and_18', atau 'greater_equal_18'
     // Fungsi ini akan menghitung stok mencit jantan dan betina berdasarkan parameter weight yang diberikan
     public function fetchStock(Request $request)
-    {
-        $weight = $request->input('weight');
+{
+    $weight = $request->input('weight');
+    [$start, $end] = $this->parseRange($weight);
 
-        $maleStock = DetailMencit::where('gender', 'Male')
-            ->where('health_status', 'Healthy')
-            ->when($weight === 'category1', function ($query) {
-                return $query->where('berat', '<', 10);
-            })
-            ->when($weight === 'category2', function ($query) {
-                return $query->whereBetween('berat', [10, 22]);
-            })
-            // ->when($weight === 'category3', function ($query) {
-            //     return $query->whereBetween('berat', [14.01, 18]);
-            // })
-            ->when($weight === 'category3', function ($query) {
-                return $query->where('berat', '>', 22);
-            })
-            ->count();
+    $maleStock = DetailMencit::where('gender', 'Male')
+        ->where('health_status', 'Healthy')
+        ->when($start !== null, fn($query) => $query->where('berat', '>=', $start))
+        ->when($end !== null, fn($query) => $query->where('berat', '<=', $end))
+        ->count();
 
-        $femaleStock = DetailMencit::where('gender', 'Female')
-            ->where('health_status', 'Healthy')
-            ->when($weight === 'category1', function ($query) {
-                return $query->where('berat', '<', 10);
-            })
-            ->when($weight === 'category2', function ($query) {
-                return $query->whereBetween('berat', [10, 22]);
-            })
-            // ->when($weight === 'category3', function ($query) {
-            //     return $query->whereBetween('berat', [14.01, 18]);
-            // })
-            ->when($weight === 'category3', function ($query) {
-                return $query->where('berat', '>', 22);
-            })
-            ->count();
+    $femaleStock = DetailMencit::where('gender', 'Female')
+        ->where('health_status', 'Healthy')
+        ->when($start !== null, fn($query) => $query->where('berat', '>=', $start))
+        ->when($end !== null, fn($query) => $query->where('berat', '<=', $end))
+        ->count();
 
-        return response()->json([
-            'maleStock' => $maleStock,
-            'femaleStock' => $femaleStock,
-        ]);
-    }
+    return response()->json([
+        'maleStock' => $maleStock,
+        'femaleStock' => $femaleStock,
+    ]);
+}
+
 
     // Mengambil data order terbaru
     public function getData()

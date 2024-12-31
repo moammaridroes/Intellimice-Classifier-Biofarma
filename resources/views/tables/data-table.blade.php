@@ -66,6 +66,28 @@
                 border-radius: 5px;
                 margin-bottom: 10px;
             }
+            .card-custom {
+                border: none;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+            .card-custom.red {
+                background-color: #e74c3c; /* Warna merah */
+            }
+            .card-custom.blue {
+                background-color: #3498db; /* Warna biru */
+            }
+            .card-custom.pink {
+                background-color: #e91e63; /* Warna pink */
+            }
+            .card-title {
+                font-size: 1.5rem;
+                margin: 0;
+            }
+            .card-text {
+                font-size: 1rem;
+                margin: 0;
+            }
         </style>
     </head>
 
@@ -83,27 +105,51 @@
                             <h4 class="mb-4">Data Collecting</h4>
 
                             <!-- Summary Section -->
-                            <div class="card mb-4">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-lg-6 mb-3">
-                                            <h5 class="summary-item"><strong>Mice Sick</strong> <span class="text-danger mice-sick-count">: {{ $miceSickCount }}</span></h5>
-                                            <h5 class="summary-item"><strong>Male Healthy (&lt;10g)</strong> <span class="text-success male-healthy-less-than-8">: {{ $maleHealthyCounts['category1'] }}</span></h5>
-                                            <h5 class="summary-item"><strong>Male Healthy (10-22g)</strong> <span class="text-success male-healthy-between-8-and-14">: {{ $maleHealthyCounts['category2'] }}</span></h5>
-                                            {{-- <h5 class="summary-item"><strong>Male Healthy (14-18g)</strong> <span class="text-success male-healthy-between-14-and-18">: {{ $maleHealthyCounts['category3'] }}</span></h5> --}}
-                                            <h5 class="summary-item"><strong>Male Healthy (&gt;22g)</strong> <span class="text-success male-healthy-greater-18">: {{ $maleHealthyCounts['category3'] }}</span></h5>
-                                        </div>
-                                        <div class="col-lg-6 mb-3">
-                                            {{-- <h5 class="summary-item"><strong>Female Sick:</strong> <span class="text-danger female-sick-count">{{ $femaleSickCount }}</span></h5> --}}
-                                            <h5 class="summary-item"><strong>Female Healthy (&lt;10g)</strong> <span class="text-success female-healthy-less-than-8">: {{ $femaleHealthyCounts['category1'] }}</span></h5>
-                                            <h5 class="summary-item"><strong>Female Healthy (10-22g)</strong> <span class="text-success female-healthy-between-8-and-14">: {{ $femaleHealthyCounts['category2'] }}</span></h5>
-                                            {{-- <h5 class="summary-item"><strong>Female Healthy (14-18g)</strong> <span class="text-success female-healthy-between-14-and-18">: {{ $femaleHealthyCounts['category3'] }}</span></h5> --}}
-                                            <h5 class="summary-item"><strong>Female Healthy (&gt;22g)</strong> <span class="text-success female-healthy-greater-18">: {{ $femaleHealthyCounts['category3'] }}</span></h5>
+                            <div class="row d-flex justify-content-center flex-wrap">
+                                <!-- Kartu Mice Sick -->
+                                <div class="col-md-3 col-6 mb-4">
+                                    <div class="card card-custom red">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-center text-white mice-sick-count">{{ $miceSickCount }}</h6>
+                                            <p class="card-text text-center text-white">Mice Sick</p>
                                         </div>
                                     </div>
                                 </div>
+                            
+                                <!-- Kartu Male Healthy -->
+                                @foreach ($maleHealthyCounts as $key => $count)
+                                @php
+                                    // Escape simbol agar aman digunakan sebagai class
+                                    $safeKey = preg_replace('[<>]', '', $key);
+                                    $classKey = str_replace(['<', '>'], ['less-', 'greater-'], $key);
+                                @endphp
+                            
+                                <div class="col-md-3 col-6 mb-4">
+                                    <div class="card card-custom blue">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-center text-white male-healthy-{{ $classKey }}">{{ $count }}</h6>
+                                            <p class="card-text text-center text-white">Male Healthy ({{ $categories[$key] }})</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                            
+                            @foreach ($femaleHealthyCounts as $key => $count)
+                                @php
+                                    $safeKey = preg_replace('[<>]', '', $key);
+                                    $classKey = str_replace(['<', '>'], ['less-', 'greater-'], $key);
+                                @endphp
+                            
+                                <div class="col-md-3 col-6 mb-4">
+                                    <div class="card card-custom pink">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-center text-white female-healthy-{{ $classKey }}">{{ $count }}</h6>
+                                            <p class="card-text text-center text-white">Female Healthy ({{ $categories[$key] }})</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach                            
                             </div>
-
                             <!-- Data Table Section -->
                             <div class="card">
                                 <div class="card-body">
@@ -183,31 +229,31 @@
                     ]
                 });
                     // Variabel untuk menyimpan interval ID
-    var refreshInterval = null;
+                        var refreshInterval = null;
 
-// Fungsi untuk mengaktifkan interval
-function startAutoRefresh() {
-    refreshInterval = setInterval(function () {
-        table.ajax.reload(null, false); // Reload data tanpa reset pagination
-    }, 5000); // Interval 5 detik
-    $('#toggleRefresh').text('Disable Auto Refresh').removeClass('btn-secondary').addClass('btn-success');
-}
+                    // Fungsi untuk mengaktifkan interval
+                    function startAutoRefresh() {
+                        refreshInterval = setInterval(function () {
+                            table.ajax.reload(null, false); // Reload data tanpa reset pagination
+                        }, 5000); // Interval 5 detik
+                        $('#toggleRefresh').text('Disable Auto Refresh').removeClass('btn-secondary').addClass('btn-success');
+                    }
 
-// Fungsi untuk menonaktifkan interval
-function stopAutoRefresh() {
-    clearInterval(refreshInterval);
-    refreshInterval = null;
-    $('#toggleRefresh').text('Enable Auto Refresh').removeClass('btn-success').addClass('btn-secondary');
-}
+                    // Fungsi untuk menonaktifkan interval
+                    function stopAutoRefresh() {
+                        clearInterval(refreshInterval);
+                        refreshInterval = null;
+                        $('#toggleRefresh').text('Enable Auto Refresh').removeClass('btn-success').addClass('btn-secondary');
+                    }
 
-// Event listener untuk tombol "Toggle Refresh"
-$('#toggleRefresh').click(function () {
-    if (refreshInterval) {
-        stopAutoRefresh();
-    } else {
-        startAutoRefresh();
-    }
-});
+                    // Event listener untuk tombol "Toggle Refresh"
+                    $('#toggleRefresh').click(function () {
+                        if (refreshInterval) {
+                            stopAutoRefresh();
+                        } else {
+                            startAutoRefresh();
+                        }
+                    });
 
 
                     $('#syncData').click(function () {
@@ -363,32 +409,33 @@ $('#toggleRefresh').click(function () {
                         });
                     });
                     // Function to update stock counts
+                    // Reload table when categories change
+                    // Update stock counts dynamically
                     function updateStockCounts() {
                         $.ajax({
                             url: "{{ route('detailmencit.updateStockCounts') }}",
                             type: 'GET',
                             success: function (data) {
-                                // Update Male Stock Counts
                                 $('.mice-sick-count').text(data.miceSickCount);
-                                $('.male-healthy-less-than-8').text(data.maleHealthyCounts.category1);
-                                $('.male-healthy-between-8-and-14').text(data.maleHealthyCounts.category2);
-                                // $('.male-healthy-between-14-and-18').text(data.maleHealthyCounts.category3);
-                                $('.male-healthy-greater-18').text(data.maleHealthyCounts.category3);
 
-                                // Update Female Stock Counts
-                                // $('.female-sick-count').text(data.femaleSickCount);
-                                $('.female-healthy-less-than-8').text(data.femaleHealthyCounts.category1);
-                                $('.female-healthy-between-8-and-14').text(data.femaleHealthyCounts.category2);
-                                // $('.female-healthy-between-14-and-18').text(data.femaleHealthyCounts.category3);
-                                $('.female-healthy-greater-18').text(data.femaleHealthyCounts.category3);
+                                // Loop untuk meng-update Male Healthy Counts
+                                Object.keys(data.maleHealthyCounts).forEach(function (key) {
+                                    var safeKey = key.replace('<', 'less-').replace('>', 'greater-');
+                                    $('.male-healthy-' + safeKey).text(data.maleHealthyCounts[key] || 0);
+                                });
 
-                                table.ajax.reload();
+                                // Loop untuk meng-update Female Healthy Counts
+                                Object.keys(data.femaleHealthyCounts).forEach(function (key) {
+                                    var safeKey = key.replace('<', 'less-').replace('>', 'greater-');
+                                    $('.female-healthy-' + safeKey).text(data.femaleHealthyCounts[key] || 0);
+                                });
                             },
                             error: function () {
                                 alert('Failed to update stock counts.');
                             }
                         });
                     }
+
                 });
             </script>
         </body>

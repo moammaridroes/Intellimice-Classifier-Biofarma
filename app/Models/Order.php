@@ -28,46 +28,9 @@ class Order extends Model
         'is_paid',
     ];
 
-    // public function setWeightAttribute($value)
-    // {
-    //     switch ($value) {
-    //         case 'category1':
-    //             $this->attributes['weight'] = '<10g'; // Menyimpan '<8g'
-    //             break;
-    //         case 'category2':
-    //             $this->attributes['weight'] = '10-22g'; // Menyimpan '8-14g'
-    //             break;
-    //         case 'category3':
-    //             $this->attributes['weight'] = '>22g'; // Menyimpan '14-18g'
-    //             break;
-    //         // case 'category4':
-    //         //     $this->attributes['weight'] = '>18g'; // Menyimpan '>18g'
-    //         //     break;
-    //     }
-    // }
+    public function detailMencit()
+    {
+        return $this->belongsTo(DetailMencit::class, 'detail_mencit_id');
+    }
 
-    // Accessor untuk mengembalikan value asli dari database ke dalam form (optional)
-    // public function getWeightAttribute($value)
-    // {
-    //     switch ($value) {
-    //         case '<10g':
-    //             return 'category1';
-    //         case '10-22g':
-    //             return 'category2';
-    //         case '>22g':
-    //             return 'category3';
-    //         // case '>18g':
-    //         //     return 'category4';
-    //         default:
-    //             return $value;
-    //     }
-    // }
-
-    // Setter untuk total_price
-    // public function setTotalPriceAttribute()
-    // {
-    //     $malePrice = 4000;
-    //     $femalePrice = 5000;
-    //     $this->attributes['total_price'] = ($this->male_quantity * $malePrice) + ($this->female_quantity * $femalePrice);
-    // }
 }

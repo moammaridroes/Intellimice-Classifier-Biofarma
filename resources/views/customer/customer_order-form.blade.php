@@ -193,14 +193,13 @@
                                 <div class="form-section">
                                     <div class="form-group">
                                         <label for="weight">@lang('messages.weight')</label>
-                                        <select class="form-control" name="weight" id="weightSelect">
+                                        <select class="form-control" name="weight" id="weightSelect" onchange="calculateTotal()">
                                             <option value="" selected disabled>Select Weight</option>
-                                            <option value="category1">&lt;10g</option>
-                                            <option value="category2">10-22g</option>
-                                            <option value="category3">&gt;22g</option>
-                                            {{-- <option value="category4">&gt;18g</option> --}}
-                                          </select>
-                                    </div>
+                                            @foreach (config('mice.categories') as $key => $label)
+                                                <option value="{{ $key }}">{{ $label }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>                                    
                                     <h4 class="card-title">Set amount of order</h4>
                                     <div class="form-group">
                                         <div class="form-check form-check-flat form-check-primary">
@@ -345,22 +344,23 @@
         }
 
         function calculateTotal() {
-    const maleQuantity = parseInt(document.querySelector("input[name='male_quantity']").value) || 0;
-    const femaleQuantity = parseInt(document.querySelector("input[name='female_quantity']").value) || 0;
+        const maleQuantity = parseInt(document.querySelector("input[name='male_quantity']").value) || 0;
+        const femaleQuantity = parseInt(document.querySelector("input[name='female_quantity']").value) || 0;
 
-    // Ambil harga dari konfigurasi PHP (dari backend)
-    const malePrices = @json(config('mice.prices.male'));
-    const femalePrices = @json(config('mice.prices.female'));
-    const selectedWeight = document.querySelector("select[name='weight']").value;
+        // Ambil harga dari konfigurasi PHP
+        const malePrices = @json(config('mice.prices.male'));
+        const femalePrices = @json(config('mice.prices.female'));
+        const selectedWeight = document.querySelector("select[name='weight']").value;
 
-    // Kalkulasi total harga berdasarkan kategori
-    const malePrice = malePrices[selectedWeight] || 0;
-    const femalePrice = femalePrices[selectedWeight] || 0;
+        // Kalkulasi total harga berdasarkan kategori
+        const malePrice = malePrices[selectedWeight] || 0;
+        const femalePrice = femalePrices[selectedWeight] || 0;
 
-    const totalPrice = (maleQuantity * malePrice) + (femaleQuantity * femalePrice);
-    document.getElementById("totalPrice").value = totalPrice.toLocaleString('id-ID');
-    return totalPrice;
-}
+        const totalPrice = (maleQuantity * malePrice) + (femaleQuantity * femalePrice);
+        document.getElementById("totalPrice").value = totalPrice.toLocaleString('id-ID');
+        return totalPrice;
+    }
+
 
     </script>
 

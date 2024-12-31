@@ -160,13 +160,18 @@ Route::middleware(['auth', \App\Http\Middleware\CheckRole::class . ':master_data
 
     Route::get('/masterdata/penjualan', [MasterPenjualanController::class, 'index'])->name('masterdata.penjualan');
     Route::get('/masterdata/penjualan/{year}', [MasterPenjualanController::class, 'fetchData']);
+    Route::get('/masterdata/export-sales/{year}', [MasterPenjualanController::class, 'exportSalesReport'])
+    ->name('masterdata.export.sales');
+
 
     //PERCOBAANNN
-    Route::get('masterdata/categories', [WeightCategoryController::class, 'index'])->name('master.categories');
-    Route::post('masterdata/categories', [WeightCategoryController::class, 'store'])->name('master.categories.store');
-    Route::put('masterdata/categories/{id}', [WeightCategoryController::class, 'update'])->name('master.categories.update');
-    Route::delete('masterdata/categories/{id}', [WeightCategoryController::class, 'destroy'])->name('master.categories.destroy');
-
+    Route::prefix('masterdata/categories')->name('master.categories.')->group(function () {
+        Route::post('/store', [MasterManageController::class, 'storeCategory'])->name('store');
+        // Route::put('/update/{key}', [MasterManageController::class, 'updateCategory'])->name('update');
+        Route::put('/{key}/update-key', [MasterManageController::class, 'updateCategoryKey'])->name('update-key');
+        Route::delete('/destroy/{key}', [MasterManageController::class, 'destroyCategory'])->name('destroy');
+    });
+    
 
     // Route::get('masterdata/stok', [DetailMencitController::class, 'showData'])->name('masterdata.data.table');
     // Route::get('masterdata/detailmencit/data', [DetailMencitController::class, 'getData'])->name('masterdata.detailmencit.data');

@@ -16,7 +16,7 @@
         "laravel/tinker": "^2.9",
         "laravel/ui": "^4.5",
         "livewire/livewire": "^3.0",
-        "maatwebsite/excel": "^1.1",
+        "phpoffice/phpspreadsheet": "^3.6",
         "pusher/pusher-php-server": "^7.2",
         "yajra/laravel-datatables-oracle": "11.0"
     },

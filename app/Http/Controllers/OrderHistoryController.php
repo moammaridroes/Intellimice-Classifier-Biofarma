@@ -46,15 +46,15 @@ class OrderHistoryController extends Controller
         })
         ->editColumn('updated_at', function($order) {
             return Carbon::parse($order->updated_at)->timezone('Asia/Jakarta')->format('d-m-Y '); // Tanggal dan jam
-        })
-        ->editColumn('weight', function($order) {
-            $weightMap = [
-                'category1' => '<10g',
-                'category2' => '10-22g',
-                'category3' => '>22g'
-                // 'category4' => '>18g'
-            ];
-            return $weightMap[$order->weight] ?? $order->weight;
+        // })
+        // ->editColumn('weight', function($order) {
+        //     $weightMap = [
+        //         'category1' => '<10g',
+        //         'category2' => '10-22g',
+        //         'category3' => '>22g'
+        //         // 'category4' => '>18g'
+        //     ];
+        //     return $weightMap[$order->weight] ?? $order->weight;
         })
         ->make(true);
 }
@@ -68,15 +68,15 @@ class OrderHistoryController extends Controller
         }
 
         // Pemetaan nilai weight
-        $weightMap = [
-            'category1' => '<10g',
-            'category2' => '10-22g',
-            'category3' => '>22g'
-            // 'category4' => '>18g'
-        ];
+        // $weightMap = [
+        //     'category1' => '<10g',
+        //     'category2' => '10-22g',
+        //     'category3' => '>22g'
+        //     // 'category4' => '>18g'
+        // ];
 
-        // Gunakan pemetaan jika tersedia
-        $order->weight = $weightMap[$order->weight] ?? $order->weight;
+        // // Gunakan pemetaan jika tersedia
+        // $order->weight = $weightMap[$order->weight] ?? $order->weight;
 
         return response()->json($order);
     }

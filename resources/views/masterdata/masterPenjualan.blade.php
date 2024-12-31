@@ -43,7 +43,12 @@
               <option value="{{ $year }}" {{ $year == $currentYear ? 'selected' : '' }}>{{ $year }}</option>
               @endforeach
             </select>
+              <a href="{{ route('masterdata.export.sales', $currentYear) }}" class="btn btn-success">
+                  <i class="fas fa-file-excel"></i> Export to Excel
+              </a>
           </div>
+          
+        
 
           <!-- Grafik Penjualan -->
           <div class="card mb-4">
@@ -246,6 +251,13 @@
         fetchData(this.value);
       });
     });
+    // Update Export URL dynamically
+    const exportButton = document.querySelector('.btn-success');
+    yearSelect.addEventListener('change', function () {
+        const selectedYear = this.value;
+        exportButton.href = `/masterdata/export-sales/${selectedYear}`;
+    });
+
   </script>
   
 </body>

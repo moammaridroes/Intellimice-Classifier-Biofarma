@@ -231,52 +231,53 @@
   @include('partials.pusher')
   <script>
     $(function () {
-     var table = $('.yajra-datatable').DataTable({
-         processing: true,
-         serverSide: true,
-         ajax: "{{ route('onlinehistory.getData') }}",
-         order: [[0, 'desc']],
-         columns: [
-             {data: 'id', name: 'id', render: function (data, type, row) {
-                 return 'ONL-' + data;
-             }},
-             {data: 'fullname', name: 'fullname'},
-             {data: 'pick_up_date', name: 'pick_up_date'},
-             {data: 'total_price', name: 'total_price', render: $.fn.dataTable.render.number(',', '.', 2, 'Rp ')},
-             {
-                 data: 'is_paid',
-                 name: 'is_paid',
-                 render: function (data, type, row) {
-                     var statusClass = data === 'Paid' ? 'badge bg-success' : 'badge bg-danger';
-                     return '<span class="' + statusClass + '">' + data + '</span>';
-                 }
-             },
-             {
-                 data: null,
-                 orderable: false,
-                 searchable: false,
-                 render: function (data, type, row) {
-                     return '<button class="btn btn-link details-button" data-bs-toggle="modal" data-bs-target="#detailsModal" data-details="' + encodeURIComponent(JSON.stringify(row)) + '"><i class="fas fa-eye"></i></button>';
-                 }
-             },
-             {
-             data: null,
-             orderable: false,
-             render: function (data) {
-               return `<button class="btn btn-link print-button" data-id="${data.id}" style="color: #4B49AC"><i class="fas fa-print"></i></button>`;
-             }
-           }
-         ],
-         lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
-         pageLength: 5,
-         language: {
-             search: "_INPUT_",
-             searchPlaceholder: "Search records",
-         },
-         drawCallback: function() {
-             $('.dataTables_paginate > .pagination').addClass('pagination-rounded');
-         }
-     });
+    var table = $('.yajra-datatable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "{{ route('onlinehistory.getData') }}",
+        order: [[0, 'desc']],
+        columns: [
+            {data: 'id', name: 'id', render: function (data, type, row) {
+                return 'ONL-' + data;
+            }},
+            {data: 'fullname', name: 'fullname'},
+            {data: 'pick_up_date', name: 'pick_up_date'},
+            {data: 'total_price', name: 'total_price', render: $.fn.dataTable.render.number(',', '.', 2, 'Rp ')},
+            {
+                data: 'is_paid',
+                name: 'is_paid',
+                render: function (data, type, row) {
+                    var statusClass = data === 'Paid' ? 'badge bg-success' : 'badge bg-danger';
+                    return '<span class="' + statusClass + '">' + data + '</span>';
+                }
+            },
+            {
+                data: null,
+                orderable: false,
+                searchable: false,
+                render: function (data, type, row) {
+                    return '<button class="btn btn-link details-button" data-bs-toggle="modal" data-bs-target="#detailsModal" data-details="' + encodeURIComponent(JSON.stringify(row)) + '"><i class="fas fa-eye"></i></button>';
+                }
+            },
+            {
+            data: null,
+            orderable: false,
+            render: function (data) {
+              return `<button class="btn btn-link print-button" data-id="${data.id}" style="color: #4B49AC"><i class="fas fa-print"></i></button>`;
+            }
+          }
+        ],
+        lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+        pageLength: 5,
+        language: {
+            search: "_INPUT_",
+            searchPlaceholder: "Search records",
+        },
+        drawCallback: function() {
+            $('.dataTables_paginate > .pagination').addClass('pagination-rounded');
+        }
+    });
+
  
      // Handle click on print button
     $('.yajra-datatable').on('click', '.print-button', function () {
@@ -299,13 +300,13 @@
                 }).format(data.total_price || 0);
     
                 // Pemetaan weight
-                const weightMap = {
-                    'category1': '<10g',
-                    'category2': '10-22g',
-                    'category3': '>22g',
-                    // 'category4': '>18g'
-                };
-                const mappedWeight = weightMap[data.weight] || data.weight;
+                // const weightMap = {
+                //     'category1': '<10g',
+                //     'category2': '10-22g',
+                //     'category3': '>22g',
+                //     // 'category4': '>18g'
+                // };
+                // const mappedWeight = weightMap[data.weight] || data.weight;
     
                 // Generate isi modal untuk print
                 $('#printContent').html(`
@@ -322,7 +323,7 @@
                             <tr><th>Item Name</th><td>${data.item_name}</td></tr>
                             <tr><th>Agency Name</th><td>${data.agency_name || '-'}</td></tr>
                             <tr><th>Pick Up Date</th><td>${data.pick_up_date ? new Date(data.pick_up_date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) : '-'}</td></tr>
-                            <tr><th>Weight</th><td>${mappedWeight}</td></tr>
+                            <tr><th>Weight</th><td>${data.weight}</td></tr>
                             <tr><th>Male Quantity</th><td>${data.male_quantity || 0}</td></tr>
                             <tr><th>Female Quantity</th><td>${data.female_quantity || 0}</td></tr>
                             <tr><th>Total Price</th><td>${formattedTotalPrice}</td></tr>

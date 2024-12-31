@@ -38,9 +38,6 @@
     color: white;
     text-align: center;
     }
-    .card-custom.orange {
-      background: linear-gradient(45deg, #ff9800, #ff5722);
-    }
     .card-custom.pink {
       background: linear-gradient(45deg, #ff69b4, #ff33b5);
     }
@@ -51,31 +48,87 @@
       background: linear-gradient(45deg, #f44336, #e91e63);
     }
   
-    /* Table styles */
-    table.table-bordered {
-      background-color: #fff;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0px 5px 10px rgba(255, 255, 255, 0.1);
-    }
-    table th {
-      background-color: #4B49AC;
-      color: white;
-      text-align: center;
-    }
-    table td {
-      text-align: center;
-      vertical-align: middle;
+    body {
+        background-color: #f4f5f7; /* Warna latar belakang lebih lembut */
+        font-family: 'Roboto', sans-serif;
     }
 
-    /* Responsive Design */
+    .card-custom {
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+        background: linear-gradient(45deg, #3f51b5, #5c6bc0); /* Warna gradien */
+        color: white;
+        text-align: center;
+    }
+
+    .card-custom:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-header {
+        background-color: #4B49AC;
+        color: white;
+        font-weight: bold;
+        border-radius: 10px 10px 0 0;
+    }
+
+    table.table-bordered {
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+    }
+
+    table th {
+        background-color: #4B49AC;
+        color: white;
+        text-align: center;
+    }
+
+    table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .btn-primary {
+        background: linear-gradient(45deg, #4B49AC, #673AB7);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(45deg, #673AB7, #4B49AC);
+    }
+
+    .btn-success {
+        background: linear-gradient(45deg, #00C853, #64DD17);
+        border: none;
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(45deg, #64DD17, #00C853);
+    }
+
+    .btn-danger {
+        background: linear-gradient(45deg, #D50000, #FF1744);
+        border: none;
+    }
+
+    .btn-danger:hover {
+        background: linear-gradient(45deg, #FF1744, #D50000);
+    }
+
+    /* Responsiveness for smaller screens */
     @media (max-width: 768px) {
-      .card-custom {
-        margin-bottom: 15px;
-      }
-      table {
-        font-size: 0.9em;
-      }
+        .card-custom {
+            margin-bottom: 20px;
+        }
+
+        table {
+            font-size: 0.85em;
+        }
     }
   </style>
   
@@ -89,67 +142,41 @@
         <div class="main-panel">
             <div class="content-wrapper">
                 <div class="row d-flex justify-content-center flex-wrap">
+                    <!-- Kartu Mencit Sakit -->
                     <div class="col-md-3 col-6 mb-4">
                         <div class="card card-custom red">
-                          <div class="card-body">
-                            <h6 class="card-title text-center" style="color: white">{{ $miceSickCount }}</h6>
-                            <p class="card-text text-center">Mice Sick</p>
-                          </div>
+                            <div class="card-body">
+                                <h6 class="card-title text-center" style="color: white">{{ $miceSickCount }}</h6>
+                                <p class="card-text text-center">Mice Sick</p>
+                            </div>
                         </div>
-                      </div>
-                      
-                    <div class="col-md-3 mb-4">
+                    </div>
+                
+                    <!-- Loop untuk Mencit Jantan -->
+                    @foreach ($weightCategories as $key => $label)
+                    <div class="col-md-3 col-6 mb-4">
                         <div class="card card-custom blue">
                             <div class="card-body">
-                                <h6 class="card-title text-center" style="color: white">{{ $maleHealthyCounts['category1'] }}</h6>
-                                <p class="card-text text-center">Male Healthy ( < 10g)</p>
+                                <h6 class="card-title text-center" style="color: white">{{ $maleHealthyCounts[$key] }}</h6>
+                                <p class="card-text text-center">Male Healthy ({{ $label }})</p>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3 mb-4">
-                        <div class="card card-custom blue">
-                            <div class="card-body">
-                                <h6 class="card-title text-center" style="color: white">{{ $maleHealthyCounts['category2'] }}</h6>
-                                <p class="card-text text-center">Male Healthy (10g - 22g)</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 mb-4">
-                        <div class="card card-custom blue">
-                            <div class="card-body">
-                                <h6 class="card-title text-center" style="color: white">{{ $maleHealthyCounts['category3'] }}</h6>
-                                <p class="card-text text-center">Male Healthy ( > 22g)</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 mb-4">
+                    @endforeach
+                
+                    <!-- Loop untuk Mencit Betina -->
+                    @foreach ($weightCategories as $key => $label)
+                    <div class="col-md-3 col-6 mb-4">
                         <div class="card card-custom pink">
                             <div class="card-body">
-                                <h6 class="card-title text-center" style="color: white">{{ $femaleHealthyCounts['category1'] }}</h6>
-                                <p class="card-text text-center">Female Healthy ( < 10g)</p>
+                                <h6 class="card-title text-center" style="color: white">{{ $femaleHealthyCounts[$key] }}</h6>
+                                <p class="card-text text-center">Female Healthy ({{ $label }})</p>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3 mb-4">
-                        <div class="card card-custom pink">
-                            <div class="card-body">
-                                <h6 class="card-title text-center" style="color: white">{{ $femaleHealthyCounts['category2'] }}</h6>
-                                <p class="card-text text-center">Female Healthy (10g - 22g)</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 mb-4">
-                        <div class="card card-custom pink">
-                            <div class="card-body">
-                                <h6 class="card-title text-center" style="color: white">{{ $femaleHealthyCounts['category3'] }}</h6>
-                                <p class="card-text text-center">Female Healthy ( > 22g)</p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Card kosong untuk menjaga keseimbangan layout -->
-                    <div class="col-md-3 mb-4 d-none d-md-block"></div>
+                    @endforeach
                 </div>
-
+                
 
                 <div class="card mt-5">
                     <div class="card-header">
@@ -190,10 +217,6 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <!-- Penjelasan kategori -->
-                            <p>* Category 1 : < 10gr</p>
-                            <p>* Category 2 : 10g - 22gr</p>
-                            <p>* Category 3 : > 22gr</p>
                             <div class="text-center mt-3">
                                 <button type="submit" class="btn btn-primary">Save Changes</button>
                             </div>
@@ -203,78 +226,75 @@
                 
                 
                 
-                <!-- Form Ubah Kategori Berat -->
-                {{-- <div class="card">
+                <div class="card mt-5">
                     <div class="card-header">
-                        <h5 class="text-center">Kelola Kategori Berat</h5>
+                        <h5 class="text-center">Manage Weight Categories</h5>
                     </div>
                     <div class="card-body">
                         <!-- Tambah Kategori -->
-                        <form action="{{ route('master.categories.store') }}" method="POST">
+                        <form action="{{ route('master.categories.store') }}" method="POST" onsubmit="return confirmAddCategory(event)">
                             @csrf
-                            <div class="row">
+                            <div class="row mb-4">
                                 <div class="col-md-4">
-                                    <label>Gender</label>
-                                    <select name="gender" class="form-control" required>
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                    </select>
+                                    <label for="key">Category Key</label>
+                                    <input type="text" name="key" id="key" class="form-control" placeholder="e.g., 10-20" required>
+                                    @error('key')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
                                 </div>
                                 <div class="col-md-4">
-                                    <label>Nama Kategori</label>
-                                    <input type="text" name="name" class="form-control" required>
+                                    <label for="description">Category Description</label>
+                                    <input type="text" name="description" id="description" class="form-control" placeholder="e.g., <10,10-20,>20" required>
+                                    @error('description')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
                                 </div>
-                                <div class="col-md-4">
-                                    <label>Range Berat</label>
-                                    <input type="text" name="weight_range" class="form-control" required>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-success w-100">Add Category</button>
                                 </div>
-                            </div>
-                            <div class="text-center mt-3">
-                                <button type="submit" class="btn btn-success">Tambah Kategori</button>
                             </div>
                         </form>                        
-                
-                        <!-- Tabel Kategori -->
-                        <table class="table table-bordered mt-4">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Gender</th>
-                                    <th>Nama Kategori</th>
-                                    <th>Range Berat</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($categories as $category)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td> <!-- loop->iteration menggantikan $index -->
-                                    <td>{{ $category->gender }}</td>
-                                    <td>
-                                        <form action="{{ route('master.categories.update', $category->id) }}" method="POST">
-                                            @csrf
-                                            @method('PUT')
-                                            <input type="text" name="name" value="{{ $category->name }}" class="form-control">
-                                    </td>
-                                    <td>
-                                        <input type="text" name="weight_range" value="{{ $category->weight_range }}" class="form-control">
-                                    </td>
-                                    <td>
-                                        <button type="submit" class="btn btn-primary btn-sm">Ubah</button>
-                                        </form>
-                                        <form action="{{ route('master.categories.destroy', $category->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                            
-                        </table>                        
+                        <!-- Tabel Kategori Berat -->
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Category Key</th>
+                                        <th>Description</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (config('mice.categories') as $key => $description)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>
+                                            <form action="{{ route('master.categories.update-key', ['key' => $key]) }}" method="POST" onsubmit="return confirmUpdateKey(event)" class="d-inline">
+                                                @csrf
+                                                @method('PUT')
+                                                <input type="text" name="new_key" value="{{ $key }}" class="form-control">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="description" value="{{ $description }}" class="form-control">
+                                        </td>
+                                        <td>
+                                            <button type="submit" class="btn btn-primary btn-sm">Update Key</button>
+                                            </form>
+                                            <form action="{{ route('master.categories.destroy', ['key' => $key]) }}" method="POST" onsubmit="return confirmDeleteCategory(event)" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                            </form>                                            
+                                        </td>
+                                    </tr>                                    
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>                 --}}
+                </div>
+                
             </div>
                 @include('partials.footer')
             </div>
@@ -282,7 +302,20 @@
         </div>
         <!-- page-body-wrapper ends -->
     </div>
-    
+    @if(session('success'))
+    <script>
+        Swal.fire({
+            title: 'Success',
+            text: "{{ session('success') }}",
+            icon: 'success',
+            confirmButtonColor: '#3085d6',
+            customClass: {
+            popup: 'custom-swal-popup', // Apply this class to the entire popup for layout adjustments
+            icon: 'custom-swal-icon' // Adjust the icon specifically
+        },
+        });
+    </script>
+    @endif
   <!-- container-scroller -->
   <!-- plugins:js -->
   <script src="{{ asset('vendors/js/vendor.bundle.base.js') }}"></script>
@@ -321,6 +354,80 @@
         }).then((result) => {
             if (result.isConfirmed && form) {
                 form.submit(); // Mengirim form jika tombol "Ya" ditekan
+            }
+        });
+    }
+     // Konfirmasi Tambah Kategori
+     function confirmAddCategory(event) {
+        event.preventDefault(); // Mencegah submit langsung
+        const form = event.target;
+
+        Swal.fire({
+            title: 'Add Category',
+            text: 'Are you sure you want to add this category?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Add it!',
+            cancelButtonText: 'Cancel',
+            customClass: {
+            popup: 'custom-swal-popup', // Apply this class to the entire popup for layout adjustments
+            icon: 'custom-swal-icon' // Adjust the icon specifically
+        },
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit(); // Submit form jika dikonfirmasi
+            }
+        });
+    }
+
+    // Konfirmasi Update Key
+    function confirmUpdateKey(event) {
+        event.preventDefault(); // Mencegah submit langsung
+        const form = event.target;
+
+        Swal.fire({
+            title: 'Update Key',
+            text: 'Are you sure you want to update this key?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Update it!',
+            cancelButtonText: 'Cancel',
+            customClass: {
+            popup: 'custom-swal-popup', // Apply this class to the entire popup for layout adjustments
+            icon: 'custom-swal-icon' // Adjust the icon specifically
+        },
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit(); // Submit form jika dikonfirmasi
+            }
+        });
+    }
+
+    // Konfirmasi Hapus Kategori
+    function confirmDeleteCategory(event) {
+        event.preventDefault(); // Mencegah submit langsung
+        const form = event.target;
+
+        Swal.fire({
+            title: 'Delete Category',
+            text: 'Are you sure you want to delete this category?',
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, Delete it!',
+            cancelButtonText: 'Cancel',
+            customClass: {
+            popup: 'custom-swal-popup', // Apply this class to the entire popup for layout adjustments
+            icon: 'custom-swal-icon' // Adjust the icon specifically
+        },
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit(); // Submit form jika dikonfirmasi
             }
         });
     }

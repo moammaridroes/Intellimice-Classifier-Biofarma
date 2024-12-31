@@ -38,12 +38,12 @@ class CustomerOrderController extends Controller
     ]);
 
     // Pemetaan dan hitung total harga
-    $weightMap = [
-        'category1' => '<10g',
-        'category2' => '10-22g',
-        'category3' => '>22g'
-        // 'category4' => '>18g'
-    ];
+    // $weightMap = [
+    //     'category1' => '<10g',
+    //     'category2' => '10-22g',
+    //     'category3' => '>22g'
+    //     // 'category4' => '>18g'
+    // ];
     
     $malePrices = config('mice.prices.male');
     $femalePrices = config('mice.prices.female');
@@ -63,7 +63,7 @@ class CustomerOrderController extends Controller
         'item_name' => $validated['item_name'],
         'agency_name' => $validated['agency_name'],
         'pick_up_date' => $validated['pick_up_date'],
-        'weight' => $weightMap[$validated['weight']],
+        'weight' => $validated['weight'],
         'male_quantity' => $validated['male_quantity'] ?? 0,
         'female_quantity' => $validated['female_quantity'] ?? 0,
         'total_price' => $totalPrice,
@@ -267,32 +267,7 @@ class CustomerOrderController extends Controller
 
     private function checkStockAvailability($maleQuantity, $femaleQuantity, $weightCategory)
     {
-        $weightMap = [
-            '<10g' => 'category1',
-            '10-22g' => 'category2',
-            '>22g' => 'category3',
-            // '>18g' => 'category4',
-        ];
-
-        if (!isset($weightMap[$weightCategory])) {
-            return false; // Jika kategori berat tidak valid
-        }
-
-        $weightConditions = [];
-        switch ($weightMap[$weightCategory]) {
-            case 'category1':
-                $weightConditions = ['<', 10];
-                break;
-            case 'category2':
-                $weightConditions = ['between', [10, 22]];
-                break;
-            // case 'category3':
-            //     $weightConditions = ['between', [14.01, 18]];
-            //     break;
-            case 'category3':
-                $weightConditions = ['>', 22];
-                break;
-        }
+        $weightConditions = $this->getWeightConditions($weightCategory);
 
         $maleStock = $this->getStockCount('Male', $weightConditions);
         $femaleStock = $this->getStockCount('Female', $weightConditions);
@@ -300,15 +275,16 @@ class CustomerOrderController extends Controller
         return $maleStock >= $maleQuantity && $femaleStock >= $femaleQuantity;
     }
 
+
     private function getStockCount($gender, $weightConditions)
     {
         $query = DetailMencit::where('gender', $gender)
             ->where('health_status', 'Healthy');
 
-        if ($weightConditions[0] === 'between') {
-            $query->whereBetween('berat', $weightConditions[1]);
+        if ($weightConditions['type'] === 'between') {
+            $query->whereBetween('berat', $weightConditions['value']);
         } else {
-            $query->where('berat', $weightConditions[0], $weightConditions[1]);
+            $query->where('berat', $weightConditions['type'], $weightConditions['value']);
         }
 
         return $query->count();
@@ -316,148 +292,52 @@ class CustomerOrderController extends Controller
 
     private function reduceStock($maleQuantity, $femaleQuantity, $weightCategory)
     {
-        // Pemetaan kategori berat dari format tampilan ke value blade asli
-        $weightMap = [
-            '<10g' => 'category1',
-            '19-22g' => 'category2',
-            '>22g' => 'category3',
-            // '>18g' => 'category4',
-        ];
+        $weightConditions = $this->getWeightConditions($weightCategory);
 
-        // Cek apakah kategori berat valid
-        if (!isset($weightMap[$weightCategory])) {
-            return; // Jika kategori berat tidak valid, hentikan eksekusi
-        }
-
-        // Tentukan kondisi berdasarkan kategori berat yang dipilih
-        $weightConditions = [];
-        switch ($weightMap[$weightCategory]) {
-            case 'category1':
-                $weightConditions = ['<', 10];
-                break;
-            case 'category2':
-                $weightConditions = ['between', [10, 22]];
-                break;
-            // case 'category3':
-            //     $weightConditions = ['between', [14.01, 18]];
-            //     break;
-            case 'category3':
-                $weightConditions = ['>', 22];
-                break;
-            default:
-                return; // Jika kategori berat tidak valid, hentikan eksekusi
-        }
-
-        // Kurangi stok mencit pria
         $this->updateStock('Male', $maleQuantity, $weightConditions);
-
-        // Kurangi stok mencit wanita
         $this->updateStock('Female', $femaleQuantity, $weightConditions);
     }
 
-
-    // Method untuk mengurangi stok mencit berdasarkan gender dan kondisi berat yang dipesan
-    // Stok mencit yang dihapus berdasarkan kategori berat yang dipilih
+    // Update stok berdasarkan gender, jumlah, dan kondisi berat
     private function updateStock($gender, $quantity, $weightConditions)
     {
-        // Ambil mencit sehat berdasarkan gender dan kondisi berat
-        $mencitQuery = DetailMencit::where('gender', $gender)
+        $query = DetailMencit::where('gender', $gender)
             ->where('health_status', 'Healthy');
 
-        // Tambahkan kondisi berat
-        if ($weightConditions[0] == 'between') {
-            $mencitQuery->whereBetween('berat', $weightConditions[1]);
+        if ($weightConditions['type'] === 'between') {
+            $query->whereBetween('berat', $weightConditions['value']);
         } else {
-            $mencitQuery->where('berat', $weightConditions[0], $weightConditions[1]);
+            $query->where('berat', $weightConditions['type'], $weightConditions['value']);
         }
 
-        // Ambil mencit sebanyak jumlah yang dipesan
-        $mencitToDelete = $mencitQuery->take($quantity)->get();
+        $mencits = $query->take($quantity)->get();
 
-        // Hapus mencit dari stok
-        foreach ($mencitToDelete as $mencit) {
+        foreach ($mencits as $mencit) {
             $mencit->delete();
         }
     }
-    // Menandai pesanan sebagai belum dibayar
-// public function markAsUnpaid($id)
-// {
-//     $order = CustomerOrder::find($id);
-//     if ($order) {
-//         // Pastikan pesanan sudah dibayar sebelumnya
-//         if ($order->is_paid) {
-//             // Update status pembayaran menjadi unpaid
-//             $order->is_paid = false;
-//             $order->save();
 
-//             // Kembalikan stok mencit berdasarkan pesanan
-//             $this->restoreStock($order->male_quantity, $order->female_quantity, $order->weight);
+    private function getWeightConditions($weightCategory)
+    {
+        $categories = config('mice.categories');
 
-//             return response()->json(['success' => true, 'message' => 'Order marked as unpaid and stock restored.']);
-//         } else {
-//             return response()->json(['success' => false, 'message' => 'Order is already unpaid.']);
-//         }
-//     }
+        if (!isset($categories[$weightCategory])) {
+            return ['type' => null, 'value' => null];
+        }
 
-//     return response()->json(['success' => false, 'message' => 'Order not found.'], 404);
-// }
+        switch ($weightCategory) {
+            case '<10':
+                return ['type' => '<', 'value' => 10];
+            case '10-22':
+                return ['type' => 'between', 'value' => [10, 22]];
+            case '>22':
+                return ['type' => '>', 'value' => 22];
+            default:
+                return ['type' => null, 'value' => null];
+        }
+    }
 
-// // Method untuk mengembalikan stok mencit yang sudah di-reduce
-// private function restoreStock($maleQuantity, $femaleQuantity, $weightCategory)
-// {
-//     // Tentukan kondisi berdasarkan kategori berat yang dipilih
-//     $weightConditions = [];
-//     switch ($weightCategory) {
-//         case 'less_than_8':
-//             $weightConditions = ['<', 8];
-//             break;
-//         case 'between_8_and_14':
-//             $weightConditions = ['between', [8, 14]];
-//             break;
-//         case 'between_14_and_18':
-//             $weightConditions = ['between', [14.01, 18]];
-//             break;
-//         case 'greater_equal_18':
-//             $weightConditions = ['>', 18];
-//             break;
-//         default:
-//             return; // Jika kategori berat tidak valid, hentikan eksekusi
-//     }
-
-//     // Kembalikan stok mencit jantan
-//     $this->addStock('Male', $maleQuantity, $weightConditions);
-
-//     // Kembalikan stok mencit betina
-//     $this->addStock('Female', $femaleQuantity, $weightConditions);
-// }
-
-// // Method untuk menambahkan stok mencit
-// private function addStock($gender, $quantity, $weightConditions)
-// {
-//     // Lakukan pengembalian stok mencit dengan menambah kembali jumlah mencit
-//     for ($i = 0; $i < $quantity; $i++) {
-//         // Tambahkan mencit baru ke stok
-//         $newMencit = new DetailMencit();
-//         $newMencit->gender = $gender;
-//         $newMencit->health_status = 'Healthy';
-
-//         // Tentukan berat sesuai kategori
-//         switch ($weightConditions[0]) {
-//             case '<':
-//                 $newMencit->berat = rand(1, 7); // Misalkan mencit yang kurang dari 8g
-//                 break;
-//             case 'between':
-//                 $newMencit->berat = rand($weightConditions[1][0], $weightConditions[1][1]); // Berat di antara batas
-//                 break;
-//             case '>':
-//                 $newMencit->berat = rand(19, 25); // Misalkan mencit lebih dari 18g
-//                 break;
-//         }
-
-//         // Simpan mencit baru ke database
-//         $newMencit->save();
-//     }
-// }
+    
     // function untuk print
     public function details($id)
     {
@@ -467,14 +347,14 @@ class CustomerOrderController extends Controller
             return response()->json(['error' => 'Order not found'], 404);
         }
 
-        $weightMap = [
-            'category1' => '<10g',
-            'category2' => '10-22g',
-            'category3' => '>22g',
-            // 'category4' => '>18g',
-        ];
+        // $weightMap = [
+        //     'category1' => '<10g',
+        //     'category2' => '10-22g',
+        //     'category3' => '>22g',
+        //     // 'category4' => '>18g',
+        // ];
 
-        $order->weight = $weightMap[$order->weight] ?? $order->weight;
+        // $order->weight = $weightMap[$order->weight] ?? $order->weight;
 
         return response()->json($order);
     }

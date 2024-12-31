@@ -56,4 +56,11 @@ class CustomerOrder extends Model
     {
         return $this->belongsTo(User::class, 'customer_id');
     }
+
+    public function detailMencit()
+    {
+        return $this->belongsTo(DetailMencit::class, 'detail_mencit_id');
+    }
+    
+
 }

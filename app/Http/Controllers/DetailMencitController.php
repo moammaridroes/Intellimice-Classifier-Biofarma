@@ -23,6 +23,26 @@ class DetailMencitController extends Controller
 
     public function store(Request $request)
     {
+        $categories = $this->getWeightCategories();
+        $berat = $request->input('berat');
+
+        $isInCategory = false;
+        foreach ($categories as $key => $description) {
+            [$start, $end] = $this->parseRange($key);
+
+            if (($start === null || $berat >= $start) && ($end === null || $berat <= $end)) {
+                $isInCategory = true;
+                break;
+            }
+        }
+
+        if (!$isInCategory) {
+            return response()->json([
+                'code' => 400,
+                'message' => 'Weight does not fit any defined category.',
+            ], 400);
+        }
+
         Log::info('Request input:', $request->all());
 
         date_default_timezone_set('Asia/Jakarta');
@@ -62,52 +82,92 @@ class DetailMencitController extends Controller
         }
     }
 
-    
-    // public function streamUpdates()
-    // {
-    //     header('Content-Type: text/event-stream');
-    //     header('Cache-Control: no-cache');
-    //     header('Connection: keep-alive');
+    private function getWeightCategories()
+    {
+        $configPath = config_path('mice.php');
+        if (!file_exists($configPath)) {
+            throw new \Exception("Configuration file not found.");
+        }
+        $config = include($configPath);
 
-    //     while (true) {
-    //         $data = DetailMencit::orderBy('created_at', 'desc')->limit(10)->get();
-    //         echo "data: " . json_encode($data) . "\n\n";
-    //         ob_flush();
-    //         flush();
-    //         sleep(5); // Kirim data setiap 5 detik
-    //     }
-    // }
+        return $config['categories'] ?? [];
+    }
 
 
     public function showData()
     {
+        // Ambil kategori berat dari konfigurasi
+        $categories = $this->getWeightCategories(); 
         $dataMencit = DetailMencit::all();
 
-        // Hitung jumlah mencit yang 'Sick'
         $miceSickCount = DetailMencit::where('health_status', 'Sick')->count();
+        $maleHealthyCounts = [];
+        $femaleHealthyCounts = [];
 
-        // Male Healthy with weight conditions
-        $maleHealthyCounts = [
-            'category1' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->where('berat', '<', 10)->count(),//3-10,12-20,20-40
-            'category2' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->whereBetween('berat', [10, 22])->count(),
-            'category3' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->where('berat', '>', 22)->count(),
-            // 'category4' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->where('berat', '>', 18)->count(),
-        ];
+        // Loop berdasarkan kategori berat dari konfigurasi
+        foreach ($categories as $key => $description) {
+            $maleHealthyCounts[$key] = DetailMencit::where('gender', 'Male')
+                ->where('health_status', 'Healthy')
+                ->when(
+                    str_starts_with($key, '<'),
+                    fn($query) => $query->where('berat', '<', intval(substr($key, 1)))
+                )
+                ->when(
+                    str_starts_with($key, '>'),
+                    fn($query) => $query->where('berat', '>', intval(substr($key, 1)))
+                )
+                ->when(
+                    strpos($key, '-') !== false,
+                    fn($query) => $query->whereBetween(
+                        'berat',
+                        array_map('intval', explode('-', $key))
+                    )
+                )
+                ->count();
 
-        // Female Healthy with weight conditions
-        $femaleHealthyCounts = [
-            'category1' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->where('berat', '<', 10)->count(),
-            'category2' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->whereBetween('berat', [10, 22])->count(),
-            'category3' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->where('berat','>', 22)->count(),
-            // 'category4' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->where('berat', '>', 18)->count(),
-        ];
+            $femaleHealthyCounts[$key] = DetailMencit::where('gender', 'Female')
+                ->where('health_status', 'Healthy')
+                ->when(
+                    str_starts_with($key, '<'),
+                    fn($query) => $query->where('berat', '<', intval(substr($key, 1)))
+                )
+                ->when(
+                    str_starts_with($key, '>'),
+                    fn($query) => $query->where('berat', '>', intval(substr($key, 1)))
+                )
+                ->when(
+                    strpos($key, '-') !== false,
+                    fn($query) => $query->whereBetween(
+                        'berat',
+                        array_map('intval', explode('-', $key))
+                    )
+                )
+                ->count();
+        }
 
+        // Return data ke view
         return view('tables.data-table', compact(
             'miceSickCount',
             'maleHealthyCounts',
             'femaleHealthyCounts',
+            'categories',
             'dataMencit'
         ));
+    }
+
+    
+    private function parseRange(string $key): array
+    {
+        if (str_starts_with($key, '<')) {
+            return [null, (int)substr($key, 1)];
+        } elseif (str_starts_with($key, '>')) {
+            return [(int)substr($key, 1), null];
+        } elseif (strpos($key, '-') !== false) {
+            [$start, $end] = explode('-', $key);
+            return [(int)$start, (int)$end];
+        }
+    
+        return [null, null];
     }
 
     public function getData(Request $request)
@@ -139,9 +199,10 @@ class DetailMencitController extends Controller
     public function deleteAll()
     {
         try {
-            DetailMencit::truncate(); // Menghapus semua data
+            DetailMencit::query()->delete(); // Hapus semua data secara aman
             return response()->json(['success' => true, 'message' => 'All records deleted successfully.']);
         } catch (\Exception $e) {
+            \Log::error('Failed to delete all records: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Failed to delete all records.']);
         }
     }
@@ -158,21 +219,57 @@ class DetailMencitController extends Controller
 
     public function updateStockCounts()
     {
+        $categories = $this->getWeightCategories();
+
         $miceSickCount = DetailMencit::where('health_status', 'Sick')->count();
 
-        $maleHealthyCounts = [
-            'category1' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->where('berat', '<', 10)->count(),
-            'category2' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->whereBetween('berat', [10, 22])->count(),
-            // 'category3' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->whereBetween('berat', [14.01, 18])->count(),
-            'category3' => DetailMencit::where('gender', 'Male')->where('health_status', 'Healthy')->where('berat', '>', 22)->count(),
-        ];
+        $maleHealthyCounts = [];
+        $femaleHealthyCounts = [];
 
-        $femaleHealthyCounts = [
-            'category1' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->where('berat', '<', 10)->count(),
-            'category2' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->whereBetween('berat', [10, 22])->count(),
-            // 'category3' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->whereBetween('berat', [14.01, 18])->count(),
-            'category3' => DetailMencit::where('gender', 'Female')->where('health_status', 'Healthy')->where('berat', '>', 22)->count(),
-        ];
+        foreach ($categories as $key => $description) {
+            [$start, $end] = $this->parseRange($key);
+
+            $maleHealthyCounts[$key] = DetailMencit::where('gender', 'Male')
+            ->where('health_status', 'Healthy')
+            ->when(
+                str_starts_with($key, '<'),
+                fn($query) => $query->where('berat', '<', intval(substr($key, 1))) // <10 (strictly less)
+            )
+            ->when(
+                str_starts_with($key, '>'),
+                fn($query) => $query->where('berat', '>', intval(substr($key, 1))) // >22 (strictly greater)
+            )
+            ->when(
+                strpos($key, '-') !== false,
+                function ($query) use ($key) {
+                    [$start, $end] = array_map('intval', explode('-', $key));
+                    return $query->where('berat', '>', $start) // Start eksklusif (strictly greater)
+                                 ->where('berat', '<=', $end); // End inklusif (less or equal)
+                }
+            )
+            ->count();
+        
+        $femaleHealthyCounts[$key] = DetailMencit::where('gender', 'Female')
+            ->where('health_status', 'Healthy')
+            ->when(
+                str_starts_with($key, '<'),
+                fn($query) => $query->where('berat', '<', intval(substr($key, 1))) // <10 (strictly less)
+            )
+            ->when(
+                str_starts_with($key, '>'),
+                fn($query) => $query->where('berat', '>', intval(substr($key, 1))) // >22 (strictly greater)
+            )
+            ->when(
+                strpos($key, '-') !== false,
+                function ($query) use ($key) {
+                    [$start, $end] = array_map('intval', explode('-', $key));
+                    return $query->where('berat', '>', $start) // Start eksklusif (strictly greater)
+                                 ->where('berat', '<=', $end); // End inklusif (less or equal)
+                }
+            )
+            ->count();
+        
+        }
 
         return response()->json([
             'miceSickCount' => $miceSickCount,
